@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-// #include "renderer.h"
+#include "renderers/root_renderer.h"
 #include "window.h"
 
 int Window::show() {
@@ -60,8 +60,8 @@ int Window::show() {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
   }
 
-  // Renderer renderer;
-  // glfwSetWindowUserPointer(window, &renderer);
+  RootRenderer rootRenderer;
+  glfwSetWindowUserPointer(window, &rootRenderer);
 
   focusInGame(window);
 
@@ -80,12 +80,12 @@ int Window::show() {
     ImGui::NewFrame();
 
     if (isFocusedInGame(window)) {
-      // renderer.processInput(window, dt);
-    } else {
-      ImGui::ShowDemoWindow();
+      rootRenderer.processInput(window, dt);
     }
-    // renderer.update(dt);
-    // renderer.render(dt);
+    rootRenderer.update(dt);
+    rootRenderer.render(dt);
+
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -159,8 +159,8 @@ void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height) 
 }
 
 void Window::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  // Renderer* rendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-  // rendererPtr->windowSizeCallback(window, width, height);
+  Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+  rootRendererPtr->windowSizeCallback(window, width, height);
 }
 
 
@@ -186,8 +186,8 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
     }
   }
   if (isFocusedInGame(window)) {
-    // Renderer* rendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    // rendererPtr->keyCallback(window, key, scancode, action, mods);
+    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    rootRendererPtr->keyCallback(window, key, scancode, action, mods);
   }
 }
 
@@ -197,8 +197,8 @@ void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
 
 void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
   if (isFocusedInGame(window)) {
-    // Renderer* rendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    // rendererPtr->cursorPosCallback(window, xpos, ypos);
+    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    rootRendererPtr->cursorPosCallback(window, xpos, ypos);
   }
   // std::cout << "xpos: " << xpos << " ypos: " << ypos << std::endl;
 }
@@ -222,12 +222,12 @@ void Window::focusInGame(GLFWwindow* window) {
   if (!isFocusedInGame(window)) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Hide cursor
 
-    // ImGuiIO& io = ImGui::GetIO();
-    // io.ConfigFlags |= ImGuiConfigFlags_NoMouse;            // Disable Mouse
-    // io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Disable Keyboard
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouse;            // Disable Mouse
+    io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Disable Keyboard
 
-    // Renderer* rendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    // rendererPtr->focusCallback(true); // focus == true -> focused in game
+    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    rootRendererPtr->focusCallback(true); // focus == true -> focused in game
   }
 }
 
@@ -235,11 +235,11 @@ void Window::focusInGUI(GLFWwindow* window) {
   if (!isFocusedInGUI(window)) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Show cursor
 
-    // ImGuiIO& io = ImGui::GetIO();
-    // io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;          // Enable Mouse
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;          // Enable Mouse
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard
 
-    // Renderer* rendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    // rendererPtr->focusCallback(false); // focus == false -> focused in GUI
+    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    rootRendererPtr->focusCallback(false); // focus == false -> focused in GUI
   }
 }

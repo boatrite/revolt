@@ -15,5 +15,7 @@ add_executable( ve2
                 src/bindings/imgui_impl_opengl3.h
                 src/main.cpp
                 src/window.cpp
+                src/renderers/renderer.h
+                src/renderers/root_renderer.cpp
 )
 target_link_libraries(ve2 ${CONAN_LIBS})

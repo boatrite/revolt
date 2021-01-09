@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "imgui.h"
+#include <imgui.h>
 #include "bindings/imgui_impl_glfw.h"
 #include "bindings/imgui_impl_opengl3.h"
 
@@ -85,7 +85,7 @@ int Window::show() {
     rootRenderer.update(dt);
     rootRenderer.render(dt);
 
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow(); // For testing
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

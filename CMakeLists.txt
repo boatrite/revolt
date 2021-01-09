@@ -17,5 +17,16 @@ add_executable( ve2
                 src/window.cpp
                 src/renderers/renderer.h
                 src/renderers/root_renderer.cpp
+                src/util/file.h
+                src/util/file.cpp
+                src/util/shader.h
+                src/util/shader.cpp
 )
+
+add_custom_command(TARGET ve2
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/root_renderer/shader.vert ${PROJECT_BINARY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/root_renderer/shader.frag ${PROJECT_BINARY_DIR}
+)
+
 target_link_libraries(ve2 ${CONAN_LIBS})

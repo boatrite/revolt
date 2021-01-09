@@ -26,6 +26,8 @@ add_executable( ve2
                 src/util/shader.cpp
 )
 
+add_compile_options("-pedantic-errors -Wall -Weffc++ -Wextra -Wsign-conversion")
+
 add_custom_command(TARGET ve2
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/demo_renderer/demo.vert ${PROJECT_BINARY_DIR}

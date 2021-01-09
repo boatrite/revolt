@@ -1,9 +1,12 @@
 # pragma once
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 class Renderer {
   public:
+    Renderer() {}
+    virtual ~Renderer() {}
     virtual void processInput(GLFWwindow* window, float dt) {};
     virtual void update(double dt) {};
     virtual void render(double dt) {};

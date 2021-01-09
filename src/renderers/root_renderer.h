@@ -1,5 +1,8 @@
+#include <memory>
+#include <vector>
+
 #include "renderer.h"
-#include "../util/shader.h"
+#include "demo_renderer.h"
 
 class RootRenderer : public Renderer {
   public:
@@ -7,8 +10,6 @@ class RootRenderer : public Renderer {
     void render(double dt) override;
 
   private:
-    unsigned int m_vao {};
-    unsigned int m_vbo {};
-    bool m_dirty { true };
-    Shader m_shader { Shader("shader.vert", "shader.frag") };
+    std::vector<std::shared_ptr<Renderer>> m_renderers {};
+    bool m_wireframe { false };
 };

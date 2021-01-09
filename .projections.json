@@ -1,0 +1,10 @@
+{
+  "src/*.cpp": {
+    "type": "src",
+    "related": ["src/{}.h"]
+  },
+  "src/*.h": {
+    "type": "header",
+    "alternate": "src/{}.cpp"
+  }
+}

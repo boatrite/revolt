@@ -22,6 +22,8 @@ add_executable( ve2
                 src/renderers/root_renderer.cpp
                 src/renderers/demo_renderer.h
                 src/renderers/demo_renderer.cpp
+                src/renderers/overlay_renderer.h
+                src/renderers/overlay_renderer.cpp
                 src/util/file.h
                 src/util/file.cpp
                 src/util/shader.h

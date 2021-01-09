@@ -1,7 +1,10 @@
 #include "root_renderer.h"
+#include "demo_renderer.h"
+#include "overlay_renderer.h"
 
 RootRenderer::RootRenderer() {
   m_rendererPtrs.push_back(std::make_shared<DemoRenderer>(m_cameraPtr));
+  m_rendererPtrs.push_back(std::make_shared<OverlayRenderer>(m_cameraPtr));
 }
 
 void RootRenderer::update(double dt) {

@@ -3,7 +3,6 @@
 
 #include "../camera.h"
 #include "renderer.h"
-#include "demo_renderer.h"
 
 class RootRenderer : public Renderer {
   public:

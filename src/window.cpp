@@ -61,8 +61,8 @@ int Window::show() {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
   }
 
-  std::shared_ptr<RootRenderer> pRootRenderer = std::make_shared<RootRenderer>();
-  glfwSetWindowUserPointer(window, pRootRenderer.get());
+  std::shared_ptr<RootRenderer> rootRendererPtr = std::make_shared<RootRenderer>();
+  glfwSetWindowUserPointer(window, rootRendererPtr.get());
 
   focusInGame(window);
 
@@ -81,10 +81,10 @@ int Window::show() {
     ImGui::NewFrame();
 
     if (isFocusedInGame(window)) {
-      pRootRenderer->processInput(window, dt);
+      rootRendererPtr->processInput(window, dt);
     }
-    pRootRenderer->update(dt);
-    pRootRenderer->render(dt);
+    rootRendererPtr->update(dt);
+    rootRendererPtr->render(dt);
 
     // ImGui::ShowDemoWindow(); // For testing
 
@@ -94,7 +94,7 @@ int Window::show() {
     glfwSwapBuffers(window);
   }
 
-  pRootRenderer.reset();
+  rootRendererPtr.reset();
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();

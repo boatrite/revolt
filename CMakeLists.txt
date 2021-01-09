@@ -13,6 +13,8 @@ add_executable( ve2
                 src/bindings/imgui_impl_opengl3.cpp
                 src/bindings/imgui_impl_glfw.h
                 src/bindings/imgui_impl_opengl3.h
+                src/camera.cpp
+                src/camera.h
                 src/main.cpp
                 src/window.cpp
                 src/renderers/renderer.h

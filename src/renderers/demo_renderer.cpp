@@ -14,12 +14,6 @@ DemoRenderer::DemoRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { ca
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
   auto grass_cube = color_cube(Color::grass);
-  // std::array<float, 8*8*36*6> mesh {};
-  // for (auto i = 0; i <= 8; ++i) {
-    // for (auto ii = 0; ii <= 8; ++ii) {
-      // std::copy(std::begin(grass_cube), std::end(grass_cube), std::begin(mesh));
-    // }
-  // }
   auto mesh = grass_cube;
   glBufferData(GL_ARRAY_BUFFER, static_cast<float>(mesh.size()) * sizeof(float), mesh.data(), GL_STATIC_DRAW);
 
@@ -47,8 +41,8 @@ void DemoRenderer::render(double dt) {
 
   glBindVertexArray(m_vao);
 
-  for (auto i = 0; i <= 8; ++i) {
-    for (auto ii = 0; ii <= 8; ++ii) {
+  for (auto i = 0; i <= 8 * (1.0 / m_scale); ++i) {
+    for (auto ii = 0; ii <= 8 * (1.0 / m_scale); ++ii) {
       m_shader.setMat4("model", glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(m_scale)), glm::vec3(i, 0, ii)));
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }

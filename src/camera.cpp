@@ -1,7 +1,9 @@
-#include "camera.h"
+#include <imgui.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "camera.h"
 
 glm::vec3 Camera::computeCameraFront() {
   glm::vec3 direction {};
@@ -87,3 +89,13 @@ void Camera::focusCallback(bool focusedInGame) {
   }
 }
 #pragma GCC diagnostic pop
+
+void Camera::imguiDebugControlPanel() {
+  ImGui::Text("Camera:");
+  ImGui::Text("Position: (%.0f,%.0f, %.0f)", position.x, position.y, position.z);
+  ImGui::SliderFloat("FOV", &fov, Camera::MIN_FOV, Camera::MAX_FOV);
+  ImGui::SliderFloat("Near Plane", &nearPlane, Camera::MIN_NEAR_PLANE, Camera::MAX_NEAR_PLANE);
+  ImGui::SliderFloat("Far Plane", &farPlane, Camera::MIN_FAR_PLANE, Camera::MAX_FAR_PLANE);
+  ImGui::SliderFloat("Camera Speed", &speed, Camera::MIN_SPEED, Camera::MAX_SPEED);
+  ImGui::SliderFloat("Mouse Sensitivity", &sensitivity, Camera::MIN_SENSITIVITY, Camera::MAX_SENSITIVITY);
+}

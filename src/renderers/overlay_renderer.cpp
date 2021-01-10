@@ -32,5 +32,9 @@ void OverlayRenderer::render(double dt) {
     } else {
       ImGui::Text("<invalid>");
     }
+
+    ImGui::Separator();
+
+    m_cameraPtr->imguiDebugControlPanel();
   }
 }

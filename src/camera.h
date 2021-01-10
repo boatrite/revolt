@@ -47,6 +47,7 @@ class Camera {
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
 
+    void imguiDebugControlPanel();
     void processInput(GLFWwindow* window, float dt);
     void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
     void windowSizeCallback(GLFWwindow* window, int width, int height);

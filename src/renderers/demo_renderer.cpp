@@ -5,22 +5,15 @@ DemoRenderer::DemoRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { ca
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);
 
-  int floats_per_vertex = 6;
-  float vertices[] = {
-    // x, y, z, r, g, b
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-     0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-  };
-
   glBindVertexArray(m_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  auto vertices = color_cube(Color::grass);
+  glBufferData(GL_ARRAY_BUFFER, static_cast<float>(vertices.size()) * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, floats_per_vertex * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, m_floats_per_vertex * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, floats_per_vertex * sizeof(float), (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, m_floats_per_vertex * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 }
 
@@ -30,16 +23,56 @@ DemoRenderer::~DemoRenderer() {
 }
 
 void DemoRenderer::render(double dt) {
+  glEnable(GL_DEPTH_TEST);
+
   glClearColor(0.132f, 0.132f, 0.132f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   m_shader.use();
 
-  m_shader.setMat4("model", glm::mat4(1.0f));
+  m_shader.setMat4("model", glm::mat4(1.0f) * m_scale);
   m_shader.setMat4("view", m_cameraPtr->getViewMatrix());
   m_shader.setMat4("projection", m_cameraPtr->getProjectionMatrix());
 
   glBindVertexArray(m_vao);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
   glBindVertexArray(0);
+}
+
+std::array<float, 36 * 6> DemoRenderer::color_cube(Color color_code) {
+  static glm::vec3 grass = glm::vec3(34.0 / 255.0, 70.0 / 255.0, 29.0 / 255.0);
+  static glm::vec3 water = glm::vec3(2.0 / 255.0, 43.0 / 255.0, 61.0 / 255.0);
+  static glm::vec3 dirt = glm::vec3(38.0 / 255.0, 28.0 / 255.0, 20.0 / 255.0);
+  static glm::vec3 sand = glm::vec3(198.0 / 255.0, 176.0 / 255.0, 128.0 / 255.0);
+
+  glm::vec3 color;
+  switch (color_code) {
+    case Color::grass:
+      color = grass;
+      break;
+    case Color::dirt:
+      color = dirt;
+      break;
+    case Color::sand:
+      color = sand;
+      break;
+    case Color::water:
+      color = water;
+      break;
+  }
+
+  std::array<float, 36 * 6> vertices {};
+
+  for (auto i = 0; i < m_cube_vertices.size(); i += 3) {
+    auto ii = i*2;
+    vertices[ii] = m_cube_vertices[i];
+    vertices[ii+1] = m_cube_vertices[i+1];
+    vertices[ii+2] = m_cube_vertices[i+2];
+
+    vertices[ii+3] = color.x;
+    vertices[ii+4] = color.y;
+    vertices[ii+5] = color.z;
+  }
+
+  return vertices;
 }

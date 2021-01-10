@@ -17,7 +17,7 @@ class RootRenderer : public Renderer {
     void focusCallback(bool focusedInGame) override;
 
   private:
-    std::shared_ptr<Camera> m_cameraPtr { std::make_shared<Camera>() };
+    std::shared_ptr<Camera> m_camera_ptr { std::make_shared<Camera>() };
     std::vector<std::shared_ptr<Renderer>> m_rendererPtrs {};
-    bool m_wireframe { false };
+    bool m_wireframe { true };
 };

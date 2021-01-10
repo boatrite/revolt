@@ -18,7 +18,7 @@ class DemoRenderer : public Renderer {
     void render(double dt) override;
 
   private:
-    float m_scale { 0.125 };
+    float m_scale { 1.0f/16.0f };
     std::shared_ptr<Camera> m_cameraPtr;
     unsigned int m_vao {};
     unsigned int m_vbo {};

@@ -17,13 +17,14 @@ add_executable( ve2
                 src/camera.h
                 src/main.cpp
                 src/window.cpp
-                src/renderers/renderer.h
-                src/renderers/root_renderer.h
-                src/renderers/root_renderer.cpp
-                src/renderers/demo_renderer.h
+                src/renderers/coordinate_lines_renderer.h
                 src/renderers/demo_renderer.cpp
-                src/renderers/overlay_renderer.h
+                src/renderers/demo_renderer.h
                 src/renderers/overlay_renderer.cpp
+                src/renderers/overlay_renderer.h
+                src/renderers/renderer.h
+                src/renderers/root_renderer.cpp
+                src/renderers/root_renderer.h
                 src/util/file.h
                 src/util/file.cpp
                 src/util/shader.h
@@ -36,6 +37,8 @@ add_custom_command(TARGET ve2
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/demo_renderer/demo.vert ${PROJECT_BINARY_DIR}
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/demo_renderer/demo.frag ${PROJECT_BINARY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/coordinate_lines_renderer/coordinate_lines.vert ${PROJECT_BINARY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/coordinate_lines_renderer/coordinate_lines.frag ${PROJECT_BINARY_DIR}
 )
 
 target_link_libraries(ve2 ${CONAN_LIBS})

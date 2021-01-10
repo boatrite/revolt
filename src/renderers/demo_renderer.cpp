@@ -1,5 +1,10 @@
 #include <iostream>
+#include <vector>
 #include "demo_renderer.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 DemoRenderer::DemoRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { cameraPtr } {
   glGenVertexArrays(1, &m_vao);
@@ -7,8 +12,16 @@ DemoRenderer::DemoRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { ca
 
   glBindVertexArray(m_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-  auto vertices = color_cube(Color::grass);
-  glBufferData(GL_ARRAY_BUFFER, static_cast<float>(vertices.size()) * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+  auto grass_cube = color_cube(Color::grass);
+  // std::array<float, 8*8*36*6> mesh {};
+  // for (auto i = 0; i <= 8; ++i) {
+    // for (auto ii = 0; ii <= 8; ++ii) {
+      // std::copy(std::begin(grass_cube), std::end(grass_cube), std::begin(mesh));
+    // }
+  // }
+  auto mesh = grass_cube;
+  glBufferData(GL_ARRAY_BUFFER, static_cast<float>(mesh.size()) * sizeof(float), mesh.data(), GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, m_floats_per_vertex * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
@@ -29,13 +42,18 @@ void DemoRenderer::render(double dt) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   m_shader.use();
-
-  m_shader.setMat4("model", glm::mat4(1.0f) * m_scale);
   m_shader.setMat4("view", m_cameraPtr->getViewMatrix());
   m_shader.setMat4("projection", m_cameraPtr->getProjectionMatrix());
 
   glBindVertexArray(m_vao);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
+
+  for (auto i = 0; i <= 8; ++i) {
+    for (auto ii = 0; ii <= 8; ++ii) {
+      m_shader.setMat4("model", glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(m_scale)), glm::vec3(i, 0, ii)));
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+  }
+
   glBindVertexArray(0);
 }
 

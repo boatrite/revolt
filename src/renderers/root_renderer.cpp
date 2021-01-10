@@ -1,10 +1,12 @@
 #include "root_renderer.h"
 #include "demo_renderer.h"
 #include "overlay_renderer.h"
+#include "coordinate_lines_renderer.h"
 
 RootRenderer::RootRenderer() {
-  m_rendererPtrs.push_back(std::make_shared<DemoRenderer>(m_cameraPtr));
-  m_rendererPtrs.push_back(std::make_shared<OverlayRenderer>(m_cameraPtr));
+  m_rendererPtrs.push_back(std::make_shared<DemoRenderer>(m_camera_ptr));
+  m_rendererPtrs.push_back(std::make_shared<OverlayRenderer>(m_camera_ptr));
+  m_rendererPtrs.push_back(std::make_shared<CoordinateLinesRenderer>(m_camera_ptr));
 }
 
 void RootRenderer::update(double dt) {
@@ -26,7 +28,7 @@ void RootRenderer::render(double dt) {
 }
 
 void RootRenderer::processInput(GLFWwindow* window, float dt) {
-  m_cameraPtr->processInput(window, dt);
+  m_camera_ptr->processInput(window, dt);
 
   for(auto rendererPtr : m_rendererPtrs) {
     rendererPtr->processInput(window, dt);
@@ -34,7 +36,7 @@ void RootRenderer::processInput(GLFWwindow* window, float dt) {
 }
 
 void RootRenderer::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-  m_cameraPtr->cursorPosCallback(window, xpos, ypos);
+  m_camera_ptr->cursorPosCallback(window, xpos, ypos);
 
   for(auto rendererPtr : m_rendererPtrs) {
     rendererPtr->cursorPosCallback(window, xpos, ypos);
@@ -48,7 +50,7 @@ void RootRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int ac
 }
 
 void RootRenderer::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  m_cameraPtr->windowSizeCallback(window, width, height);
+  m_camera_ptr->windowSizeCallback(window, width, height);
 
   for(auto rendererPtr : m_rendererPtrs) {
     rendererPtr->windowSizeCallback(window, width, height);
@@ -56,7 +58,7 @@ void RootRenderer::windowSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 void RootRenderer::focusCallback(bool focusedInGame) {
-  m_cameraPtr->focusCallback(focusedInGame);
+  m_camera_ptr->focusCallback(focusedInGame);
 
   for(auto rendererPtr : m_rendererPtrs) {
     rendererPtr->focusCallback(focusedInGame);

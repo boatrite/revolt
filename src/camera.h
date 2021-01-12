@@ -13,8 +13,8 @@ class Camera {
     float pitch { -30.0f };
     glm::vec3 cameraFront { computeCameraFront() };
     glm::vec3 cameraUp { glm::vec3(0.0f, 1.0f,  0.0f) };
-    int width { Window::WIDTH };
-    int height { Window::HEIGHT };
+    int width;
+    int height;
     double lastX {};
     double lastY {};
 

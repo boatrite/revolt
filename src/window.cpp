@@ -11,19 +11,28 @@
 #include "renderers/root_renderer.h"
 #include "window.h"
 
-int Window::show() {
-  glfwSetErrorCallback(errorCallback);
+Window::Window(std::string title, int width, int height) : m_title{title}, m_width{width}, m_height{height} {}
 
+int Window::show() {
+  // Print any glfw errors by setting error callback before doing anything else.
+  glfwSetErrorCallback([](int error, const char* description){
+    std::cerr << "Error: " << error << ", Description: " << description << std::endl;
+  });
+
+  // Initialize glfw and set basic options.
   glfwInit();
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  // Get better debuggging.
   if (true) { // Eventually put behind some sort of debug flag
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
   }
 
-  GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Voxel Engine Mk 2", NULL, NULL);
+  // Create window, get handle, set as current.
+  GLFWwindow* window = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
   if (window == NULL) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -31,15 +40,13 @@ int Window::show() {
   }
   glfwMakeContextCurrent(window);
 
-  glfwSetCursorPosCallback(window, cursorPosCallback);
-  glfwSetKeyCallback(window, keyCallback);
-  glfwSetScrollCallback(window, scrollCallback);
-
+  // Initialize opengl.
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cerr << "Failed to initialize GLAD" << std::endl;
     return -1;
   }
 
+  // Initialize Dear Imgui.
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGui::StyleColorsDark();
@@ -49,10 +56,19 @@ int Window::show() {
   ImGuiIO& io = ImGui::GetIO();
   io.IniFilename = NULL;
 
-  glViewport(0, 0, WIDTH, HEIGHT);
-  glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-  glfwSetWindowSizeCallback(window, windowSizeCallback);
+  // Configure viewport size and update it when the framebuffer size changes.
+  //
+  // The FramebufferSizeCallback and WindowSizeCallback differ in that the
+  // FB size callback receives the width and height in pixels, to be used
+  // for pixel-based calls like glViewport. The window size callback receives
+  // the new size in screen coordinates.
+  // https://stackoverflow.com/a/52730404
+  glViewport(0, 0, m_width, m_height);
+  glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+  });
 
+  // Output any errors from OpenGL.
   GLint flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
   if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
     glEnable(GL_DEBUG_OUTPUT);
@@ -61,11 +77,23 @@ int Window::show() {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
   }
 
+  // Setup RootRenderer instance. Events get forwarded to it to act on and to
+  // pass them on.
   std::shared_ptr<RootRenderer> rootRendererPtr = std::make_shared<RootRenderer>();
   glfwSetWindowUserPointer(window, rootRendererPtr.get());
 
+  // Setup event handlers
+  glfwSetCursorPosCallback(window, cursorPosCallback);
+  glfwSetKeyCallback(window, keyCallback);
+  glfwSetScrollCallback(window, scrollCallback);
+  glfwSetWindowSizeCallback(window, windowSizeCallback);
+
+  // Starting off in the game is useful when wanting to test in the game.
+  // I need to figure out how to do GUIs and imgui and setting that up in a sane
+  // way.
   focusInGame(window);
 
+  // Main loop
   glfwSetTime(0.0);
   double lastTime = 0.0;
   while(!glfwWindowShouldClose(window)) {
@@ -94,6 +122,9 @@ int Window::show() {
     glfwSwapBuffers(window);
   }
 
+  //
+  // Clean up
+  //
   rootRendererPtr.reset();
 
   ImGui_ImplOpenGL3_Shutdown();
@@ -102,10 +133,6 @@ int Window::show() {
 
   glfwTerminate();
   return 0;
-}
-
-void Window::errorCallback(int error, const char* description) {
-  std::cerr << "Error: " << error << ", Description: " << description << std::endl;
 }
 
 #pragma GCC diagnostic push
@@ -155,10 +182,6 @@ void GLAPIENTRY Window::glDebugOutput(GLenum source,
         case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
     } std::cout << std::endl;
     std::cout << std::endl;
-}
-
-void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-  glViewport(0, 0, width, height);
 }
 
 void Window::windowSizeCallback(GLFWwindow* window, int width, int height) {

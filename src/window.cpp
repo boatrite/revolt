@@ -8,8 +8,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "renderers/root_renderer.h"
 #include "window.h"
+
+#include "app.h"
 
 Window::Window(std::string title, int width, int height) : m_title{title}, m_width{width}, m_height{height} {}
 
@@ -77,10 +78,10 @@ int Window::show() {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
   }
 
-  // Setup RootRenderer instance. Events get forwarded to it to act on and to
+  // Setup App instance. Events get forwarded to it to act on and to
   // pass them on.
-  std::shared_ptr<RootRenderer> rootRendererPtr = std::make_shared<RootRenderer>();
-  glfwSetWindowUserPointer(m_window, rootRendererPtr.get());
+  std::shared_ptr<App> app_ptr = std::make_shared<App>();
+  glfwSetWindowUserPointer(m_window, app_ptr.get());
 
   // Setup event handlers
   glfwSetCursorPosCallback(m_window, cursorPosCallback);
@@ -109,10 +110,10 @@ int Window::show() {
     ImGui::NewFrame();
 
     if (isFocusedInGame(m_window)) {
-      rootRendererPtr->processInput(m_window, dt);
+      app_ptr->processInput(m_window, dt);
     }
-    rootRendererPtr->update(dt);
-    rootRendererPtr->render(dt);
+    app_ptr->update(dt);
+    app_ptr->render(dt);
 
     // ImGui::ShowDemoWindow(); // For testing
 
@@ -125,7 +126,7 @@ int Window::show() {
   //
   // Clean up
   //
-  rootRendererPtr.reset();
+  app_ptr.reset();
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
@@ -185,8 +186,8 @@ void GLAPIENTRY Window::glDebugOutput(GLenum source,
 }
 
 void Window::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-  rootRendererPtr->windowSizeCallback(window, width, height);
+  App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
+  app_ptr->windowSizeCallback(window, width, height);
 }
 
 
@@ -212,8 +213,8 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
     }
   }
   if (isFocusedInGame(window)) {
-    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    rootRendererPtr->keyCallback(window, key, scancode, action, mods);
+    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
+    app_ptr->keyCallback(window, key, scancode, action, mods);
   }
 }
 
@@ -223,8 +224,8 @@ void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
 
 void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
   if (isFocusedInGame(window)) {
-    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    rootRendererPtr->cursorPosCallback(window, xpos, ypos);
+    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
+    app_ptr->cursorPosCallback(window, xpos, ypos);
   }
   // std::cout << "xpos: " << xpos << " ypos: " << ypos << std::endl;
 }
@@ -252,8 +253,8 @@ void Window::focusInGame(GLFWwindow* window) {
     io.ConfigFlags |= ImGuiConfigFlags_NoMouse;            // Disable Mouse
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Disable Keyboard
 
-    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    rootRendererPtr->focusCallback(true); // focus == true -> focused in game
+    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
+    app_ptr->focusCallback(true); // focus == true -> focused in game
   }
 }
 
@@ -265,7 +266,7 @@ void Window::focusInGUI(GLFWwindow* window) {
     io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;          // Enable Mouse
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard
 
-    Renderer* rootRendererPtr = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    rootRendererPtr->focusCallback(false); // focus == false -> focused in GUI
+    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
+    app_ptr->focusCallback(false); // focus == false -> focused in GUI
   }
 }

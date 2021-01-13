@@ -9,14 +9,15 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 add_executable( ve2
+                src/app.cpp
+                src/app.h
                 src/bindings/imgui_impl_glfw.cpp
-                src/bindings/imgui_impl_opengl3.cpp
                 src/bindings/imgui_impl_glfw.h
+                src/bindings/imgui_impl_opengl3.cpp
                 src/bindings/imgui_impl_opengl3.h
                 src/camera.cpp
                 src/camera.h
                 src/main.cpp
-                src/window.cpp
                 src/renderers/coordinate_lines_renderer.h
                 src/renderers/demo_renderer.cpp
                 src/renderers/demo_renderer.h
@@ -25,10 +26,12 @@ add_executable( ve2
                 src/renderers/renderer.h
                 src/renderers/root_renderer.cpp
                 src/renderers/root_renderer.h
-                src/util/file.h
                 src/util/file.cpp
-                src/util/shader.h
+                src/util/file.h
                 src/util/shader.cpp
+                src/util/shader.h
+                src/window.cpp
+                src/window.h
 )
 
 add_compile_options("-pedantic-errors -Wall -Weffc++ -Wextra -Wsign-conversion")

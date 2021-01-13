@@ -32,13 +32,13 @@ int Window::show() {
   }
 
   // Create window, get handle, set as current.
-  GLFWwindow* window = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
-  if (window == NULL) {
+  m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
+  if (m_window == NULL) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
     return -1;
   }
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent(m_window);
 
   // Initialize opengl.
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -50,7 +50,7 @@ int Window::show() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGui::StyleColorsDark();
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
   const char* glslVersion = "#version 130";
   ImGui_ImplOpenGL3_Init(glslVersion);
   ImGuiIO& io = ImGui::GetIO();
@@ -64,7 +64,7 @@ int Window::show() {
   // the new size in screen coordinates.
   // https://stackoverflow.com/a/52730404
   glViewport(0, 0, m_width, m_height);
-  glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
   });
 
@@ -80,23 +80,23 @@ int Window::show() {
   // Setup RootRenderer instance. Events get forwarded to it to act on and to
   // pass them on.
   std::shared_ptr<RootRenderer> rootRendererPtr = std::make_shared<RootRenderer>();
-  glfwSetWindowUserPointer(window, rootRendererPtr.get());
+  glfwSetWindowUserPointer(m_window, rootRendererPtr.get());
 
   // Setup event handlers
-  glfwSetCursorPosCallback(window, cursorPosCallback);
-  glfwSetKeyCallback(window, keyCallback);
-  glfwSetScrollCallback(window, scrollCallback);
-  glfwSetWindowSizeCallback(window, windowSizeCallback);
+  glfwSetCursorPosCallback(m_window, cursorPosCallback);
+  glfwSetKeyCallback(m_window, keyCallback);
+  glfwSetScrollCallback(m_window, scrollCallback);
+  glfwSetWindowSizeCallback(m_window, windowSizeCallback);
 
   // Starting off in the game is useful when wanting to test in the game.
   // I need to figure out how to do GUIs and imgui and setting that up in a sane
   // way.
-  focusInGame(window);
+  focusInGame(m_window);
 
   // Main loop
   glfwSetTime(0.0);
   double lastTime = 0.0;
-  while(!glfwWindowShouldClose(window)) {
+  while(!glfwWindowShouldClose(m_window)) {
     double time = glfwGetTime();
     double dt = time - lastTime;
     lastTime = time;
@@ -108,8 +108,8 @@ int Window::show() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    if (isFocusedInGame(window)) {
-      rootRendererPtr->processInput(window, dt);
+    if (isFocusedInGame(m_window)) {
+      rootRendererPtr->processInput(m_window, dt);
     }
     rootRendererPtr->update(dt);
     rootRendererPtr->render(dt);
@@ -119,7 +119,7 @@ int Window::show() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(m_window);
   }
 
   //

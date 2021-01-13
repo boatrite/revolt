@@ -1,10 +1,11 @@
 # pragma once
 
 #include "renderers/root_renderer.h"
+#include "renderers/main_menu_renderer.h"
 
 class App {
   private:
-    std::shared_ptr<RootRenderer> m_root_renderer_ptr { std::make_shared<RootRenderer>() };
+    std::shared_ptr<Renderer> m_root_renderer_ptr { std::make_shared<MainMenuRenderer>() };
 
   public:
     void update(double dt);

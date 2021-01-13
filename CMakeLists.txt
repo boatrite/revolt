@@ -21,6 +21,8 @@ add_executable( ve2
                 src/renderers/coordinate_lines_renderer.h
                 src/renderers/demo_renderer.cpp
                 src/renderers/demo_renderer.h
+                src/renderers/main_menu_renderer.cpp
+                src/renderers/main_menu_renderer.h
                 src/renderers/overlay_renderer.cpp
                 src/renderers/overlay_renderer.h
                 src/renderers/renderer.h

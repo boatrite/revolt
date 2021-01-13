@@ -92,7 +92,12 @@ int Window::show() {
   // Starting off in the game is useful when wanting to test in the game.
   // I need to figure out how to do GUIs and imgui and setting that up in a sane
   // way.
-  focusInGame(m_window);
+  // Starting off in gui is probably what a real program would do because it
+  // opens to the main menu, not directly to gameplay.
+  // TODO Eventually the Renderer itself should do this, because it's dumb for
+  // Window to care about what the first thing rendered is, the renderers should
+  // just take care of themselves.
+  focusInGUI(m_window);
 
   // Main loop
   glfwSetTime(0.0);
@@ -115,7 +120,7 @@ int Window::show() {
     app_ptr->update(dt);
     app_ptr->render(dt);
 
-    // ImGui::ShowDemoWindow(); // For testing
+    ImGui::ShowDemoWindow(); // For testing
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

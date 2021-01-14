@@ -1,24 +1,27 @@
 #include "app.h"
 
-void do_nothing() {
-}
-
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
-  // m_handler_ids.push(
-  // m_ui_context_ptr->pushKeyHandler(GLFW_KEY_F12, []() { m_show_demo_window = !m_show_demo_window; })
-  m_ui_context_ptr->pushKeyHandler(
+  int id = m_ui_context_ptr->addKeyPressedHandler(
     GLFW_KEY_F12,
     [=]() {
       m_show_demo_window = !m_show_demo_window;
     }
   );
-  // );
+  m_handler_ids.push_back(id);
+
+  id = m_ui_context_ptr->addKeyPressedHandler(
+    GLFW_KEY_F11,
+    []() {
+      std::cout << "hello from f11 key pressed callback" << std::endl;
+    }
+  );
+  m_handler_ids.push_back(id);
 }
 
 App::~App() {
-  // for (auto& h : m_handler_ids) {
-    // m_ui_context_ptr->popKeyHandler(h);
-  // }
+  for (auto& id : m_handler_ids) {
+    m_ui_context_ptr->removeKeyPressedHandler(id);
+  }
 }
 
 void App::update(double dt) {

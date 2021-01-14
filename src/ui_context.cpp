@@ -1,5 +1,7 @@
 #include <imgui.h>
 
+#include <algorithm>
+
 #include "ui_context.h"
 
 UIContext::UIContext(GLFWwindow* window) : m_window{window} {
@@ -22,29 +24,51 @@ int UIContext::getHeight() const {
 void UIContext::keyCallback(int key, int scancode, int action, int mods) {
   switch (action) {
     case GLFW_PRESS:
-      // Get all callbacks for a specific key.
-      // auto callbacks_for_key = m_map[key];
-      // The current methodology is that we only invoke the latest callback for a
-      // specific key.
-      // callbacks_for_key[callbacks_for_key.size()-1]();
-      m_callbacks[m_callbacks.size()-1]();
-      break;
+      {
+        // Get all callbacks for a specific key. The current methodology is that
+        // we only invoke the latest callback for a specific key.
+        auto it = m_handlers_by_key_map.find(key);
+        if (it != m_handlers_by_key_map.end()) { // If we have anything bound for this key
+          auto& handlers = it->second;
+          auto it2 = handlers.rbegin();
+          if (it2 != handlers.rend()) {
+            it2->second();
+          }
+        }
+        break;
+      }
     case GLFW_REPEAT:
-      break;
+      {
+        break;
+      }
     case GLFW_RELEASE:
-      break;
+      {
+        break;
+      }
   }
 }
 
-int UIContext::pushKeyHandler(int key, const std::function<void()> f) {
-  // auto callbacks_for_key = m_map[key];
-  // callbacks_for_key.push_back(f);
+int UIContext::addKeyPressedHandler(int key, std::function<void()> f) {
+  static int curr_id { 1 };
+  curr_id++;
 
-  m_callbacks.push_back(f);
-  return 1;
+  auto it = m_handlers_by_key_map.find(key);
+  if (it == m_handlers_by_key_map.end()) {
+    std::map<int, std::function<void()>> handlers {}; // Create new empty map
+    handlers.insert(std::make_pair(curr_id, f)); // Add our handler to it
+    m_handlers_by_key_map.insert(std::make_pair(key, handlers)); // Add our new handlers for the key
+  } else {
+    auto& handlers = it->second;
+    handlers.insert(std::make_pair(curr_id, f));
+  }
+
+  return curr_id;
 }
 
-void UIContext::popKeyHandler(int handler_id) {
+void UIContext::removeKeyPressedHandler(int handler_id) {
+  for (auto& [key, handlers] : m_handlers_by_key_map) {
+    handlers.erase(handler_id);
+  }
 }
 
 //

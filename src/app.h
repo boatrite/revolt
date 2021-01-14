@@ -6,6 +6,7 @@
 
 class App {
   private:
+    std::vector<int> m_handler_ids {};
     std::shared_ptr<UIContext> m_ui_context_ptr;
     std::shared_ptr<Renderer> m_root_renderer_ptr { std::make_shared<RootRenderer>() };
     bool m_show_demo_window { false };

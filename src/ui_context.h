@@ -3,7 +3,6 @@
 #include <functional>
 #include <iostream>
 #include <map>
-#include <vector>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -35,16 +34,13 @@ class UIContext {
     // Key Callback
     //
   private:
-    // std::map<int, std::vector<const std::function<void()>&>> m_map;
-    std::vector<std::function<void()>> m_callbacks {
-      []() { std::cout << "hello from f12 key pressed callback" << std::endl; }
-    };
+    std::map<int, std::map<int,std::function<void()>>> m_handlers_by_key_map;
 
   public:
     // Called by Window
     void keyCallback(int key, int scancode, int action, int mods);
 
     // Called by consumers of UIContext
-    int pushKeyHandler(int key, std::function<void()> f);
-    void popKeyHandler(int handler_id);
+    int addKeyPressedHandler(int key, std::function<void()> f);
+    void removeKeyPressedHandler(int handler_id);
 };

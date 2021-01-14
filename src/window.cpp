@@ -1,4 +1,3 @@
-#include <memory>
 #include <iostream>
 
 #include <imgui.h>
@@ -11,6 +10,9 @@
 #include "window.h"
 
 #include "app.h"
+#include "ui_context.h"
+
+std::shared_ptr<UIContext> Window::s_ui_context_ptr { nullptr };
 
 Window::Window(std::string title, int width, int height) : m_title{title}, m_width{width}, m_height{height} {}
 
@@ -78,12 +80,20 @@ int Window::show() {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
   }
 
+  // idk Something to do with handling input.
+  // std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(m_window);
+  // yeah this is probably bad if anyone tried initializing multiple window objects.
+  // Maybe show should just be static too. It's not like this is a real object.
+  s_ui_context_ptr = std::make_shared<UIContext>(m_window);
+
   // Setup App instance. Events get forwarded to it to act on and to
   // pass them on.
-  std::shared_ptr<App> app_ptr = std::make_shared<App>();
+  std::shared_ptr<App> app_ptr = std::make_shared<App>(s_ui_context_ptr);
   glfwSetWindowUserPointer(m_window, app_ptr.get());
 
   // Setup event handlers
+  // TODO Presumably I can inline all of these since they basically just call
+  // out to the UIContext instance?
   glfwSetCursorPosCallback(m_window, cursorPosCallback);
   glfwSetKeyCallback(m_window, keyCallback);
   glfwSetScrollCallback(m_window, scrollCallback);
@@ -119,8 +129,6 @@ int Window::show() {
     }
     app_ptr->update(dt);
     app_ptr->render(dt);
-
-    ImGui::ShowDemoWindow(); // For testing
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -197,6 +205,7 @@ void Window::windowSizeCallback(GLFWwindow* window, int width, int height) {
 
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  s_ui_context_ptr->keyCallback(key, scancode, action, mods);
   // std::cout
     // << "key: " << key
     // << " scancode: " << scancode
@@ -217,10 +226,8 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
         break;
     }
   }
-  if (isFocusedInGame(window)) {
-    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app_ptr->keyCallback(window, key, scancode, action, mods);
-  }
+  App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
+  app_ptr->keyCallback(window, key, scancode, action, mods);
 }
 
 void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {

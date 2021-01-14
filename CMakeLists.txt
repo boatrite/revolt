@@ -28,6 +28,8 @@ add_executable( ve2
                 src/renderers/renderer.h
                 src/renderers/root_renderer.cpp
                 src/renderers/root_renderer.h
+                src/ui_context.cpp
+                src/ui_context.h
                 src/util/file.cpp
                 src/util/file.h
                 src/util/shader.cpp

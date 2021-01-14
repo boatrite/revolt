@@ -31,6 +31,19 @@ class UIContext {
     void focusInGUI();
 
     //
+    // Cursor Moved Callback
+    //
+  private:
+    std::map<int, std::function<void(double,double)>> m_cursor_moved_handlers;
+  public:
+    // Called by window
+    void cursorPosCallback(double xpos, double ypos);
+
+    // Called by consumers
+    int addCursorMovedHandler(std::function<void(double, double)> f);
+    // void removeCursorMovedHandler(int handler_id);
+
+    //
     // Key Callback
     //
   private:
@@ -43,4 +56,10 @@ class UIContext {
     // Called by consumers of UIContext
     int addKeyPressedHandler(int key, std::function<void()> f);
     void removeKeyPressedHandler(int handler_id);
+
+    //
+    // Key State
+    //
+  public:
+    bool isKeyPressed(int key);
 };

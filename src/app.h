@@ -8,7 +8,7 @@ class App {
   private:
     std::vector<int> m_handler_ids {};
     std::shared_ptr<UIContext> m_ui_context_ptr;
-    std::shared_ptr<Renderer> m_root_renderer_ptr { std::make_shared<RootRenderer>() };
+    std::shared_ptr<Renderer> m_root_renderer_ptr { std::make_shared<RootRenderer>(m_ui_context_ptr) };
     bool m_show_demo_window { false };
 
   public:
@@ -19,7 +19,6 @@ class App {
 
     void processInput(GLFWwindow* window, float dt);
 
-    void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     void windowSizeCallback(GLFWwindow* window, int width, int height);
     void focusCallback(bool focusedInGame);

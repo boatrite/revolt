@@ -235,11 +235,7 @@ void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) 
 }
 
 void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-  if (isFocusedInGame(window)) {
-    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app_ptr->cursorPosCallback(window, xpos, ypos);
-  }
-  // std::cout << "xpos: " << xpos << " ypos: " << ypos << std::endl;
+  s_ui_context_ptr->cursorPosCallback(xpos, ypos);
 }
 #pragma GCC diagnostic pop
 

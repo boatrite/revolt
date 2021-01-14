@@ -19,6 +19,25 @@ int UIContext::getHeight() const {
 }
 
 //
+// Cursor Moved Callback
+//
+void UIContext::cursorPosCallback(double xpos, double ypos) {
+  auto it = m_cursor_moved_handlers.rbegin();
+  if (it != m_cursor_moved_handlers.rend()) {
+    it->second(xpos, ypos);
+  }
+}
+
+int UIContext::addCursorMovedHandler(std::function<void(double, double)> f) {
+  static int curr_id { 1 };
+  curr_id++;
+
+  m_cursor_moved_handlers.insert(std::make_pair(curr_id, f));
+
+  return curr_id;
+}
+
+//
 // Key Callback
 //
 void UIContext::keyCallback(int key, int scancode, int action, int mods) {
@@ -69,6 +88,13 @@ void UIContext::removeKeyPressedHandler(int handler_id) {
   for (auto& [key, handlers] : m_handlers_by_key_map) {
     handlers.erase(handler_id);
   }
+}
+
+//
+// Key State
+//
+bool UIContext::isKeyPressed(int key) {
+  return glfwGetKey(m_window, key) == GLFW_PRESS;
 }
 
 //

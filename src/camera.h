@@ -9,6 +9,7 @@
 
 class Camera {
   private:
+    std::shared_ptr<UIContext> m_ui_context_ptr;
     float yaw { 270.0f };
     float pitch { -30.0f };
     glm::vec3 cameraFront { computeCameraFront() };
@@ -19,6 +20,8 @@ class Camera {
     double lastY {};
 
   public:
+    Camera(std::shared_ptr<UIContext> ui_context_ptr);
+
     static constexpr float MIN_FOV { 22.5f };
     static constexpr float MAX_FOV { 67.5f };
 
@@ -48,8 +51,8 @@ class Camera {
     glm::mat4 getProjectionMatrix() const;
 
     void imguiDebugControlPanel();
-    void processInput(GLFWwindow* window, float dt);
-    void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+    void processInput(float dt);
+    void onCursorMoved(double xpos, double ypos);
     void windowSizeCallback(GLFWwindow* window, int width, int height);
     void focusCallback(bool focusedInGame);
 };

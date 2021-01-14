@@ -5,6 +5,14 @@
 
 #include "camera.h"
 
+Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { ui_context_ptr } {
+  m_ui_context_ptr->addCursorMovedHandler(
+    [=](double xpos, double ypos) {
+      this->onCursorMoved(xpos, ypos);
+    }
+  );
+}
+
 glm::vec3 Camera::computeCameraFront() {
   glm::vec3 direction {};
   direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -21,57 +29,59 @@ glm::mat4 Camera::getProjectionMatrix() const {
   return glm::perspective(glm::radians(fov), static_cast<float>(width) / height, nearPlane, farPlane);
 }
 
-void Camera::processInput(GLFWwindow* window, float dt) {
+void Camera::processInput(float dt) {
   float cameraSpeed = speed * dt;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+  if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_W)) {
     position.x += cameraSpeed * cos(glm::radians(yaw));
     position.z += cameraSpeed * sin(glm::radians(yaw));
   }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+  if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_S)) {
     position.x -= cameraSpeed * cos(glm::radians(yaw));
     position.z -= cameraSpeed * sin(glm::radians(yaw));
   }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+  if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_A)) {
     position -= cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
   }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+  if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_D)) {
     position += cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
   }
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+  if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
     position -= cameraSpeed * cameraUp;
   }
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+  if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_SPACE)) {
     position += cameraSpeed * cameraUp;
   }
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-void Camera::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-  if (!lastX) {
+void Camera::onCursorMoved(double xpos, double ypos) {
+  if (m_ui_context_ptr->isFocusedInGame()) {
+    if (!lastX) {
+      lastX = xpos;
+    }
+    if (!lastY) {
+      lastY = ypos;
+    }
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
     lastX = xpos;
-  }
-  if (!lastY) {
     lastY = ypos;
+
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f) {
+      pitch = 89.0f;
+    } else if (pitch < -89.0f) {
+      pitch = -89.0f;
+    }
+
+    cameraFront = computeCameraFront();
   }
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos;
-  lastX = xpos;
-  lastY = ypos;
-
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
-
-  yaw += xoffset;
-  pitch += yoffset;
-
-  if (pitch > 89.0f) {
-    pitch = 89.0f;
-  } else if (pitch < -89.0f) {
-    pitch = -89.0f;
-  }
-
-  cameraFront = computeCameraFront();
 }
 
 void Camera::windowSizeCallback(GLFWwindow* window, int width, int height) {

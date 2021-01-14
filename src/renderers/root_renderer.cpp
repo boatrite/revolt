@@ -3,7 +3,7 @@
 #include "overlay_renderer.h"
 #include "coordinate_lines_renderer.h"
 
-RootRenderer::RootRenderer() {
+RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   m_rendererPtrs.push_back(std::make_shared<DemoRenderer>(m_camera_ptr));
   m_rendererPtrs.push_back(std::make_shared<OverlayRenderer>(m_camera_ptr));
   m_rendererPtrs.push_back(std::make_shared<CoordinateLinesRenderer>(m_camera_ptr));
@@ -28,18 +28,10 @@ void RootRenderer::render(double dt) {
 }
 
 void RootRenderer::processInput(GLFWwindow* window, float dt) {
-  m_camera_ptr->processInput(window, dt);
+  m_camera_ptr->processInput(dt);
 
   for(auto rendererPtr : m_rendererPtrs) {
     rendererPtr->processInput(window, dt);
-  }
-}
-
-void RootRenderer::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-  m_camera_ptr->cursorPosCallback(window, xpos, ypos);
-
-  for(auto rendererPtr : m_rendererPtrs) {
-    rendererPtr->cursorPosCallback(window, xpos, ypos);
   }
 }
 

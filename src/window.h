@@ -10,13 +10,9 @@
 
 class Window {
   public:
-    Window(std::string title, int width, int height);
-    int show();
+    int show(std::string title, int width, int height);
 
   private:
-    std::string m_title;
-    int m_width;
-    int m_height;
     GLFWwindow* m_window;
 
     static std::shared_ptr<UIContext> s_ui_context_ptr;

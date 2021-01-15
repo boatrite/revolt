@@ -13,6 +13,5 @@ class RootRenderer : public Renderer {
 
   public:
     RootRenderer(std::shared_ptr<UIContext> ui_context_ptr);
-    void update(double dt) override;
     void render(double dt) override;
 };

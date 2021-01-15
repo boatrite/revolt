@@ -50,7 +50,6 @@ App::~App() {
 }
 
 void App::update(double dt) {
-  m_root_renderer_ptr->update(dt);
 }
 
 void App::render(double dt) {

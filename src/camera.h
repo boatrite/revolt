@@ -17,6 +17,10 @@ class Camera {
     double lastX {};
     double lastY {};
 
+    void processInput(float dt);
+    void onCursorMoved(double xpos, double ypos);
+    void focusCallback(bool focusedInGame);
+
   public:
     Camera(std::shared_ptr<UIContext> ui_context_ptr);
     ~Camera();
@@ -50,7 +54,4 @@ class Camera {
     glm::mat4 getProjectionMatrix() const;
 
     void imguiDebugControlPanel();
-    void processInput(float dt);
-    void onCursorMoved(double xpos, double ypos);
-    void focusCallback(bool focusedInGame);
 };

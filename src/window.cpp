@@ -14,9 +14,7 @@
 
 std::shared_ptr<UIContext> Window::s_ui_context_ptr { nullptr };
 
-Window::Window(std::string title, int width, int height) : m_title{title}, m_width{width}, m_height{height} {}
-
-int Window::show() {
+int Window::show(std::string title, int width, int height) {
   // Print any glfw errors by setting error callback before doing anything else.
   glfwSetErrorCallback([](int error, const char* description){
     std::cerr << "Error: " << error << ", Description: " << description << std::endl;
@@ -35,7 +33,7 @@ int Window::show() {
   }
 
   // Create window, get handle, set as current.
-  m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
+  m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
   if (m_window == NULL) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -66,9 +64,9 @@ int Window::show() {
   // for pixel-based calls like glViewport. The window size callback receives
   // the new size in screen coordinates.
   // https://stackoverflow.com/a/52730404
-  glViewport(0, 0, m_width, m_height);
-  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+  glViewport(0, 0, width, height);
+  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int w, int h) {
+    glViewport(0, 0, w, h);
   });
 
   // Output any errors from OpenGL.

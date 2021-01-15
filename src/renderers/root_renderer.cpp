@@ -9,12 +9,6 @@ RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_con
   m_rendererPtrs.push_back(std::make_shared<CoordinateLinesRenderer>(m_camera_ptr));
 }
 
-void RootRenderer::update(double dt) {
-  for(auto rendererPtr : m_rendererPtrs) {
-    rendererPtr->update(dt);
-  }
-}
-
 void RootRenderer::render(double dt) {
   if (m_wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

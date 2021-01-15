@@ -26,6 +26,12 @@ class UIContext {
     int getHeight() const;
 
     //
+    // General purpose handler functionality
+    //
+  public:
+    void removeHandlers(void* instance);
+
+    //
     // Per-frame Input processing
     //
   private:
@@ -34,12 +40,6 @@ class UIContext {
   public:
     void processInput(double dt);
     void addProcessInput(void* instance, std::function<void(double)> f);
-
-    //
-    // General purpose handler functionality
-    //
-  public:
-    void removeHandlers(void* instance);
 
     //
     // Cursor Moved Callback
@@ -81,9 +81,9 @@ class UIContext {
     std::map<void*, std::function<void(bool)>> m_game_gui_focus_changed_handlers;
     void removeGameGuiFocusChangedHandler(void* instance);
   public:
-    bool isFocusedInGame() const;
-    bool isFocusedInGUI() const;
     void focusInGame();
     void focusInGUI();
+    bool isFocusedInGame() const;
+    bool isFocusedInGUI() const;
     void addGameGuiFocusChangedHandler(void* instance, std::function<void(bool)>);
 };

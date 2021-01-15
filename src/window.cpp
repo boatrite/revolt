@@ -12,8 +12,6 @@
 #include "app.h"
 #include "ui_context.h"
 
-std::shared_ptr<UIContext> Window::s_ui_context_ptr { nullptr };
-
 int Window::show(std::string title, int width, int height) {
   // Print any glfw errors by setting error callback before doing anything else.
   glfwSetErrorCallback([](int error, const char* description){
@@ -33,13 +31,13 @@ int Window::show(std::string title, int width, int height) {
   }
 
   // Create window, get handle, set as current.
-  m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-  if (m_window == NULL) {
+  GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+  if (window == NULL) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
     return -1;
   }
-  glfwMakeContextCurrent(m_window);
+  glfwMakeContextCurrent(window);
 
   // Initialize opengl.
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -51,7 +49,7 @@ int Window::show(std::string title, int width, int height) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGui::StyleColorsDark();
-  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
   const char* glslVersion = "#version 130";
   ImGui_ImplOpenGL3_Init(glslVersion);
   ImGuiIO& io = ImGui::GetIO();
@@ -65,7 +63,7 @@ int Window::show(std::string title, int width, int height) {
   // the new size in screen coordinates.
   // https://stackoverflow.com/a/52730404
   glViewport(0, 0, width, height);
-  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int w, int h) {
+  glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
   });
 
@@ -79,39 +77,42 @@ int Window::show(std::string title, int width, int height) {
   }
 
   // idk Something to do with handling input.
-  // std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(m_window);
+  // std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(window);
   // yeah this is probably bad if anyone tried initializing multiple window objects.
   // Maybe show should just be static too. It's not like this is a real object.
-  s_ui_context_ptr = std::make_shared<UIContext>(m_window);
-  s_ui_context_ptr->addKeyPressedHandler(
+  std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(window);
+  glfwSetWindowUserPointer(window, ui_context_ptr.get());
+
+  ui_context_ptr->addKeyPressedHandler(
       GLFW_KEY_ESCAPE,
       this,
-      [=]() { glfwSetWindowShouldClose(m_window, 1); }
+      [=]() { glfwSetWindowShouldClose(window, 1); }
   );
 
-  // Setup App instance. Events get forwarded to it to act on and to
-  // pass them on.
-  std::shared_ptr<App> app_ptr = std::make_shared<App>(s_ui_context_ptr);
+  std::shared_ptr<App> app_ptr = std::make_shared<App>(ui_context_ptr);
 
   // Setup glfw event handlers to forward to the UIContext.
-  glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
-    s_ui_context_ptr->cursorPosCallback(xpos, ypos);
+  glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
+    ui_context_ptr->cursorPosCallback(xpos, ypos);
   });
-  glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-    s_ui_context_ptr->keyCallback(key, scancode, action, mods);
+  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
+    ui_context_ptr->keyCallback(key, scancode, action, mods);
   });
-  glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
-    // Not yet implemented
+  glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+    // Not yet implemented in UIContext
     // std::cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
   });
-  glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-    s_ui_context_ptr->windowSizeCallback(width, height);
+  glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
+    ui_context_ptr->windowSizeCallback(width, height);
   });
 
   // Main loop
   glfwSetTime(0.0);
   double lastTime = 0.0;
-  while(!glfwWindowShouldClose(m_window)) {
+  while(!glfwWindowShouldClose(window)) {
     double time = glfwGetTime();
     double dt = time - lastTime;
     lastTime = time;
@@ -123,14 +124,14 @@ int Window::show(std::string title, int width, int height) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    s_ui_context_ptr->processInput(dt);
+    ui_context_ptr->processInput(dt);
     app_ptr->update(dt);
     app_ptr->render(dt);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwSwapBuffers(m_window);
+    glfwSwapBuffers(window);
   }
 
   //

@@ -17,6 +17,11 @@ Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { u
     this,
     std::bind(&Camera::focusCallback, this, std::placeholders::_1)
   );
+
+  m_ui_context_ptr->addProcessInput(
+    this,
+    std::bind(&Camera::processInput, this, std::placeholders::_1)
+  );
 }
 
 Camera::~Camera() {
@@ -40,6 +45,10 @@ glm::mat4 Camera::getProjectionMatrix() const {
 }
 
 void Camera::processInput(float dt) {
+  if (!m_ui_context_ptr->isFocusedInGame()) {
+    return;
+  }
+
   float cameraSpeed = speed * dt;
   if (m_ui_context_ptr->isKeyPressed(GLFW_KEY_W)) {
     position.x += cameraSpeed * cos(glm::radians(yaw));

@@ -26,6 +26,16 @@ class UIContext {
     int getHeight() const;
 
     //
+    // Per-frame Input processing
+    //
+  private:
+    std::map<void*, std::function<void(double)>> m_process_input_funcs;
+    void removeProcessInput(void* instance);
+  public:
+    void processInput(double dt);
+    void addProcessInput(void* instance, std::function<void(double)> f);
+
+    //
     // General purpose handler functionality
     //
   public:

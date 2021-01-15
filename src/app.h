@@ -16,6 +16,4 @@ class App {
     ~App();
     void update(double dt);
     void render(double dt);
-
-    void processInput(GLFWwindow* window, float dt);
 };

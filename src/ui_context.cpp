@@ -29,8 +29,26 @@ int UIContext::getHeight() const {
 //
 void UIContext::removeHandlers(void* instance) {
   removeCursorMovedHandler(instance);
-  removeKeyPressedHandlers(instance);
   removeGameGuiFocusChangedHandler(instance);
+  removeKeyPressedHandlers(instance);
+  removeProcessInput(instance);
+}
+
+//
+// Per-frame Input processing
+//
+void UIContext::processInput(double dt) {
+  for (auto& [instance, f] : m_process_input_funcs) {
+    f(dt);
+  }
+}
+
+void UIContext::addProcessInput(void* instance, std::function<void(double)> f) {
+  m_process_input_funcs.insert(std::make_pair(instance, f));
+}
+
+void UIContext::removeProcessInput(void* instance) {
+  m_process_input_funcs.erase(instance);
 }
 
 //

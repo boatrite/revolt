@@ -94,25 +94,21 @@ int Window::show() {
   // Setup App instance. Events get forwarded to it to act on and to
   // pass them on.
   std::shared_ptr<App> app_ptr = std::make_shared<App>(s_ui_context_ptr);
-  glfwSetWindowUserPointer(m_window, app_ptr.get());
 
-  // Setup event handlers
-  // TODO Presumably I can inline all of these since they basically just call
-  // out to the UIContext instance?
-  glfwSetCursorPosCallback(m_window, cursorPosCallback);
-  glfwSetKeyCallback(m_window, keyCallback);
-  glfwSetScrollCallback(m_window, scrollCallback);
-  glfwSetWindowSizeCallback(m_window, windowSizeCallback);
-
-  // Starting off in the game is useful when wanting to test in the game.
-  // I need to figure out how to do GUIs and imgui and setting that up in a sane
-  // way.
-  // Starting off in gui is probably what a real program would do because it
-  // opens to the main menu, not directly to gameplay.
-  // TODO Eventually the Renderer itself should do this, because it's dumb for
-  // Window to care about what the first thing rendered is, the renderers should
-  // just take care of themselves.
-  s_ui_context_ptr->focusInGUI();
+  // Setup glfw event handlers to forward to the UIContext.
+  glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
+    s_ui_context_ptr->cursorPosCallback(xpos, ypos);
+  });
+  glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    s_ui_context_ptr->keyCallback(key, scancode, action, mods);
+  });
+  glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
+    // Not yet implemented
+    // std::cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
+  });
+  glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
+    s_ui_context_ptr->windowSizeCallback(width, height);
+  });
 
   // Main loop
   glfwSetTime(0.0);
@@ -129,9 +125,7 @@ int Window::show() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    if (s_ui_context_ptr->isFocusedInGame()) {
-      app_ptr->processInput(m_window, dt);
-    }
+    s_ui_context_ptr->processInput(dt);
     app_ptr->update(dt);
     app_ptr->render(dt);
 
@@ -201,22 +195,5 @@ void GLAPIENTRY Window::glDebugOutput(GLenum source,
         case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
     } std::cout << std::endl;
     std::cout << std::endl;
-}
-
-void Window::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  s_ui_context_ptr->windowSizeCallback(width, height);
-}
-
-
-void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  s_ui_context_ptr->keyCallback(key, scancode, action, mods);
-}
-
-void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-  // std::cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
-}
-
-void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-  s_ui_context_ptr->cursorPosCallback(xpos, ypos);
 }
 #pragma GCC diagnostic pop

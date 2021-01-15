@@ -13,7 +13,6 @@ class RootRenderer : public Renderer {
 
   public:
     RootRenderer(std::shared_ptr<UIContext> ui_context_ptr);
-    void processInput(GLFWwindow* window, float dt) override;
     void update(double dt) override;
     void render(double dt) override;
 };

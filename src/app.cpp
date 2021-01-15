@@ -13,6 +13,8 @@
 // I compare? Can I just straight up use the pointer? I mean it's a basically a
 // number right?
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
+  m_ui_context_ptr->focusInGUI();
+
   m_ui_context_ptr->addKeyPressedHandler(
     GLFW_KEY_F12,
     this,
@@ -57,8 +59,4 @@ void App::render(double dt) {
   if (m_show_demo_window) {
     ImGui::ShowDemoWindow();
   }
-}
-
-void App::processInput(GLFWwindow* window, float dt) {
-  m_root_renderer_ptr->processInput(window, dt);
 }

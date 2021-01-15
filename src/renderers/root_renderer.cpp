@@ -26,11 +26,3 @@ void RootRenderer::render(double dt) {
     rendererPtr->render(dt);
   }
 }
-
-void RootRenderer::processInput(GLFWwindow* window, float dt) {
-  m_camera_ptr->processInput(dt);
-
-  for(auto rendererPtr : m_rendererPtrs) {
-    rendererPtr->processInput(window, dt);
-  }
-}

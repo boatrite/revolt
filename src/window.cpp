@@ -76,38 +76,27 @@ int Window::show(std::string title, int width, int height) {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
   }
 
-  // idk Something to do with handling input.
-  // std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(window);
-  // yeah this is probably bad if anyone tried initializing multiple window objects.
-  // Maybe show should just be static too. It's not like this is a real object.
+  // UIContext is the input (and windowing?) system. I does a few sort of
+  // related but alltogether useful things. It's more-or-less a wrapper over
+  // glfw, using the window pointer to make glfw calls.
+  // It acts as (sort of?) as a Subject from the Observer pattern.
+  // Anything can get passed a ui_context_ptr and ask to be notified when a key
+  // is pressed or whatnot. The main difference is that it doesn't have a
+  // Notify() method that's called, it uses the glfw callbacks to drive out
+  // notifications.
+  // Has random stuff like a quit() method to do the whole
+  // glfwSetWindowShouldClose thing. I might add beforeQuit callbacks if that
+  // becomes desirable.
+  // I have this concept of "in game" or "in gui" which toggles some imgui
+  // enabled/disable settings, and is used by various places to know to stop
+  // accepting input. It's kinda random, but rose pretty quickly out of a real
+  // need to interact with imgui controls or move around in game.
   std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(window);
-  glfwSetWindowUserPointer(window, ui_context_ptr.get());
 
-  ui_context_ptr->addKeyPressedHandler(
-      GLFW_KEY_ESCAPE,
-      this,
-      [=]() { glfwSetWindowShouldClose(window, 1); }
-  );
-
+  // App -- right now it gets its update() and render() methods called in the main
+  // loop, and composes other update() and render() calls to do all the updating
+  // and rendering.
   std::shared_ptr<App> app_ptr = std::make_shared<App>(ui_context_ptr);
-
-  // Setup glfw event handlers to forward to the UIContext.
-  glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
-    ui_context_ptr->cursorPosCallback(xpos, ypos);
-  });
-  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
-    ui_context_ptr->keyCallback(key, scancode, action, mods);
-  });
-  glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
-    // Not yet implemented in UIContext
-    // std::cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
-  });
-  glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
-    ui_context_ptr->windowSizeCallback(width, height);
-  });
 
   // Main loop
   glfwSetTime(0.0);

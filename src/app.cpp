@@ -15,6 +15,12 @@
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   m_ui_context_ptr->focusInGUI();
 
+  ui_context_ptr->addKeyPressedHandler(
+      GLFW_KEY_ESCAPE,
+      this,
+      [=]() { ui_context_ptr->quit(); }
+  );
+
   m_ui_context_ptr->addKeyPressedHandler(
     GLFW_KEY_F12,
     this,

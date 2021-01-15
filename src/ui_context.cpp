@@ -5,6 +5,34 @@
 #include "ui_context.h"
 
 UIContext::UIContext(GLFWwindow* window) : m_window{window} {
+  glfwSetWindowUserPointer(window, this);
+
+  glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
+    ui_context_ptr->windowSizeCallback(width, height);
+  });
+
+  glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
+    ui_context_ptr->cursorPosCallback(xpos, ypos);
+  });
+
+  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    UIContext* ui_context_ptr = static_cast<UIContext*>(glfwGetWindowUserPointer(window));
+    ui_context_ptr->keyCallback(key, scancode, action, mods);
+  });
+
+  glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+    // Not yet implemented in UIContext
+    // std::cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
+  });
+}
+
+//
+// Quit functionality
+//
+void UIContext::quit() {
+  glfwSetWindowShouldClose(m_window, 1);
 }
 
 //

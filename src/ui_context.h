@@ -17,6 +17,11 @@ class UIContext {
     UIContext(GLFWwindow* window);
 
     //
+    // Quit functionality
+    //
+    void quit();
+
+    //
     // Window size accessors.
     // Uses the callback to keep them up-to-date.
     //

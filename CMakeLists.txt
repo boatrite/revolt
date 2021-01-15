@@ -34,7 +34,6 @@ add_executable( ve2
                 src/util/file.h
                 src/util/shader.cpp
                 src/util/shader.h
-                src/window.cpp
                 src/window.h
 )
 

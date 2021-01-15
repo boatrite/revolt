@@ -26,9 +26,4 @@ class Window {
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
     static void windowSizeCallback(GLFWwindow* window, int width, int height);
-
-    static bool isFocusedInGame(GLFWwindow* window);
-    static bool isFocusedInGUI(GLFWwindow* window);
-    static void focusInGame(GLFWwindow* window);
-    static void focusInGUI(GLFWwindow* window);
 };

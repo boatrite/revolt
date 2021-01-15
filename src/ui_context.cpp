@@ -5,9 +5,15 @@
 #include "ui_context.h"
 
 UIContext::UIContext(GLFWwindow* window) : m_window{window} {
-  // TODO Eventually I want these callbacks all defined here I think? All the UI
-  // and input stuff.
-  // glfwSetWindowSizeCallback(m_window, windowSizeCallback);
+}
+
+//
+// Window size accessors.
+// Uses the callback to keep them up-to-date.
+//
+void UIContext::windowSizeCallback(int width, int height) {
+  m_width = width;
+  m_height = height;
 }
 
 int UIContext::getWidth() const {
@@ -24,6 +30,7 @@ int UIContext::getHeight() const {
 void UIContext::removeHandlers(void* instance) {
   removeCursorMovedHandler(instance);
   removeKeyPressedHandlers(instance);
+  removeGameGuiFocusChangedHandler(instance);
 }
 
 //
@@ -107,14 +114,9 @@ bool UIContext::isKeyPressed(int key) {
 }
 
 //
-//
+// Game/Gui Focus
 //
 bool UIContext::isFocusedInGame() const {
-  // We only want to process in-game input when we are actually "in the game".
-  //
-  // Now that we have a GUI we want to interact with, we need to know whether
-  // we are focused in game or focused in the gui, and only do input for one or
-  // the other.
   int cursorMode = glfwGetInputMode(m_window, GLFW_CURSOR);
   return cursorMode == GLFW_CURSOR_DISABLED;
 }
@@ -131,8 +133,9 @@ void UIContext::focusInGame() {
     io.ConfigFlags |= ImGuiConfigFlags_NoMouse;            // Disable Mouse
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Disable Keyboard
 
-    // App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-    // app_ptr->focusCallback(true); // focus == true -> focused in game
+    for (auto& [instance, handler] : m_game_gui_focus_changed_handlers) {
+      handler(true);
+    }
   }
 }
 
@@ -144,7 +147,16 @@ void UIContext::focusInGUI() {
     io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;          // Enable Mouse
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard
 
-    // App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-    // app_ptr->focusCallback(false); // focus == false -> focused in GUI
+    for (auto& [instance, handler] : m_game_gui_focus_changed_handlers) {
+      handler(false);
+    }
   }
+}
+
+void UIContext::addGameGuiFocusChangedHandler(void* instance, std::function<void(bool)> f) {
+  m_game_gui_focus_changed_handlers.insert(std::make_pair(instance, f));
+}
+
+void UIContext::removeGameGuiFocusChangedHandler(void* instance) {
+  m_game_gui_focus_changed_handlers.erase(instance);
 }

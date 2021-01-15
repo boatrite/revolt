@@ -85,6 +85,11 @@ int Window::show() {
   // yeah this is probably bad if anyone tried initializing multiple window objects.
   // Maybe show should just be static too. It's not like this is a real object.
   s_ui_context_ptr = std::make_shared<UIContext>(m_window);
+  s_ui_context_ptr->addKeyPressedHandler(
+      GLFW_KEY_ESCAPE,
+      this,
+      [=]() { glfwSetWindowShouldClose(m_window, 1); }
+  );
 
   // Setup App instance. Events get forwarded to it to act on and to
   // pass them on.
@@ -107,7 +112,7 @@ int Window::show() {
   // TODO Eventually the Renderer itself should do this, because it's dumb for
   // Window to care about what the first thing rendered is, the renderers should
   // just take care of themselves.
-  focusInGUI(m_window);
+  s_ui_context_ptr->focusInGUI();
 
   // Main loop
   glfwSetTime(0.0);
@@ -124,7 +129,7 @@ int Window::show() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    if (isFocusedInGame(m_window)) {
+    if (s_ui_context_ptr->isFocusedInGame()) {
       app_ptr->processInput(m_window, dt);
     }
     app_ptr->update(dt);
@@ -199,35 +204,12 @@ void GLAPIENTRY Window::glDebugOutput(GLenum source,
 }
 
 void Window::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-  app_ptr->windowSizeCallback(window, width, height);
+  s_ui_context_ptr->windowSizeCallback(width, height);
 }
 
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
   s_ui_context_ptr->keyCallback(key, scancode, action, mods);
-  // std::cout
-    // << "key: " << key
-    // << " scancode: " << scancode
-    // << " action: " << action
-    // << " mods: " << mods << std::endl;
-  if (action == GLFW_PRESS) {
-    switch (key) {
-      case GLFW_KEY_ESCAPE:
-      case GLFW_KEY_Q:
-        glfwSetWindowShouldClose(window, 1);
-        break;
-      case GLFW_KEY_E:
-        if (isFocusedInGame(window)) {
-          focusInGUI(window);
-        } else {
-          focusInGame(window);
-        }
-        break;
-    }
-  }
-  App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-  app_ptr->keyCallback(window, key, scancode, action, mods);
 }
 
 void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -238,43 +220,3 @@ void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
   s_ui_context_ptr->cursorPosCallback(xpos, ypos);
 }
 #pragma GCC diagnostic pop
-
-bool Window::isFocusedInGame(GLFWwindow* window) {
-  // We only want to process in-game input when we are actually "in the game".
-  //
-  // Now that we have a GUI we want to interact with, we need to know whether
-  // we are focused in game or focused in the gui, and only do input for one or
-  // the other.
-  int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
-  return cursorMode == GLFW_CURSOR_DISABLED;
-}
-
-bool Window::isFocusedInGUI(GLFWwindow* window) {
-  return !isFocusedInGame(window);
-}
-
-void Window::focusInGame(GLFWwindow* window) {
-  if (!isFocusedInGame(window)) {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Hide cursor
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouse;            // Disable Mouse
-    io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Disable Keyboard
-
-    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app_ptr->focusCallback(true); // focus == true -> focused in game
-  }
-}
-
-void Window::focusInGUI(GLFWwindow* window) {
-  if (!isFocusedInGUI(window)) {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Show cursor
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;          // Enable Mouse
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard
-
-    App* app_ptr = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app_ptr->focusCallback(false); // focus == false -> focused in GUI
-  }
-}

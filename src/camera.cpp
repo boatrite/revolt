@@ -3,14 +3,19 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <functional>
+
 #include "camera.h"
 
 Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { ui_context_ptr } {
   m_ui_context_ptr->addCursorMovedHandler(
     this,
-    [=](double xpos, double ypos) {
-      this->onCursorMoved(xpos, ypos);
-    }
+    std::bind(&Camera::onCursorMoved, this, std::placeholders::_1, std::placeholders::_2)
+  );
+
+  m_ui_context_ptr->addGameGuiFocusChangedHandler(
+    this,
+    std::bind(&Camera::focusCallback, this, std::placeholders::_1)
   );
 }
 
@@ -31,7 +36,7 @@ glm::mat4 Camera::getViewMatrix() const {
 }
 
 glm::mat4 Camera::getProjectionMatrix() const {
-  return glm::perspective(glm::radians(fov), static_cast<float>(width) / height, nearPlane, farPlane);
+  return glm::perspective(glm::radians(fov), static_cast<float>(m_ui_context_ptr->getWidth()) / m_ui_context_ptr->getHeight(), nearPlane, farPlane);
 }
 
 void Camera::processInput(float dt) {
@@ -87,11 +92,6 @@ void Camera::onCursorMoved(double xpos, double ypos) {
 
     cameraFront = computeCameraFront();
   }
-}
-
-void Camera::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  this->width = width;
-  this->height = height;
 }
 
 void Camera::focusCallback(bool focusedInGame) {

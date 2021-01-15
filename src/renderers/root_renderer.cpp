@@ -34,25 +34,3 @@ void RootRenderer::processInput(GLFWwindow* window, float dt) {
     rendererPtr->processInput(window, dt);
   }
 }
-
-void RootRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  for(auto rendererPtr : m_rendererPtrs) {
-    rendererPtr->keyCallback(window, key, scancode, action, mods);
-  }
-}
-
-void RootRenderer::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  m_camera_ptr->windowSizeCallback(window, width, height);
-
-  for(auto rendererPtr : m_rendererPtrs) {
-    rendererPtr->windowSizeCallback(window, width, height);
-  }
-}
-
-void RootRenderer::focusCallback(bool focusedInGame) {
-  m_camera_ptr->focusCallback(focusedInGame);
-
-  for(auto rendererPtr : m_rendererPtrs) {
-    rendererPtr->focusCallback(focusedInGame);
-  }
-}

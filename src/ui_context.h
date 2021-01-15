@@ -17,18 +17,13 @@ class UIContext {
     UIContext(GLFWwindow* window);
 
     //
+    // Window size accessors.
+    // Uses the callback to keep them up-to-date.
     //
-    //
+  public:
+    void windowSizeCallback(int width, int height);
     int getWidth() const;
     int getHeight() const;
-
-    //
-    //
-    //
-    bool isFocusedInGame() const;
-    bool isFocusedInGUI() const;
-    void focusInGame();
-    void focusInGUI();
 
     //
     // General purpose handler functionality
@@ -68,4 +63,17 @@ class UIContext {
     //
   public:
     bool isKeyPressed(int key);
+
+    //
+    // Game/Gui Focus
+    //
+  private:
+    std::map<void*, std::function<void(bool)>> m_game_gui_focus_changed_handlers;
+    void removeGameGuiFocusChangedHandler(void* instance);
+  public:
+    bool isFocusedInGame() const;
+    bool isFocusedInGUI() const;
+    void focusInGame();
+    void focusInGUI();
+    void addGameGuiFocusChangedHandler(void* instance, std::function<void(bool)>);
 };

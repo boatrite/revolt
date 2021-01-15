@@ -28,6 +28,19 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
       std::cout << "hello from f11 key pressed callback" << std::endl;
     }
   );
+
+  m_ui_context_ptr->addKeyPressedHandler(
+    GLFW_KEY_E,
+    this,
+    [=]() {
+      if (m_ui_context_ptr->isFocusedInGame()) {
+        m_ui_context_ptr->focusInGUI();
+      } else {
+        m_ui_context_ptr->focusInGame();
+      }
+    }
+  );
+
 }
 
 App::~App() {
@@ -48,18 +61,4 @@ void App::render(double dt) {
 
 void App::processInput(GLFWwindow* window, float dt) {
   m_root_renderer_ptr->processInput(window, dt);
-}
-
-void App::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if (m_ui_context_ptr->isFocusedInGame()) {
-    m_root_renderer_ptr->keyCallback(window, key, scancode, action, mods);
-  }
-}
-
-void App::windowSizeCallback(GLFWwindow* window, int width, int height) {
-  m_root_renderer_ptr->windowSizeCallback(window, width, height);
-}
-
-void App::focusCallback(bool focusedInGame) {
-  m_root_renderer_ptr->focusCallback(focusedInGame);
 }

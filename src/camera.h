@@ -14,8 +14,6 @@ class Camera {
     float pitch { -30.0f };
     glm::vec3 cameraFront { computeCameraFront() };
     glm::vec3 cameraUp { glm::vec3(0.0f, 1.0f,  0.0f) };
-    int width;
-    int height;
     double lastX {};
     double lastY {};
 
@@ -54,6 +52,5 @@ class Camera {
     void imguiDebugControlPanel();
     void processInput(float dt);
     void onCursorMoved(double xpos, double ypos);
-    void windowSizeCallback(GLFWwindow* window, int width, int height);
     void focusCallback(bool focusedInGame);
 };

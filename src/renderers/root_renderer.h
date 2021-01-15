@@ -16,8 +16,4 @@ class RootRenderer : public Renderer {
     void processInput(GLFWwindow* window, float dt) override;
     void update(double dt) override;
     void render(double dt) override;
-
-    void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) override;
-    void windowSizeCallback(GLFWwindow* window, int width, int height) override;
-    void focusCallback(bool focusedInGame) override;
 };

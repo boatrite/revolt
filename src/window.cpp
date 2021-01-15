@@ -136,8 +136,6 @@ int Window::show(std::string title, int width, int height) {
   return 0;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 void GLAPIENTRY Window::glDebugOutput(GLenum source,
                             GLenum type,
                             GLuint id,
@@ -184,4 +182,3 @@ void GLAPIENTRY Window::glDebugOutput(GLenum source,
     } std::cout << std::endl;
     std::cout << std::endl;
 }
-#pragma GCC diagnostic pop

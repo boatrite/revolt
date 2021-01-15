@@ -19,6 +19,13 @@ int UIContext::getHeight() const {
 }
 
 //
+// General purpose handler functionality
+//
+// void UIContext::removeHandlers(void* instance) {
+  // removeCursorMovedHandler(instance);
+// }
+
+//
 // Cursor Moved Callback
 //
 void UIContext::cursorPosCallback(double xpos, double ypos) {
@@ -28,13 +35,12 @@ void UIContext::cursorPosCallback(double xpos, double ypos) {
   }
 }
 
-int UIContext::addCursorMovedHandler(std::function<void(double, double)> f) {
-  static int curr_id { 1 };
-  curr_id++;
+void UIContext::addCursorMovedHandler(void* instance, std::function<void(double, double)> f) {
+  m_cursor_moved_handlers.insert(std::make_pair(instance, f));
+}
 
-  m_cursor_moved_handlers.insert(std::make_pair(curr_id, f));
-
-  return curr_id;
+void UIContext::removeCursorMovedHandler(void* instance) {
+  m_cursor_moved_handlers.erase(instance);
 }
 
 //

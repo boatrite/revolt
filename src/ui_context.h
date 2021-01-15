@@ -31,17 +31,23 @@ class UIContext {
     void focusInGUI();
 
     //
+    // General purpose handler functionality
+    //
+  // public:
+    // void removeHandlers(void* instance);
+
+    //
     // Cursor Moved Callback
     //
   private:
-    std::map<int, std::function<void(double,double)>> m_cursor_moved_handlers;
+    std::map<void*, std::function<void(double,double)>> m_cursor_moved_handlers;
   public:
     // Called by window
     void cursorPosCallback(double xpos, double ypos);
 
     // Called by consumers
-    int addCursorMovedHandler(std::function<void(double, double)> f);
-    // void removeCursorMovedHandler(int handler_id);
+    void addCursorMovedHandler(void* instance, std::function<void(double, double)> f);
+    void removeCursorMovedHandler(void* instance);
 
     //
     // Key Callback

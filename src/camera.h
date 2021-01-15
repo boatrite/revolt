@@ -21,6 +21,7 @@ class Camera {
 
   public:
     Camera(std::shared_ptr<UIContext> ui_context_ptr);
+    ~Camera();
 
     static constexpr float MIN_FOV { 22.5f };
     static constexpr float MAX_FOV { 67.5f };

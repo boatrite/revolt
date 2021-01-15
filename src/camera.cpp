@@ -7,10 +7,15 @@
 
 Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { ui_context_ptr } {
   m_ui_context_ptr->addCursorMovedHandler(
+    this,
     [=](double xpos, double ypos) {
       this->onCursorMoved(xpos, ypos);
     }
   );
+}
+
+Camera::~Camera() {
+  m_ui_context_ptr->removeCursorMovedHandler(this);
 }
 
 glm::vec3 Camera::computeCameraFront() {

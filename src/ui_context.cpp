@@ -21,9 +21,10 @@ int UIContext::getHeight() const {
 //
 // General purpose handler functionality
 //
-// void UIContext::removeHandlers(void* instance) {
-  // removeCursorMovedHandler(instance);
-// }
+void UIContext::removeHandlers(void* instance) {
+  removeCursorMovedHandler(instance);
+  removeKeyPressedHandlers(instance);
+}
 
 //
 // Cursor Moved Callback
@@ -92,7 +93,7 @@ void UIContext::addKeyPressedHandler(int key, void* instance, std::function<void
   }
 }
 
-void UIContext::removeKeyPressedHandler(void* instance) {
+void UIContext::removeKeyPressedHandlers(void* instance) {
   for (auto& [key, handlers] : m_handlers_by_key_map) {
     handlers.erase(instance);
   }

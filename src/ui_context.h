@@ -33,27 +33,28 @@ class UIContext {
     //
     // General purpose handler functionality
     //
-  // public:
-    // void removeHandlers(void* instance);
+  public:
+    void removeHandlers(void* instance);
 
     //
     // Cursor Moved Callback
     //
   private:
     std::map<void*, std::function<void(double,double)>> m_cursor_moved_handlers;
+    void removeCursorMovedHandler(void* instance);
   public:
     // Called by window
     void cursorPosCallback(double xpos, double ypos);
 
     // Called by consumers
     void addCursorMovedHandler(void* instance, std::function<void(double, double)> f);
-    void removeCursorMovedHandler(void* instance);
 
     //
     // Key Callback
     //
   private:
     std::map<int, std::map<void*,std::function<void()>>> m_handlers_by_key_map;
+    void removeKeyPressedHandlers(void* instance);
 
   public:
     // Called by Window
@@ -61,7 +62,6 @@ class UIContext {
 
     // Called by consumers of UIContext
     void addKeyPressedHandler(int key, void* instance, std::function<void()> f);
-    void removeKeyPressedHandler(void* instance);
 
     //
     // Key State

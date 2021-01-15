@@ -31,7 +31,7 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
 }
 
 App::~App() {
-  m_ui_context_ptr->removeKeyPressedHandler(this);
+  m_ui_context_ptr->removeHandlers(this);
 }
 
 void App::update(double dt) {

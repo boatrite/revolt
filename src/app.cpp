@@ -13,27 +13,25 @@
 // I compare? Can I just straight up use the pointer? I mean it's a basically a
 // number right?
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
-  int id = m_ui_context_ptr->addKeyPressedHandler(
+  m_ui_context_ptr->addKeyPressedHandler(
     GLFW_KEY_F12,
+    this,
     [=]() {
       m_show_demo_window = !m_show_demo_window;
     }
   );
-  m_handler_ids.push_back(id);
 
-  id = m_ui_context_ptr->addKeyPressedHandler(
+  m_ui_context_ptr->addKeyPressedHandler(
     GLFW_KEY_F11,
+    this,
     []() {
       std::cout << "hello from f11 key pressed callback" << std::endl;
     }
   );
-  m_handler_ids.push_back(id);
 }
 
 App::~App() {
-  for (auto& id : m_handler_ids) {
-    m_ui_context_ptr->removeKeyPressedHandler(id);
-  }
+  m_ui_context_ptr->removeKeyPressedHandler(this);
 }
 
 void App::update(double dt) {

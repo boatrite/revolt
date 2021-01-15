@@ -52,6 +52,13 @@ void UIContext::keyCallback(int key, int scancode, int action, int mods) {
       {
         // Get all callbacks for a specific key. The current methodology is that
         // we only invoke the latest callback for a specific key.
+        // FIXME This doesn't work exactly right, I used to store an int as the
+        // key, so the ordered map would have the latest one last. Now I store a
+        // void* pointer, I might need to store a timestamp too now or something. I
+        // don't have any bindings where this matters right now, but I was
+        // thinking ESC would be one
+        // that could be a test case for rebinding, as in when closing
+        // nested interfaces.
         auto it = m_handlers_by_key_map.find(key);
         if (it != m_handlers_by_key_map.end()) { // If we have anything bound for this key
           auto& handlers = it->second;
@@ -73,26 +80,21 @@ void UIContext::keyCallback(int key, int scancode, int action, int mods) {
   }
 }
 
-int UIContext::addKeyPressedHandler(int key, std::function<void()> f) {
-  static int curr_id { 1 };
-  curr_id++;
-
+void UIContext::addKeyPressedHandler(int key, void* instance, std::function<void()> f) {
   auto it = m_handlers_by_key_map.find(key);
   if (it == m_handlers_by_key_map.end()) {
-    std::map<int, std::function<void()>> handlers {}; // Create new empty map
-    handlers.insert(std::make_pair(curr_id, f)); // Add our handler to it
+    std::map<void*, std::function<void()>> handlers {}; // Create new empty map
+    handlers.insert(std::make_pair(instance, f)); // Add our handler to it
     m_handlers_by_key_map.insert(std::make_pair(key, handlers)); // Add our new handlers for the key
   } else {
     auto& handlers = it->second;
-    handlers.insert(std::make_pair(curr_id, f));
+    handlers.insert(std::make_pair(instance, f));
   }
-
-  return curr_id;
 }
 
-void UIContext::removeKeyPressedHandler(int handler_id) {
+void UIContext::removeKeyPressedHandler(void* instance) {
   for (auto& [key, handlers] : m_handlers_by_key_map) {
-    handlers.erase(handler_id);
+    handlers.erase(instance);
   }
 }
 

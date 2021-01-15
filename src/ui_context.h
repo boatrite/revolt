@@ -53,15 +53,15 @@ class UIContext {
     // Key Callback
     //
   private:
-    std::map<int, std::map<int,std::function<void()>>> m_handlers_by_key_map;
+    std::map<int, std::map<void*,std::function<void()>>> m_handlers_by_key_map;
 
   public:
     // Called by Window
     void keyCallback(int key, int scancode, int action, int mods);
 
     // Called by consumers of UIContext
-    int addKeyPressedHandler(int key, std::function<void()> f);
-    void removeKeyPressedHandler(int handler_id);
+    void addKeyPressedHandler(int key, void* instance, std::function<void()> f);
+    void removeKeyPressedHandler(void* instance);
 
     //
     // Key State

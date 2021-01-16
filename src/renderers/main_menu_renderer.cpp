@@ -1,6 +1,6 @@
 #include "main_menu_renderer.h"
 
-MainMenuRenderer::MainMenuRenderer() {
+MainMenuRenderer::MainMenuRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   // Duplicate the current imgui state
   const ImGuiStyle& style = ImGui::GetStyle();
   ref_saved_style = style;
@@ -16,7 +16,7 @@ void MainMenuRenderer::render(double dt) {
   glClear(GL_COLOR_BUFFER_BIT);
 
   ImGui::SetNextWindowPos(ImVec2(0, 0));
-  // ImGui::SetNextWindowSize(ImVec2(100.0f, 100.0f));
+  ImGui::SetNextWindowSize(ImVec2(m_ui_context_ptr->getWidth(), m_ui_context_ptr->getHeight()));
   // ImGui::SetNextWindowSizeConstraints();
   ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 
@@ -36,7 +36,12 @@ void MainMenuRenderer::render(double dt) {
 
   // Render
   ImGui::Begin("Main Menu", NULL, flags);
-  if (ImGui::Button("New World")) {
+
+  ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+  ImVec2 buttonSize(280, 40);
+  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
+  if (ImGui::Button("New World", buttonSize)) {
+    std::cout << "New world button clicked." << std::endl;
   }
   // ImGui::ShowStyleEditor();
   ImGui::End();

@@ -45,6 +45,10 @@ void MainMenuRenderer::render(double dt) {
   if (ImGui::Button("New World", buttonSize)) {
     std::cout << "New world button clicked." << std::endl;
   }
+  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10)); // Move cursor on needed positions
+  if (ImGui::Button("Test", buttonSize)) {
+    std::cout << "Test button clicked." << std::endl;
+  }
   ImGui::PopFont();
 
   ImGui::End();

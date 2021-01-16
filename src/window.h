@@ -12,6 +12,7 @@
 #include "bindings/imgui_impl_opengl3.h"
 
 #include "app.h"
+#include "font_book.h"
 #include "ui_context.h"
 
 class Window {
@@ -58,6 +59,7 @@ class Window {
       ImGui_ImplOpenGL3_Init(glslVersion);
       ImGuiIO& io = ImGui::GetIO();
       io.IniFilename = NULL;
+      FontBook::loadFonts();
 
       // Configure viewport size and update it when the framebuffer size changes.
       //

@@ -17,6 +17,7 @@ add_executable( ve2
                 src/bindings/imgui_impl_opengl3.h
                 src/camera.cpp
                 src/camera.h
+                src/font_book.h
                 src/main.cpp
                 src/renderers/coordinate_lines_renderer.h
                 src/renderers/demo_renderer.cpp
@@ -45,6 +46,7 @@ add_custom_command(TARGET ve2
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/demo_renderer/demo.frag ${PROJECT_BINARY_DIR}
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/coordinate_lines_renderer/coordinate_lines.vert ${PROJECT_BINARY_DIR}
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/coordinate_lines_renderer/coordinate_lines.frag ${PROJECT_BINARY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/assets/fonts/Inconsolata-Regular.ttf ${PROJECT_BINARY_DIR}/Inconsolata.ttf
 )
 
 target_link_libraries(ve2 ${CONAN_LIBS})

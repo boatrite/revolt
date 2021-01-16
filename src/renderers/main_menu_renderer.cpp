@@ -1,3 +1,4 @@
+#include "../font_book.h"
 #include "main_menu_renderer.h"
 
 MainMenuRenderer::MainMenuRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
@@ -40,10 +41,12 @@ void MainMenuRenderer::render(double dt) {
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   ImVec2 buttonSize(280, 40);
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
+  ImGui::PushFont(FontBook::Inconsolata28());
   if (ImGui::Button("New World", buttonSize)) {
     std::cout << "New world button clicked." << std::endl;
   }
-  // ImGui::ShowStyleEditor();
+  ImGui::PopFont();
+
   ImGui::End();
 
   // Revert to old style

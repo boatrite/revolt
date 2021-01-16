@@ -9,6 +9,8 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 add_executable( ve2
+                src/actions.cpp
+                src/actions.h
                 src/app.cpp
                 src/app.h
                 src/bindings/imgui_impl_glfw.cpp

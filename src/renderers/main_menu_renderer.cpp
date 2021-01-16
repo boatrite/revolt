@@ -43,7 +43,7 @@ void MainMenuRenderer::render(double dt) {
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
   ImGui::PushFont(FontBook::NotoSans28Bold());
   if (ImGui::Button("New World", buttonSize)) {
-    m_store_ptr->dispatch(INCREMENT);
+    m_store_ptr->dispatch(CounterAction(CounterActionType::INCREMENT, 2));
     std::cout << "New world button clicked." << std::endl;
     // todo Add redux-cpp and see about using a basic setup to change the main
     // scene being rendered.
@@ -53,7 +53,7 @@ void MainMenuRenderer::render(double dt) {
   }
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10));
   if (ImGui::Button("Test", buttonSize)) {
-    m_store_ptr->dispatch(DECREMENT);
+    m_store_ptr->dispatch(CounterAction(CounterActionType::DECREMENT, 2));
     std::cout << "Test button clicked." << std::endl;
   }
   ImGui::PopFont();

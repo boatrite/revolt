@@ -41,7 +41,7 @@ void MainMenuRenderer::render(double dt) {
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   ImVec2 buttonSize(280, 40);
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
-  ImGui::PushFont(FontBook::Inconsolata28());
+  ImGui::PushFont(FontBook::NotoSans28Bold());
   if (ImGui::Button("New World", buttonSize)) {
     std::cout << "New world button clicked." << std::endl;
   }

@@ -1,6 +1,8 @@
 #include "app.h"
 
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
+  m_store_ptr->subscribe([](int state) { std::cout << state << std::endl; });
+
   m_ui_context_ptr->focusInGUI();
 
   ui_context_ptr->addKeyPressedHandler(

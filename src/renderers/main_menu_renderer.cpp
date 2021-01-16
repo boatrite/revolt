@@ -1,7 +1,7 @@
 #include "../font_book.h"
 #include "main_menu_renderer.h"
 
-MainMenuRenderer::MainMenuRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
+MainMenuRenderer::MainMenuRenderer(std::shared_ptr<AppStore> store_ptr, std::shared_ptr<UIContext> ui_context_ptr) : m_store_ptr{store_ptr}, m_ui_context_ptr{ui_context_ptr} {
   // Duplicate the current imgui state
   const ImGuiStyle& style = ImGui::GetStyle();
   ref_saved_style = style;
@@ -43,10 +43,17 @@ void MainMenuRenderer::render(double dt) {
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
   ImGui::PushFont(FontBook::NotoSans28Bold());
   if (ImGui::Button("New World", buttonSize)) {
+    m_store_ptr->dispatch(INCREMENT);
     std::cout << "New world button clicked." << std::endl;
+    // todo Add redux-cpp and see about using a basic setup to change the main
+    // scene being rendered.
+    // I could maybe even callit "Current Page" like I did in the old electron
+    // app. CurrentPage has more of an application-y feel, whereas scene feels
+    // more game-oriented.
   }
-  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10)); // Move cursor on needed positions
+  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10));
   if (ImGui::Button("Test", buttonSize)) {
+    m_store_ptr->dispatch(DECREMENT);
     std::cout << "Test button clicked." << std::endl;
   }
   ImGui::PopFont();

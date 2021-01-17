@@ -19,18 +19,6 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
     }
   );
 
-  m_ui_context_ptr->addKeyPressedHandler(
-    GLFW_KEY_E,
-    this,
-    [=]() {
-      if (m_ui_context_ptr->isFocusedInGame()) {
-        m_ui_context_ptr->focusInGUI();
-      } else {
-        m_ui_context_ptr->focusInGame();
-      }
-    }
-  );
-
 }
 
 App::~App() {

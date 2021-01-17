@@ -15,5 +15,6 @@ class RootRenderer : public Renderer {
 
   public:
     RootRenderer(std::shared_ptr<AppStore> store_ptr, std::shared_ptr<UIContext> ui_context_ptr);
+    ~RootRenderer();
     void render(double dt) override;
 };

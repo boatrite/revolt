@@ -3,7 +3,7 @@
 #include "overlay_renderer.h"
 #include "coordinate_lines_renderer.h"
 
-RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
+RootRenderer::RootRenderer(std::shared_ptr<AppStore> store_ptr, std::shared_ptr<UIContext> ui_context_ptr) : m_store_ptr{store_ptr}, m_ui_context_ptr{ui_context_ptr} {
   m_rendererPtrs.push_back(std::make_shared<DemoRenderer>(m_camera_ptr));
   m_rendererPtrs.push_back(std::make_shared<OverlayRenderer>(m_camera_ptr));
   m_rendererPtrs.push_back(std::make_shared<CoordinateLinesRenderer>(m_camera_ptr));

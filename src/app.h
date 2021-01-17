@@ -11,8 +11,12 @@ class App {
   private:
     std::vector<int> m_handler_ids {};
     std::shared_ptr<UIContext> m_ui_context_ptr;
-    std::shared_ptr<AppStore> m_store_ptr { std::make_shared<AppStore>(counterReducer, 0) };
-    std::shared_ptr<Renderer> m_root_renderer_ptr { std::make_shared<MainMenuRenderer>(m_store_ptr, m_ui_context_ptr) };
+    std::shared_ptr<AppStore> m_store_ptr {
+      std::make_shared<AppStore>(
+        appStateReducer,
+        std::make_shared<AppState>(m_ui_context_ptr)
+      )
+    };
     bool m_show_demo_window { false };
 
   public:

@@ -1,9 +1,9 @@
 #include "app.h"
 
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
-  m_store_ptr->subscribe([](int state) { std::cout << state << std::endl; });
+  m_store_ptr->getState()->ui_context_ptr->focusInGUI();
 
-  m_ui_context_ptr->focusInGUI();
+  m_store_ptr->dispatch(Action::setRenderer(std::make_shared<MainMenuRenderer>(m_store_ptr, m_ui_context_ptr)));
 
   ui_context_ptr->addKeyPressedHandler(
       GLFW_KEY_ESCAPE,
@@ -41,7 +41,9 @@ void App::update(double dt) {
 }
 
 void App::render(double dt) {
-  m_root_renderer_ptr->render(dt);
+  if (m_store_ptr->getState()->renderer_ptr) {
+    m_store_ptr->getState()->renderer_ptr->render(dt);
+  }
 
   if (m_show_demo_window) {
     ImGui::ShowDemoWindow();

@@ -2,7 +2,9 @@
 #include "main_menu_renderer.h"
 #include "root_renderer.h"
 
-MainMenuRenderer::MainMenuRenderer(std::shared_ptr<AppStore> store_ptr, std::shared_ptr<UIContext> ui_context_ptr) : m_store_ptr{store_ptr}, m_ui_context_ptr{ui_context_ptr} {
+MainMenuRenderer::MainMenuRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
+  std::cout << "MainMenuRenderer (" << this << ") created" << std::endl;
+
   // Duplicate the current imgui state
   const ImGuiStyle& style = ImGui::GetStyle();
   ref_saved_style = style;
@@ -11,6 +13,12 @@ MainMenuRenderer::MainMenuRenderer(std::shared_ptr<AppStore> store_ptr, std::sha
   // Apply edits to style
   ref_saved_style.WindowRounding = 0.0f;
   ref_saved_style.WindowBorderSize = 0.0f;
+
+  m_ui_context_ptr->focusInGUI();
+}
+
+MainMenuRenderer::~MainMenuRenderer() {
+  std::cout << "MainMenuRenderer (" << this << ") destroyed" << std::endl;
 }
 
 void MainMenuRenderer::render(double dt) {
@@ -48,8 +56,10 @@ void MainMenuRenderer::render(double dt) {
   }
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10));
   if (ImGui::Button("Test", buttonSize)) {
-    m_store_ptr->dispatch(Action::setRenderer(std::make_shared<RootRenderer>(m_store_ptr, m_ui_context_ptr)));
     std::cout << "Test button clicked." << std::endl;
+    m_ui_context_ptr->changeCurrentPage(
+      std::make_shared<RootRenderer>(m_ui_context_ptr)
+    );
   }
   ImGui::PopFont();
 

@@ -36,6 +36,24 @@ void UIContext::quit() {
 }
 
 //
+// Page functionality
+//
+std::shared_ptr<Renderer> UIContext::getCurrentPagePtr() {
+  return m_current_page_ptr;
+}
+
+void UIContext::changeCurrentPage(std::shared_ptr<Renderer> renderer_ptr) {
+  // One of the useful things about having the page change functionality live
+  // in this class is that this method can automatically cleanup any input
+  // handlers automatically.
+  if (m_current_page_ptr) {
+    removeHandlers(m_current_page_ptr.get());
+  }
+
+  m_current_page_ptr = renderer_ptr;
+}
+
+//
 // Window size accessors.
 // Uses the callback to keep them up-to-date.
 //
@@ -56,6 +74,7 @@ int UIContext::getHeight() const {
 // General purpose handler functionality
 //
 void UIContext::removeHandlers(void* instance) {
+  std::cout << "Removing handlers for instance " << instance << std::endl;
   removeCursorMovedHandler(instance);
   removeGameGuiFocusChangedHandler(instance);
   removeKeyPressedHandlers(instance);

@@ -3,15 +3,16 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "renderers/renderer.h"
+
 class UIContext {
   private:
     GLFWwindow* m_window;
-    int m_width;
-    int m_height;
 
   public:
     UIContext(GLFWwindow* window);
@@ -22,9 +23,29 @@ class UIContext {
     void quit();
 
     //
-    // Window size accessors.
-    // Uses the callback to keep them up-to-date.
+    // Page functionality
+    // UIContext keeps track of the current "page" to be rendered. It's
+    // basically the top level node for e.g. the intro menu, the new world
+    // form, the game world.
+    // In the code I just use Renderer and the naming is all over the place.
+    // RootRenderer is basically the game renderer. MainMenuRenderer is
+    // probably better referred to as the the IntroMenuRenderer.
     //
+  private:
+    std::shared_ptr<Renderer> m_current_page_ptr {};
+  public:
+    std::shared_ptr<Renderer> getCurrentPagePtr();
+    void changeCurrentPage(std::shared_ptr<Renderer> renderer_ptr);
+
+    //
+    // Window size accessors.
+    // Gives consumers the ability to get the width and height each frame
+    // without having to query glfw or deal with a callback and track the
+    // values itself. UIContext uses the callback to keep them up-to-date.
+    //
+  private:
+    int m_width;
+    int m_height;
   public:
     void windowSizeCallback(int width, int height);
     int getWidth() const;

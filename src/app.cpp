@@ -1,9 +1,9 @@
 #include "app.h"
 
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
-  m_store_ptr->getState()->ui_context_ptr->focusInGUI();
-
-  m_store_ptr->dispatch(Action::setRenderer(std::make_shared<MainMenuRenderer>(m_store_ptr, m_ui_context_ptr)));
+  m_ui_context_ptr->changeCurrentPage(
+    std::make_shared<MainMenuRenderer>(m_ui_context_ptr)
+  );
 
   ui_context_ptr->addKeyPressedHandler(
       GLFW_KEY_ESCAPE,
@@ -29,8 +29,8 @@ void App::update(double dt) {
 }
 
 void App::render(double dt) {
-  if (m_store_ptr->getState()->renderer_ptr) {
-    m_store_ptr->getState()->renderer_ptr->render(dt);
+  if (m_ui_context_ptr->getCurrentPagePtr()) {
+    m_ui_context_ptr->getCurrentPagePtr()->render(dt);
   }
 
   if (m_show_demo_window) {

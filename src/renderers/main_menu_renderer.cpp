@@ -1,4 +1,5 @@
 #include "../font_book.h"
+#include "../util/imgui_util.h"
 #include "main_menu_renderer.h"
 #include "root_renderer.h"
 
@@ -36,17 +37,10 @@ void MainMenuRenderer::render(double dt) {
     ImGuiWindowFlags_AlwaysAutoResize |
     ImGuiWindowFlags_NoSavedSettings;
 
-  // Backup current style
-  ImGuiStyle& style = ImGui::GetStyle();
-  ImGuiStyle previous = style;
-  ImGuiStyle* previous_ptr = &previous;
-
-  // Enable custom style
-  style = *ref_saved_style_ptr;
+  ImGuiUtil::PushStyle(ref_saved_style_ptr);
 
   // Render
   ImGui::Begin("Main Menu", NULL, flags);
-
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   ImVec2 buttonSize(280, 40);
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
@@ -62,9 +56,7 @@ void MainMenuRenderer::render(double dt) {
     );
   }
   ImGui::PopFont();
-
   ImGui::End();
 
-  // Revert to old style
-  style = *previous_ptr;
+  ImGuiUtil::PopStyle();
 }

@@ -33,6 +33,8 @@ add_executable( ve2
                 src/ui_context.h
                 src/util/file.cpp
                 src/util/file.h
+                src/util/imgui_util.cpp
+                src/util/imgui_util.h
                 src/util/shader.cpp
                 src/util/shader.h
                 src/window.h

@@ -6,14 +6,13 @@
 MainMenuRenderer::MainMenuRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   std::cout << "MainMenuRenderer (" << this << ") created" << std::endl;
 
-  // Duplicate the current imgui state
-  const ImGuiStyle& style = ImGui::GetStyle();
-  ref_saved_style = style;
-  ref_saved_style_ptr = &ref_saved_style;
-
-  // Apply edits to style
-  ref_saved_style.WindowRounding = 0.0f;
-  ref_saved_style.WindowBorderSize = 0.0f;
+  // Create custom style for rendering window.
+  m_style = ImGuiUtil::CreateStyle(
+    [](ImGuiStyle& style) {
+      style.WindowRounding = 0.0f;
+      style.WindowBorderSize = 0.0f;
+    }
+  );
 
   m_ui_context_ptr->focusInGUI();
 }
@@ -37,7 +36,7 @@ void MainMenuRenderer::render(double dt) {
     ImGuiWindowFlags_AlwaysAutoResize |
     ImGuiWindowFlags_NoSavedSettings;
 
-  ImGuiUtil::PushStyle(ref_saved_style_ptr);
+  ImGuiUtil::PushStyle(m_style);
 
   // Render
   ImGui::Begin("Main Menu", NULL, flags);

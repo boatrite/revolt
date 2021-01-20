@@ -15,6 +15,10 @@
 struct State {
   std::string world_seed;
   int world_size;
+  // FIXME If I don't want to copy state all the time (which seems dangerous),
+  // I need to update redux.hpp to use references where appropriate.
+  // State(const State&) = delete; // Delete copy constructor
+  // State& operator=(const State&) = delete; // Delete copy assignment
 };
 
 class Action {
@@ -24,7 +28,9 @@ class Action {
     };
 
   public:
-    virtual ~Action() {};
+    virtual ~Action() {
+      std::cout << "Action destroyed" << std::endl;
+    };
     Action(const Action&) = delete; // Delete copy constructor
     Action& operator=(const Action&) = delete; // Delete copy assignment
 
@@ -55,6 +61,12 @@ static State theReducer(State state, Action* action) {
       state.world_size = 2;
       break;
   }
+
+  // Because we need an Action* to dynamic_cast, when dispatch is called, we
+  // pass it a new WhateverAction() which means we need to manually delete it
+  // when done.
+  delete action;
+
   return state;
 };
 

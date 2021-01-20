@@ -1,11 +1,30 @@
 # pragma once
 
+#include <array>
 #include <iostream>
+#include <memory>
 #include <string>
 
+#include <glm/glm.hpp>
+#include <redux.hpp>
+
+constexpr int CHUNK_SIZE { 32 };
+
+constexpr int CHUNK_SIZE_CUBED { CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE };
+
+struct Block {
+};
+
+struct Chunk {
+  glm::vec3 position { 0, 0, 0 };
+  std::array<Block, CHUNK_SIZE_CUBED> blocks {};
+};
+
 struct State {
-  std::string world_seed;
-  int world_size;
+  std::string world_seed {};
+  int world_size {};
+  Chunk chunk {};
+
   // FIXME If I don't want to copy state all the time (which seems dangerous),
   // I need to update redux.hpp to use references where appropriate.
   // State(const State&) = delete; // Delete copy constructor
@@ -57,4 +76,3 @@ static State theReducer(State state, std::shared_ptr<Action> action) {
 };
 
 using Store = redux::Store<State, std::shared_ptr<Action>>;
-

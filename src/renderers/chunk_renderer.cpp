@@ -1,12 +1,13 @@
 #include <iostream>
 #include <vector>
-#include "demo_renderer.h"
+#include "chunk_renderer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-DemoRenderer::DemoRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { cameraPtr } {
+ChunkRenderer::ChunkRenderer(std::shared_ptr<UIContext> ui_context_ptr, std::shared_ptr<Camera> camera_ptr)
+  : m_ui_context_ptr{ui_context_ptr}, m_camera_ptr {camera_ptr} {
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);
 
@@ -24,20 +25,20 @@ DemoRenderer::DemoRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { ca
   glEnableVertexAttribArray(1);
 }
 
-DemoRenderer::~DemoRenderer() {
+ChunkRenderer::~ChunkRenderer() {
   glDeleteBuffers(1, &m_vbo);
   glDeleteVertexArrays(1, &m_vao);
 }
 
-void DemoRenderer::render(double dt) {
+void ChunkRenderer::render(double dt) {
   glEnable(GL_DEPTH_TEST);
 
   glClearColor(0.132f, 0.132f, 0.132f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   m_shader.use();
-  m_shader.setMat4("view", m_cameraPtr->getViewMatrix());
-  m_shader.setMat4("projection", m_cameraPtr->getProjectionMatrix());
+  m_shader.setMat4("view", m_camera_ptr->getViewMatrix());
+  m_shader.setMat4("projection", m_camera_ptr->getProjectionMatrix());
 
   glBindVertexArray(m_vao);
 
@@ -60,7 +61,7 @@ void DemoRenderer::render(double dt) {
   glBindVertexArray(0);
 }
 
-std::array<float, 36 * 6> DemoRenderer::color_cube(Color color_code) {
+std::array<float, 36 * 6> ChunkRenderer::color_cube(Color color_code) {
   static glm::vec3 grass = glm::vec3(34.0 / 255.0, 70.0 / 255.0, 29.0 / 255.0);
   static glm::vec3 water = glm::vec3(2.0 / 255.0, 43.0 / 255.0, 61.0 / 255.0);
   static glm::vec3 dirt = glm::vec3(38.0 / 255.0, 28.0 / 255.0, 20.0 / 255.0);

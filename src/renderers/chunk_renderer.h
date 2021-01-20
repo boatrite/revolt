@@ -11,15 +11,17 @@ enum class Color {
   water
 };
 
-class DemoRenderer : public Renderer {
+class ChunkRenderer : public Renderer {
   public:
-    DemoRenderer(std::shared_ptr<Camera> cameraPtr);
-    ~DemoRenderer() override;
+    ChunkRenderer(std::shared_ptr<UIContext> m_ui_context_ptr, std::shared_ptr<Camera> camera_ptr);
+    ~ChunkRenderer() override;
     void render(double dt) override;
 
   private:
-    float m_scale { 1.0f/32.0f };
-    std::shared_ptr<Camera> m_cameraPtr;
+    std::shared_ptr<UIContext> m_ui_context_ptr;
+    std::shared_ptr<Camera> m_camera_ptr;
+
+    float m_scale { 1.0f };
     unsigned int m_vao {};
     unsigned int m_vbo {};
     Shader m_shader { Shader("demo.vert", "demo.frag") };

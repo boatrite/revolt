@@ -9,45 +9,8 @@ add_definitions("-std=c++17")
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-file(GLOB EXTERN_SOURCES
-  extern/*.h
-  extern/*.cpp
-)
-
-add_executable( ve2
-                ${EXTERN_SOURCES}
-                src/app.cpp
-                src/app.h
-                src/bindings/imgui_impl_glfw.cpp
-                src/bindings/imgui_impl_glfw.h
-                src/bindings/imgui_impl_opengl3.cpp
-                src/bindings/imgui_impl_opengl3.h
-                src/camera.cpp
-                src/camera.h
-                src/font_book.h
-                src/main.cpp
-                src/renderers/coordinate_lines_renderer.h
-                src/renderers/demo_renderer.cpp
-                src/renderers/demo_renderer.h
-                src/renderers/main_menu_renderer.cpp
-                src/renderers/main_menu_renderer.h
-                src/renderers/new_world_page_renderer.cpp
-                src/renderers/new_world_page_renderer.h
-                src/renderers/overlay_renderer.cpp
-                src/renderers/overlay_renderer.h
-                src/renderers/renderer.h
-                src/renderers/root_renderer.cpp
-                src/renderers/root_renderer.h
-                src/ui_context.cpp
-                src/ui_context.h
-                src/util/file.cpp
-                src/util/file.h
-                src/util/imgui_util.cpp
-                src/util/imgui_util.h
-                src/util/shader.cpp
-                src/util/shader.h
-                src/window.h
-)
+file(GLOB_RECURSE SOURCES src/*.cpp extern/*.cpp)
+add_executable( ve2 ${SOURCES})
 
 add_compile_options("-pedantic-errors -Wall -Weffc++ -Wextra -Wsign-conversion")
 

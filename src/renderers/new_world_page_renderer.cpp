@@ -1,5 +1,8 @@
+#include "../../extern/imgui_stdlib.h"
+
 #include "../font_book.h"
 #include "../util/imgui_util.h"
+#include "root_renderer.h"
 #include "new_world_page_renderer.h"
 
 NewWorldPageRenderer::NewWorldPageRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
@@ -33,9 +36,17 @@ void NewWorldPageRenderer::render(double dt) {
       ImGuiWindowFlags_AlwaysAutoResize |
       ImGuiWindowFlags_NoSavedSettings);
   ImVec2 buttonSize(280, 40);
-  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
+  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, 20)); // Move cursor on needed positions
   ImGui::PushFont(FontBook::NotoSans28Bold());
-  ImGui::Text("Placeholder");
+  ImGui::InputText("Seed", &m_world_seed, 0);
+  ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10));
+  if (ImGui::Button("Create World", buttonSize)) {
+    std::cout << "Create world button clicked. Seed: " + m_world_seed << std::endl;
+    m_ui_context_ptr->getStore().dispatch(new CreateNewWorldAction(m_world_seed));
+    m_ui_context_ptr->changeCurrentPage(
+      std::make_shared<RootRenderer>(m_ui_context_ptr)
+    );
+  }
   ImGui::PopFont();
   ImGui::End();
   ImGuiUtil::PopStyle();

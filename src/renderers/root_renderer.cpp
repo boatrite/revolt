@@ -1,3 +1,5 @@
+#include <imgui.h>
+
 #include "root_renderer.h"
 #include "demo_renderer.h"
 #include "overlay_renderer.h"
@@ -40,4 +42,12 @@ void RootRenderer::render(double dt) {
   for(auto rendererPtr : m_rendererPtrs) {
     rendererPtr->render(dt);
   }
+
+  ImGui::SetNextWindowPos(ImVec2(10, 300));
+  if (ImGui::Begin("State")) {
+    const State& state = m_ui_context_ptr->getStore().getState();
+    ImGui::Text("world_seed: %s", state.world_seed.c_str());
+    ImGui::Text("world_size: %i", state.world_size);
+  }
+  ImGui::End();
 }

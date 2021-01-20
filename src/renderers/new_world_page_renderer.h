@@ -12,6 +12,8 @@ class NewWorldPageRenderer : public Renderer {
     std::shared_ptr<UIContext> m_ui_context_ptr;
     ImGuiStyle m_style;
 
+    std::string m_world_seed { "some letters" };
+
   public:
     NewWorldPageRenderer(std::shared_ptr<UIContext> ui_context_ptr);
     ~NewWorldPageRenderer();

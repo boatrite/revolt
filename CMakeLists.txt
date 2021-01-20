@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11)
+
 project(VoxelEngineMk2 CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -8,7 +9,13 @@ add_definitions("-std=c++17")
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
+file(GLOB EXTERN_SOURCES
+  extern/*.h
+  extern/*.cpp
+)
+
 add_executable( ve2
+                ${EXTERN_SOURCES}
                 src/app.cpp
                 src/app.h
                 src/bindings/imgui_impl_glfw.cpp

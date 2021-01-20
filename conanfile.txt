@@ -3,6 +3,7 @@ glad/0.1.34
 glfw/3.3.2
 glm/0.9.9.8
 imgui/1.79
+redux-cpp-conan/0.1@demo/testing
 
 [options]
 glad:gl_profile=core

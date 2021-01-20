@@ -8,7 +8,57 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <redux.hpp>
+
 #include "renderers/renderer.h"
+
+struct State {
+  std::string world_seed;
+  int world_size;
+};
+
+class Action {
+  public:
+    enum class Type {
+      CREATE_NEW_WORLD
+    };
+
+  public:
+    virtual ~Action() {};
+    Action(const Action&) = delete; // Delete copy constructor
+    Action& operator=(const Action&) = delete; // Delete copy assignment
+
+    const Type getType() const {
+      return m_type;
+    };
+
+  protected:
+    Action(Type type) : m_type{type} {};
+
+  private:
+    const Type m_type;
+};
+
+class CreateNewWorldAction : public Action {
+  public:
+    CreateNewWorldAction(std::string seed) : Action { Type::CREATE_NEW_WORLD }, m_seed{seed} {};
+    std::string getSeed() { return m_seed; };
+  private:
+    std::string m_seed;
+};
+
+static State theReducer(State state, Action* action) {
+  switch(action->getType()) {
+    case Action::Type::CREATE_NEW_WORLD:
+      std::cout << "In CREATE_NEW_WORLD action handler" << std::endl;
+      state.world_seed = dynamic_cast<CreateNewWorldAction*>(action)->getSeed();
+      state.world_size = 2;
+      break;
+  }
+  return state;
+};
+
+using Store = redux::Store<State, Action*>;
 
 class UIContext {
   private:
@@ -18,8 +68,21 @@ class UIContext {
     UIContext(GLFWwindow* window);
 
     //
+    // Well, I'm going to try to use redux again.
+    // I'm just putting it here because it's the easiest way to be
+    // able to access it since most places have a ui context.
+    //
+  private:
+    State m_my_state {};
+    Store m_store { Store(theReducer, m_my_state) };
+
+  public:
+    Store& getStore() { return m_store; };
+
+    //
     // Quit functionality
     //
+  public:
     void quit();
 
     //

@@ -53,24 +53,19 @@ class CreateNewWorldAction : public Action {
     std::string m_seed;
 };
 
-static State theReducer(State state, Action* action) {
+static State theReducer(State state, std::shared_ptr<Action> action) {
   switch(action->getType()) {
     case Action::Type::CREATE_NEW_WORLD:
       std::cout << "In CREATE_NEW_WORLD action handler" << std::endl;
-      state.world_seed = dynamic_cast<CreateNewWorldAction*>(action)->getSeed();
+      state.world_seed = static_cast<CreateNewWorldAction&>(*action).getSeed();
       state.world_size = 2;
       break;
   }
 
-  // Because we need an Action* to dynamic_cast, when dispatch is called, we
-  // pass it a new WhateverAction() which means we need to manually delete it
-  // when done.
-  delete action;
-
   return state;
 };
 
-using Store = redux::Store<State, Action*>;
+using Store = redux::Store<State, std::shared_ptr<Action>>;
 
 class UIContext {
   private:

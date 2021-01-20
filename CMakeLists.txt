@@ -14,15 +14,12 @@ add_executable( ve2 ${SOURCES})
 
 add_compile_options("-pedantic-errors -Wall -Weffc++ -Wextra -Wsign-conversion")
 
+file(GLOB_RECURSE SHADERS src/*.vert src/*.frag)
+file(GLOB_RECURSE FONTS src/assets/*.ttf)
 add_custom_command(TARGET ve2
   POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/chunk_renderer/demo.vert ${PROJECT_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/chunk_renderer/demo.frag ${PROJECT_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/coordinate_lines_renderer/coordinate_lines.vert ${PROJECT_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/renderers/coordinate_lines_renderer/coordinate_lines.frag ${PROJECT_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/assets/fonts/Inconsolata-Regular.ttf ${PROJECT_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/assets/fonts/NotoSans-Bold.ttf ${PROJECT_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/assets/fonts/NotoSans-Regular.ttf ${PROJECT_BINARY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy ${SHADERS} ${PROJECT_BINARY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy ${FONTS} ${PROJECT_BINARY_DIR}
 )
 
 target_link_libraries(ve2 ${CONAN_LIBS})

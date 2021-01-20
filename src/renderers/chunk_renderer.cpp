@@ -1,10 +1,13 @@
 #include <iostream>
 #include <vector>
-#include "chunk_renderer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/scalar_multiplication.hpp>
+
+#include "../common.h"
+#include "chunk_renderer.h"
 
 ChunkRenderer::ChunkRenderer(std::shared_ptr<UIContext> ui_context_ptr, std::shared_ptr<Camera> camera_ptr)
   : m_ui_context_ptr{ui_context_ptr}, m_camera_ptr {camera_ptr} {
@@ -42,19 +45,27 @@ void ChunkRenderer::render(double dt) {
 
   glBindVertexArray(m_vao);
 
-  for (auto i = 0; i <= 8 * (1.0 / m_scale); ++i) {
-    for (auto ii = 0; ii <= 8 * (1.0 / m_scale); ++ii) {
-      m_shader.setMat4(
-        "model",
-        glm::translate( // Move it to (i, ii) in the fake chunk thing
-          glm::scale( // Scale the unit cube to create our fundamental building block
-            glm::mat4(1.0f),
-            glm::vec3(m_scale)
-          ),
-          glm::vec3(i+0.5f, 0.5f, ii+0.5f) // Offset by 0.5f to align on integer values.
-        )
-      );
-      glDrawArrays(GL_TRIANGLES, 0, 36);
+  for (const auto& chunk_ptr : m_ui_context_ptr->getStore().getState().chunks) {
+    if (!chunk_ptr) {
+      continue;
+    }
+    glm::mat4 blockModel = glm::mat4(1.0);
+    blockModel = glm::translate(blockModel, chunk_ptr->position * CHUNK_SIZE);
+
+    for (auto i = 0; i < CHUNK_SIZE * (1.0 / m_scale); ++i) {
+      for (auto ii = 0; ii < CHUNK_SIZE * (1.0 / m_scale); ++ii) {
+        m_shader.setMat4(
+          "model",
+          glm::translate( // Move it to (i, ii) in the fake chunk thing
+            glm::scale( // Scale the unit cube to create our fundamental building block
+              blockModel,
+              glm::vec3(m_scale)
+            ),
+            glm::vec3(i+0.5f, 0.5f, ii+0.5f) // Offset by 0.5f to align on integer values.
+          )
+        );
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+      }
     }
   }
 

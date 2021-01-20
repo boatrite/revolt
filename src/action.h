@@ -8,22 +8,12 @@
 #include <glm/glm.hpp>
 #include <redux.hpp>
 
-constexpr int CHUNK_SIZE { 32 };
-
-constexpr int CHUNK_SIZE_CUBED { CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE };
-
-struct Block {
-};
-
-struct Chunk {
-  glm::vec3 position { 0, 0, 0 };
-  std::array<Block, CHUNK_SIZE_CUBED> blocks {};
-};
+#include "common.h"
 
 struct State {
   std::string world_seed {};
   int world_size {};
-  Chunk chunk {};
+  std::array<std::shared_ptr<Chunk>, 100> chunks {};
 
   // FIXME If I don't want to copy state all the time (which seems dangerous),
   // I need to update redux.hpp to use references where appropriate.
@@ -68,7 +58,13 @@ static State theReducer(State state, std::shared_ptr<Action> action) {
     case Action::Type::CREATE_NEW_WORLD:
       std::cout << "In CREATE_NEW_WORLD action handler" << std::endl;
       state.world_seed = static_cast<CreateNewWorldAction&>(*action).getSeed();
-      state.world_size = 2;
+      state.world_size = 4;
+      for (auto i = 0; i < state.world_size; ++i) {
+        for (auto ii = 0; ii < state.world_size; ++ii) {
+          auto index { ii * CHUNK_SIZE + i };
+          state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii));
+        }
+      }
       break;
   }
 

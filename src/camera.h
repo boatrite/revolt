@@ -44,10 +44,10 @@ class Camera {
     float fov { 45.0f };
     float nearPlane { 0.1f };
     float farPlane { 400.0f };
-    float speed { 4.0f };
+    float speed { 8.0f };
     float sensitivity { 0.05f };
 
-    glm::vec3 position { glm::vec3(0.0f, 0.0f, 3.0f) };
+    glm::vec3 position { glm::vec3(10.0f, 10.0f, 30.0f) };
 
     glm::vec3 computeCameraFront();
 

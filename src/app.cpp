@@ -18,7 +18,6 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
       m_show_demo_window = !m_show_demo_window;
     }
   );
-
 }
 
 App::~App() {

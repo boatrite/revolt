@@ -10,18 +10,28 @@
 
 class ChunkBoundariesRenderer : public Renderer {
   private:
+    std::shared_ptr<UIContext> m_ui_context_ptr;
     std::shared_ptr<Camera> m_camera_ptr;
     Shader m_shader { Shader("coordinate_lines.vert", "coordinate_lines.frag") };
 
     unsigned int m_vao {};
     unsigned int m_vbo {};
+    bool m_show { false };
     static const int s_dimensions { 3 };
     static const int s_planes_per_dimension { 5 };
     static const int s_lines_per_plane { 7 };
     static const int s_vertices_per_line { 2 };
 
   public:
-    ChunkBoundariesRenderer(std::shared_ptr<Camera> camera_ptr) : m_camera_ptr{camera_ptr} {
+    ChunkBoundariesRenderer(std::shared_ptr<UIContext> ui_context_ptr, std::shared_ptr<Camera> camera_ptr)
+      : m_ui_context_ptr{ui_context_ptr}, m_camera_ptr{camera_ptr}
+    {
+      m_ui_context_ptr->addKeyPressedHandler(
+        GLFW_KEY_F3,
+        this,
+        [=]() { m_show = !m_show; }
+      );
+
       float length = 512.0f;
       const int floats_per_vertex = 6;
       float vertices[s_dimensions * s_planes_per_dimension * s_lines_per_plane * s_vertices_per_line * floats_per_vertex] {};
@@ -70,6 +80,10 @@ class ChunkBoundariesRenderer : public Renderer {
     }
 
     void render(double dt) override {
+      if (!m_show) {
+        return;
+      }
+
       m_shader.use();
 
       m_shader.setMat4("model", glm::translate(

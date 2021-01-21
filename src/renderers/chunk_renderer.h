@@ -21,7 +21,6 @@ class ChunkRenderer : public Renderer {
     std::shared_ptr<UIContext> m_ui_context_ptr;
     std::shared_ptr<Camera> m_camera_ptr;
 
-    float m_scale { 1.0f };
     unsigned int m_vao {};
     unsigned int m_vbo {};
     Shader m_shader { Shader("demo.vert", "demo.frag") };

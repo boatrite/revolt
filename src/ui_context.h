@@ -8,10 +8,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <redux.hpp>
-
-#include "renderers/renderer.h"
 #include "action.h"
+#include "redux.hpp"
+#include "renderers/renderer.h"
 
 class UIContext {
   private:

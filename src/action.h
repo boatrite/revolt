@@ -6,14 +6,17 @@
 #include <string>
 
 #include <glm/glm.hpp>
-#include <redux.hpp>
 
 #include "common.h"
+#include "redux.hpp"
 
 struct State {
   std::string world_seed {};
   int world_size {};
   std::array<std::shared_ptr<Chunk>, 100> chunks {};
+
+  bool wireframe { false };
+  float scale { 1.0f };
 
   // FIXME If I don't want to copy state all the time (which seems dangerous),
   // I need to update redux.hpp to use references where appropriate.
@@ -58,7 +61,7 @@ static State theReducer(State state, std::shared_ptr<Action> action) {
     case Action::Type::CREATE_NEW_WORLD:
       std::cout << "In CREATE_NEW_WORLD action handler" << std::endl;
       state.world_seed = static_cast<CreateNewWorldAction&>(*action).getSeed();
-      state.world_size = 4;
+      state.world_size = 2;
       for (auto i = 0; i < state.world_size; ++i) {
         for (auto ii = 0; ii < state.world_size; ++ii) {
           auto index { ii * CHUNK_SIZE + i };

@@ -1,10 +1,9 @@
 # pragma once
 
 #include "redux.hpp"
-
-#include "ui_context.h"
-#include "renderers/root_renderer.h"
 #include "renderers/main_menu_renderer.h"
+#include "renderers/root_renderer.h"
+#include "ui_context.h"
 
 class App {
   private:

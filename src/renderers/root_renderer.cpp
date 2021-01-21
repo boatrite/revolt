@@ -35,7 +35,7 @@ RootRenderer::~RootRenderer() {
 }
 
 void RootRenderer::render(double dt) {
-  if (m_wireframe) {
+  if (m_ui_context_ptr->getStore().getState().wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   } else {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -47,9 +47,12 @@ void RootRenderer::render(double dt) {
 
   ImGui::SetNextWindowPos(ImVec2(10, 300));
   if (ImGui::Begin("State")) {
-    const State& state = m_ui_context_ptr->getStore().getState();
-    ImGui::Text("world_seed: %s", state.world_seed.c_str());
-    ImGui::Text("world_size: %i", state.world_size);
+    if (ImGui::CollapsingHeader("State", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
+      State& state = m_ui_context_ptr->getStore().getState();
+      ImGui::Text("world_seed: %s", state.world_seed.c_str());
+      ImGui::Text("world_size: %i", state.world_size);
+      ImGui::Checkbox("wireframe", &state.wireframe);
+    }
   }
   ImGui::End();
 }

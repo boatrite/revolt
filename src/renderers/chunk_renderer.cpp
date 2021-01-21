@@ -45,6 +45,8 @@ void ChunkRenderer::render(double dt) {
 
   glBindVertexArray(m_vao);
 
+  const auto& scale = m_ui_context_ptr->getStore().getState().scale;
+
   for (const auto& chunk_ptr : m_ui_context_ptr->getStore().getState().chunks) {
     if (!chunk_ptr) {
       continue;
@@ -52,14 +54,14 @@ void ChunkRenderer::render(double dt) {
     glm::mat4 blockModel = glm::mat4(1.0);
     blockModel = glm::translate(blockModel, chunk_ptr->position * CHUNK_SIZE);
 
-    for (auto i = 0; i < CHUNK_SIZE * (1.0 / m_scale); ++i) {
-      for (auto ii = 0; ii < CHUNK_SIZE * (1.0 / m_scale); ++ii) {
+    for (auto i = 0; i < CHUNK_SIZE * (1.0 / scale); ++i) {
+      for (auto ii = 0; ii < CHUNK_SIZE * (1.0 / scale); ++ii) {
         m_shader.setMat4(
           "model",
           glm::translate( // Move it to (i, ii) in the fake chunk thing
             glm::scale( // Scale the unit cube to create our fundamental building block
               blockModel,
-              glm::vec3(m_scale)
+              glm::vec3(scale)
             ),
             glm::vec3(i+0.5f, 0.5f, ii+0.5f) // Offset by 0.5f to align on integer values.
           )

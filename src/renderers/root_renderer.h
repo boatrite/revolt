@@ -11,7 +11,7 @@ class RootRenderer : public Renderer {
 
     std::vector<std::shared_ptr<Renderer>> m_renderer_ptrs {};
 
-    bool m_wireframe { true };
+    bool m_wireframe { false };
 
   public:
     RootRenderer(std::shared_ptr<UIContext> ui_context_ptr);

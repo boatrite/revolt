@@ -4,6 +4,7 @@
 #include "chunk_renderer.h"
 #include "overlay_renderer.h"
 #include "coordinate_lines_renderer.h"
+#include "chunk_boundaries_renderer.h"
 
 RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   std::cout << "RootRenderer (" << this << ") created" << std::endl;
@@ -11,6 +12,7 @@ RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_con
   m_renderer_ptrs.push_back(std::make_shared<ChunkRenderer>(m_ui_context_ptr, m_camera_ptr));
   m_renderer_ptrs.push_back(std::make_shared<OverlayRenderer>(m_camera_ptr));
   m_renderer_ptrs.push_back(std::make_shared<CoordinateLinesRenderer>(m_camera_ptr));
+  m_renderer_ptrs.push_back(std::make_shared<ChunkBoundariesRenderer>(m_camera_ptr));
 
   m_ui_context_ptr->addKeyPressedHandler(
     GLFW_KEY_E,

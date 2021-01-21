@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-constexpr int CHUNK_SIZE { 8 };
+constexpr int CHUNK_SIZE { 16 };
 
 constexpr int CHUNK_SIZE_CUBED { CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE };
 

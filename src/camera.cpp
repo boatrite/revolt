@@ -2,10 +2,12 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/scalar_multiplication.hpp>
 
 #include <functional>
 
 #include "camera.h"
+#include "common.h"
 
 Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { ui_context_ptr } {
   m_ui_context_ptr->addCursorMovedHandler(
@@ -42,6 +44,10 @@ glm::mat4 Camera::getViewMatrix() const {
 
 glm::mat4 Camera::getProjectionMatrix() const {
   return glm::perspective(glm::radians(fov), static_cast<float>(m_ui_context_ptr->getWidth()) / m_ui_context_ptr->getHeight(), nearPlane, farPlane);
+}
+
+const glm::vec3& Camera::getPosition() const {
+  return position;
 }
 
 void Camera::processInput(float dt) {
@@ -117,6 +123,8 @@ void Camera::focusCallback(bool focusedInGame) {
 void Camera::imguiDebugControlPanel() {
   ImGui::Text("Camera:");
   ImGui::Text("Position: (%.0f,%.0f, %.0f)", position.x, position.y, position.z);
+  const auto& chunk_position { Chunk::chunkPosition(position) };
+  ImGui::Text("Chunk Position: (%.0f,%.0f, %.0f)", chunk_position.x, chunk_position.y, chunk_position.z);
   ImGui::SliderFloat("FOV", &fov, Camera::MIN_FOV, Camera::MAX_FOV);
   ImGui::SliderFloat("Near Plane", &nearPlane, Camera::MIN_NEAR_PLANE, Camera::MAX_NEAR_PLANE);
   ImGui::SliderFloat("Far Plane", &farPlane, Camera::MIN_FAR_PLANE, Camera::MAX_FAR_PLANE);

@@ -13,6 +13,7 @@ class Camera {
     std::shared_ptr<UIContext> m_ui_context_ptr;
     float yaw { 270.0f };
     float pitch { -30.0f };
+    glm::vec3 position { glm::vec3(10.0f, 10.0f, 30.0f) };
     glm::vec3 cameraFront { computeCameraFront() };
     glm::vec3 cameraUp { glm::vec3(0.0f, 1.0f,  0.0f) };
     double lastX {};
@@ -47,12 +48,11 @@ class Camera {
     float speed { 8.0f };
     float sensitivity { 0.05f };
 
-    glm::vec3 position { glm::vec3(10.0f, 10.0f, 30.0f) };
-
     glm::vec3 computeCameraFront();
 
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
+    const glm::vec3& getPosition() const;
 
     void imguiDebugControlPanel();
 };

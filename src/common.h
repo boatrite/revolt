@@ -22,4 +22,12 @@ struct Chunk {
   std::array<Block, CHUNK_SIZE_CUBED> blocks {};
 
   Chunk(glm::vec3 position) : position{position} {};
+
+  static const glm::vec3 chunkPosition(const glm::vec3& position) {
+    return glm::vec3(
+      (position.x > 0 ? floor : ceil)(position.x / CHUNK_SIZE),
+      floor(position.y / CHUNK_SIZE),
+      (position.z > 0 ? floor : ceil)(position.z / CHUNK_SIZE)
+    );
+  }
 };

@@ -1,6 +1,7 @@
 #include <memory>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/scalar_multiplication.hpp>
 
 #include "../camera.h"
 #include "../common.h"
@@ -15,8 +16,8 @@ class ChunkBoundariesRenderer : public Renderer {
     unsigned int m_vao {};
     unsigned int m_vbo {};
     static const int s_dimensions { 3 };
-    static const int s_planes_per_dimension { 8 + 1 };
-    static const int s_lines_per_plane { 8 + 1 };
+    static const int s_planes_per_dimension { 5 };
+    static const int s_lines_per_plane { 7 };
     static const int s_vertices_per_line { 2 };
 
   public:
@@ -71,12 +72,16 @@ class ChunkBoundariesRenderer : public Renderer {
     void render(double dt) override {
       m_shader.use();
 
-      m_shader.setMat4("model", glm::mat4(1.0f));
+      m_shader.setMat4("model", glm::translate(
+        glm::mat4(1.0f),
+        Chunk::chunkPosition(m_camera_ptr->getPosition()) * CHUNK_SIZE
+      ));
       m_shader.setMat4("view", m_camera_ptr->getViewMatrix());
       m_shader.setMat4("projection", m_camera_ptr->getProjectionMatrix());
 
       glBindVertexArray(m_vao);
-      glDrawArrays(GL_LINES, 0, s_dimensions * s_planes_per_dimension * s_lines_per_plane * s_vertices_per_line);
+      auto total_vertex_count = s_dimensions * s_planes_per_dimension * s_lines_per_plane * s_vertices_per_line;
+      glDrawArrays(GL_LINES, 0, total_vertex_count);
 
       glBindVertexArray(0);
     }

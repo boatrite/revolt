@@ -1,7 +1,7 @@
 {
   "src/*.cpp": {
     "type": "src",
-    "related": ["src/{}.h"]
+    "alternate": "src/{}.h"
   },
   "src/*.h": {
     "type": "header",

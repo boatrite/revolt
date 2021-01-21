@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <cmath>
 
 #include <glm/glm.hpp>
 
@@ -15,8 +16,12 @@ struct State {
   int world_size {};
   std::array<std::shared_ptr<Chunk>, 100> chunks {};
 
-  bool wireframe { false };
-  float scale { 1.0f };
+  bool wireframe { true };
+  int scale_factor { 3 };
+
+  float scale() {
+    return 1.0f / pow(2.0, scale_factor);
+  }
 
   // FIXME If I don't want to copy state all the time (which seems dangerous),
   // I need to update redux.hpp to use references where appropriate.
@@ -34,6 +39,7 @@ class Action {
     virtual ~Action() {
       std::cout << "Action destroyed" << std::endl;
     };
+    // virtual operator()(State& state);
     Action(const Action&) = delete; // Delete copy constructor
     Action& operator=(const Action&) = delete; // Delete copy assignment
 
@@ -51,12 +57,14 @@ class Action {
 class CreateNewWorldAction : public Action {
   public:
     CreateNewWorldAction(std::string seed) : Action { Type::CREATE_NEW_WORLD }, m_seed{seed} {};
+    // void operator()(State& state) {};
     std::string getSeed() { return m_seed; };
   private:
     std::string m_seed;
 };
 
 static State theReducer(State state, std::shared_ptr<Action> action) {
+  // action(state);
   switch(action->getType()) {
     case Action::Type::CREATE_NEW_WORLD:
       std::cout << "In CREATE_NEW_WORLD action handler" << std::endl;

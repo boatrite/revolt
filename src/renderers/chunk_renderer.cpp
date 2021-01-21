@@ -45,7 +45,7 @@ void ChunkRenderer::render(double dt) {
 
   glBindVertexArray(m_vao);
 
-  const auto& scale = m_ui_context_ptr->getStore().getState().scale;
+  const auto& scale = m_ui_context_ptr->getStore().getState().scale();
 
   for (const auto& chunk_ptr : m_ui_context_ptr->getStore().getState().chunks) {
     if (!chunk_ptr) {

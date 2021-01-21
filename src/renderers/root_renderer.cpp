@@ -52,6 +52,7 @@ void RootRenderer::render(double dt) {
       ImGui::Text("world_seed: %s", state.world_seed.c_str());
       ImGui::Text("world_size: %i", state.world_size);
       ImGui::Checkbox("wireframe", &state.wireframe);
+      ImGui::SliderInt("scale_factor", &state.scale_factor, 1, 5);
     }
   }
   ImGui::End();

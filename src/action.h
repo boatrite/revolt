@@ -39,7 +39,7 @@ class Action {
     virtual ~Action() {
       std::cout << "Action destroyed" << std::endl;
     };
-    // virtual operator()(State& state);
+    virtual void operator()(State& state) {};
     Action(const Action&) = delete; // Delete copy constructor
     Action& operator=(const Action&) = delete; // Delete copy assignment
 
@@ -57,29 +57,21 @@ class Action {
 class CreateNewWorldAction : public Action {
   public:
     CreateNewWorldAction(std::string seed) : Action { Type::CREATE_NEW_WORLD }, m_seed{seed} {};
-    // void operator()(State& state) {};
-    std::string getSeed() { return m_seed; };
-  private:
-    std::string m_seed;
-};
 
-static State theReducer(State state, std::shared_ptr<Action> action) {
-  // action(state);
-  switch(action->getType()) {
-    case Action::Type::CREATE_NEW_WORLD:
-      std::cout << "In CREATE_NEW_WORLD action handler" << std::endl;
-      state.world_seed = static_cast<CreateNewWorldAction&>(*action).getSeed();
+    void operator()(State& state) override {
+      std::cout << "In new CREATE_NEW_WORLD action handler" << std::endl;
+      state.world_seed = m_seed;
       state.world_size = 2;
       for (auto i = 0; i < state.world_size; ++i) {
         for (auto ii = 0; ii < state.world_size; ++ii) {
           auto index { ii * CHUNK_SIZE + i };
-          state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii));
+          state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii), state.scale());
         }
       }
-      break;
-  }
+    };
 
-  return state;
+  private:
+    std::string m_seed;
 };
 
 using Store = redux::Store<State, std::shared_ptr<Action>>;

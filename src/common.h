@@ -1,12 +1,11 @@
 #pragma once
 
 #include <array>
+#include <vector>
 
 #include <glm/glm.hpp>
 
 constexpr int CHUNK_SIZE { 16 };
-
-constexpr int CHUNK_SIZE_CUBED { CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE };
 
 struct Block {
   enum class Type {
@@ -14,14 +13,19 @@ struct Block {
     GRASS,
   };
 
-  Type type;
+  Type type { Type::NONE };
 };
 
 struct Chunk {
   glm::vec3 position { 0, 0, 0 };
-  std::array<Block, CHUNK_SIZE_CUBED> blocks {};
+  std::vector<Block> blocks {};
 
-  Chunk(glm::vec3 position) : position{position} {};
+  Chunk(glm::vec3 position, float scale) : position{position} {
+    blocks.resize(pow(CHUNK_SIZE * (1.0 / scale), 3), Block{Block::Type::NONE});
+    blocks[0] = Block{Block::Type::GRASS};
+    blocks[1] = Block{Block::Type::GRASS};
+    blocks[2] = Block{Block::Type::GRASS};
+  };
 
   static const glm::vec3 chunkPosition(const glm::vec3& position) {
     return glm::vec3(

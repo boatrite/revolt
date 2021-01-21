@@ -26,7 +26,14 @@ class UIContext {
     //
   private:
     State m_my_state {};
-    Store m_store { Store(theReducer, m_my_state) };
+    // Store m_store { Store(theReducer, m_my_state) };
+    Store m_store { Store(
+      [](State state, std::shared_ptr<Action> action) {
+        action->operator()(state);
+        return state;
+      },
+      m_my_state
+    ) };
 
   public:
     Store& getStore() { return m_store; };

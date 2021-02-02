@@ -2,13 +2,14 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
 #include "chunk.h"
 #include "services/greedy_mesh.h"
 
-Chunk::Chunk(glm::vec3 position, float scale) : m_position{position} {
+Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{scale} {
   m_blocks.resize(pow(CHUNK_SIZE * (1.0 / scale), 3), Block{Block::Type::NONE});
   m_blocks[0] = Block{Block::Type::GRASS};
   m_blocks[1] = Block{Block::Type::DIRT};
@@ -59,7 +60,7 @@ void Chunk::render(const Shader& shader) {
   // Only render the chunk if the mesh is up to date. I'm not sure how
   // necessary this is.
   if (!m_is_mesh_dirty) {
-    glm::mat4 block_model = glm::mat4(1.0);
+    glm::mat4 block_model = glm::scale(glm::mat4(1.0), glm::vec3(m_scale));
     block_model = glm::translate(block_model, m_position * CHUNK_SIZE);
     shader.setMat4("model", block_model);
 

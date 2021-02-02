@@ -13,6 +13,7 @@ class Chunk {
   private:
     glm::vec3 m_position { 0, 0, 0 };
     std::vector<Block> m_blocks {};
+    const float m_scale; // 1 / 2^n where n is 0,1,2,...
 
     // Meshing & Rendering
     std::vector<float> m_mesh {};

@@ -1,37 +1,51 @@
 #pragma once
 
 #include <array>
+#include <ostream>
 #include <vector>
 
-#include <glm/glm.hpp>
-
 constexpr int CHUNK_SIZE { 16 };
+constexpr int CHUNK_SIZE_CUBED { CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE };
+constexpr int CHUNK_SIZE_SQUARED { CHUNK_SIZE * CHUNK_SIZE };
+constexpr int CHUNK_SIZE_HALVED { CHUNK_SIZE / 2 };
+constexpr int CHUNK_SIZE_QUARTERED { CHUNK_SIZE / 4 };
 
 struct Block {
   enum class Type {
     NONE = 0,
     GRASS,
+    DIRT,
   };
 
   Type type { Type::NONE };
-};
 
-struct Chunk {
-  glm::vec3 position { 0, 0, 0 };
-  std::vector<Block> blocks {};
+  bool operator==(const Block& other) const {
+    return this->type == other.type;
+  }
 
-  Chunk(glm::vec3 position, float scale) : position{position} {
-    blocks.resize(pow(CHUNK_SIZE * (1.0 / scale), 3), Block{Block::Type::NONE});
-    blocks[0] = Block{Block::Type::GRASS};
-    blocks[1] = Block{Block::Type::GRASS};
-    blocks[2] = Block{Block::Type::GRASS};
-  };
-
-  static const glm::vec3 chunkPosition(const glm::vec3& position) {
-    return glm::vec3(
-      (position.x > 0 ? floor : ceil)(position.x / CHUNK_SIZE),
-      floor(position.y / CHUNK_SIZE),
-      (position.z > 0 ? floor : ceil)(position.z / CHUNK_SIZE)
-    );
+  bool operator!=(const Block& other) const {
+    return !(*this == other);
   }
 };
+
+static constexpr struct Block EMPTY_BLOCK { Block::Type::NONE };
+
+// This contains the 4 vertices (x, y, z) for a quad.
+// The vertices are given in the following order:
+//
+// float
+//   lt_x { quad.at(0) }, lt_y { quad.at(1) },  lt_z { quad.at(2) };  // left top
+//   rt_x { quad.at(3) }, rt_y { quad.at(4) },  rt_z { quad.at(5) },  // right top
+//   lb_x { quad.at(6) }, lb_y { quad.at(7) },  lb_z { quad.at(8) },  // left bottom
+//   rb_x { quad.at(9) }, rb_y { quad.at(10) }, rb_z { quad.at(11) }, // right bottom
+typedef std::array<float, 12> quad;
+
+enum class Side {
+  NORTH,
+  SOUTH,
+  EAST,
+  WEST,
+  TOP,
+  BOTTOM,
+};
+std::ostream& operator<<(std::ostream& o, const Side side);

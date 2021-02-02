@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 #include "common.h"
+#include "chunk.h"
 #include "redux.hpp"
 
 struct State {
@@ -29,6 +30,12 @@ struct State {
   // State& operator=(const State&) = delete; // Delete copy assignment
 };
 
+// I've tried out lots of variations, here
+// (https://devtato.com/2020/09/30/flux-architecture-part-4-message-types/) is a
+// dispatch method that uses template overloading stuff to handle actions which
+// is similar to something I was researching earlier.
+//
+// Another flux implementation: https://github.com/eandritskiy/flux_cpp
 class Action {
   public:
     enum class Type {

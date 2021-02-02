@@ -5,10 +5,10 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
     std::make_shared<MainMenuRenderer>(m_ui_context_ptr)
   );
 
-  ui_context_ptr->addKeyPressedHandler(
-      GLFW_KEY_ESCAPE,
-      this,
-      [=]() { ui_context_ptr->quit(); }
+  m_ui_context_ptr->addKeyPressedHandler(
+    GLFW_KEY_ESCAPE,
+    this,
+    [=]() { m_ui_context_ptr->quit(); }
   );
 
   m_ui_context_ptr->addKeyPressedHandler(

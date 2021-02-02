@@ -12,8 +12,12 @@
 Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{scale} {
   m_blocks.resize(pow(CHUNK_SIZE * (1.0 / scale), 3), Block{Block::Type::NONE});
   m_blocks[0] = Block{Block::Type::GRASS};
-  m_blocks[1] = Block{Block::Type::DIRT};
+  m_blocks[1] = Block{Block::Type::GRASS};
   m_blocks[2] = Block{Block::Type::GRASS};
+
+  m_blocks[4] = Block{Block::Type::GRASS};
+  m_blocks[5] = Block{Block::Type::DIRT};
+  m_blocks[6] = Block{Block::Type::GRASS};
   m_mesh = GreedyMesh::computeChunkMesh(this);
   m_is_mesh_dirty = true;
 };

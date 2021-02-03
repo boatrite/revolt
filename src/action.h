@@ -38,11 +38,6 @@ struct State {
 // Another flux implementation: https://github.com/eandritskiy/flux_cpp
 class Action {
   public:
-    enum class Type {
-      CREATE_NEW_WORLD
-    };
-
-  public:
     virtual ~Action() {
       std::cout << "Action destroyed" << std::endl;
     };
@@ -50,20 +45,13 @@ class Action {
     Action(const Action&) = delete; // Delete copy constructor
     Action& operator=(const Action&) = delete; // Delete copy assignment
 
-    const Type getType() const {
-      return m_type;
-    };
-
   protected:
-    Action(Type type) : m_type{type} {};
-
-  private:
-    const Type m_type;
+    Action() {};
 };
 
 class CreateNewWorldAction : public Action {
   public:
-    CreateNewWorldAction(std::string seed) : Action { Type::CREATE_NEW_WORLD }, m_seed{seed} {};
+    CreateNewWorldAction(std::string seed) : m_seed{seed} {};
 
     void operator()(State& state) override {
       std::cout << "In new CREATE_NEW_WORLD action handler" << std::endl;

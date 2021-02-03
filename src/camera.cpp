@@ -121,13 +121,14 @@ void Camera::focusCallback(bool focusedInGame) {
 #pragma GCC diagnostic pop
 
 void Camera::imguiDebugControlPanel() {
-  ImGui::Text("Camera:");
-  ImGui::Text("Position: (%.0f,%.0f, %.0f)", position.x, position.y, position.z);
-  const auto& chunk_position { Chunk::chunkPosition(position) };
-  ImGui::Text("Chunk Position: (%.0f,%.0f, %.0f)", chunk_position.x, chunk_position.y, chunk_position.z);
-  ImGui::SliderFloat("FOV", &fov, Camera::MIN_FOV, Camera::MAX_FOV);
-  ImGui::SliderFloat("Near Plane", &nearPlane, Camera::MIN_NEAR_PLANE, Camera::MAX_NEAR_PLANE);
-  ImGui::SliderFloat("Far Plane", &farPlane, Camera::MIN_FAR_PLANE, Camera::MAX_FAR_PLANE);
-  ImGui::SliderFloat("Camera Speed", &speed, Camera::MIN_SPEED, Camera::MAX_SPEED);
-  ImGui::SliderFloat("Mouse Sensitivity", &sensitivity, Camera::MIN_SENSITIVITY, Camera::MAX_SENSITIVITY);
+  if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::Text("Position: (%.0f,%.0f, %.0f)", position.x, position.y, position.z);
+    const auto& chunk_position { Chunk::chunkPosition(position) };
+    ImGui::Text("Chunk Position: (%.0f,%.0f, %.0f)", chunk_position.x, chunk_position.y, chunk_position.z);
+    ImGui::SliderFloat("FOV", &fov, Camera::MIN_FOV, Camera::MAX_FOV);
+    ImGui::SliderFloat("Near Plane", &nearPlane, Camera::MIN_NEAR_PLANE, Camera::MAX_NEAR_PLANE);
+    ImGui::SliderFloat("Far Plane", &farPlane, Camera::MIN_FAR_PLANE, Camera::MAX_FAR_PLANE);
+    ImGui::SliderFloat("Camera Speed", &speed, Camera::MIN_SPEED, Camera::MAX_SPEED);
+    ImGui::SliderFloat("Mouse Sensitivity", &sensitivity, Camera::MIN_SENSITIVITY, Camera::MAX_SENSITIVITY);
+  }
 }

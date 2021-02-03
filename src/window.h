@@ -97,6 +97,10 @@ class Window {
       // enabled/disable settings, and is used by various places to know to stop
       // accepting input. It's kinda random, but rose pretty quickly out of a real
       // need to interact with imgui controls or move around in game.
+      //
+      // FIXME I think this and app_ptr don't need to be shared_ptrs. They and
+      // everything only exist as long as this function runs, so I should be
+      // able to pass by reference everywhere instead.
       std::shared_ptr<UIContext> ui_context_ptr = std::make_shared<UIContext>(window);
 
       // App -- right now it gets its update() and render() methods called in the main

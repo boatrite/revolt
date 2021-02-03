@@ -15,7 +15,7 @@
 struct State {
   std::string world_seed {};
   int world_size {};
-  std::array<std::shared_ptr<Chunk>, 100> chunks {};
+  std::vector<std::shared_ptr<Chunk>> chunks {};
 
   bool wireframe { true };
   int scale_factor { 3 };
@@ -59,8 +59,7 @@ class CreateNewWorldAction : public Action {
       state.world_size = 2;
       for (auto i = 0; i < state.world_size; ++i) {
         for (auto ii = 0; ii < state.world_size; ++ii) {
-          auto index { ii * CHUNK_SIZE + i };
-          state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii), state.scale());
+          state.chunks.push_back(std::make_shared<Chunk>(glm::vec3(i, 0, ii), state.scale()));
         }
       }
     };

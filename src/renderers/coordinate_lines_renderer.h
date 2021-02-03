@@ -1,5 +1,7 @@
 #include <memory>
 
+#include <imgui.h>
+
 #include "../camera.h"
 #include "../util/shader.h"
 #include "renderer.h"
@@ -11,6 +13,7 @@ class CoordinateLinesRenderer : public Renderer {
 
     unsigned int m_vao {};
     unsigned int m_vbo {};
+    bool m_show { true };
 
   public:
     CoordinateLinesRenderer(std::shared_ptr<Camera> camera_ptr) : m_camera_ptr { camera_ptr } {
@@ -47,6 +50,12 @@ class CoordinateLinesRenderer : public Renderer {
     }
 
     void render(double dt) override {
+      imguiDebugControlPanel();
+
+      if (!m_show) {
+        return;
+      }
+
       m_shader.use();
 
       m_shader.setMat4("model", glm::mat4(1.0f));
@@ -58,4 +67,11 @@ class CoordinateLinesRenderer : public Renderer {
 
       glBindVertexArray(0);
     };
+
+    void imguiDebugControlPanel() {
+      if (ImGui::Begin("Info")) {
+        ImGui::Separator();
+        ImGui::Checkbox("Enable CoordinateLinesRenderer", &m_show);
+      }
+    }
 };

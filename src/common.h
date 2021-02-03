@@ -4,6 +4,8 @@
 #include <ostream>
 #include <vector>
 
+#include "util/print.h"
+
 struct Block {
   enum class Type {
     NONE = 0,

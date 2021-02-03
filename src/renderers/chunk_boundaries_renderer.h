@@ -1,6 +1,8 @@
 #include <memory>
 
+#include <imgui.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
 #include "../camera.h"
@@ -16,11 +18,10 @@ class ChunkBoundariesRenderer : public Renderer {
 
     unsigned int m_vao {};
     unsigned int m_vbo {};
-    bool m_show { false };
-    static const int s_dimensions { 3 };
-    static const int s_planes_per_dimension { 5 };
-    static const int s_lines_per_plane { 7 };
-    static const int s_vertices_per_line { 2 };
+    bool m_show { true };
+
+    static const int s_floats_per_vertex = 6; // x, y, z, r, g, b
+    std::vector<float> m_vertices {};
 
   public:
     ChunkBoundariesRenderer(std::shared_ptr<UIContext> ui_context_ptr, std::shared_ptr<Camera> camera_ptr)
@@ -32,40 +33,39 @@ class ChunkBoundariesRenderer : public Renderer {
         [=]() { m_show = !m_show; }
       );
 
-      float length = 512.0f;
-      const int floats_per_vertex = 6;
-      float vertices[s_dimensions * s_planes_per_dimension * s_lines_per_plane * s_vertices_per_line * floats_per_vertex] {};
-      for (auto dim = 0; dim < s_dimensions; ++dim) {
-        auto dim_i = dim * (s_planes_per_dimension * s_lines_per_plane * s_vertices_per_line * floats_per_vertex);
-
-        for (auto plane = 0; plane < s_planes_per_dimension; ++plane) {
-          auto plane_i = plane * (s_lines_per_plane * s_vertices_per_line * floats_per_vertex);
-
-          for (auto line = 0; line < 2*s_lines_per_plane; line += 2) {
-            auto line_i = line * floats_per_vertex;
-            vertices[dim_i + plane_i + line_i + (0 + dim)%3] = -length;
-            vertices[dim_i + plane_i + line_i + (1 + dim)%3] = (s_lines_per_plane/2 - line/2)*CHUNK_SIZE;
-            vertices[dim_i + plane_i + line_i + (2 + dim)%3] = (s_planes_per_dimension/2 - plane)*CHUNK_SIZE;
-            vertices[dim_i + plane_i + line_i + 3] = 1.0f;
-            vertices[dim_i + plane_i + line_i + 4] = 1.0f;
-            vertices[dim_i + plane_i + line_i + 5] = 0.0f;
-
-            vertices[dim_i + plane_i + line_i + (0 + dim)%3 + 6] = length;
-            vertices[dim_i + plane_i + line_i + (1 + dim)%3 + 6] = (s_lines_per_plane/2 - line/2)*CHUNK_SIZE;
-            vertices[dim_i + plane_i + line_i + (2 + dim)%3 + 6] = (s_planes_per_dimension/2 - plane)*CHUNK_SIZE;
-            vertices[dim_i + plane_i + line_i + 9] = 1.0f;
-            vertices[dim_i + plane_i + line_i + 10] = 1.0f;
-            vertices[dim_i + plane_i + line_i + 11] = 0.0f;
-          }
-        }
-      }
+      // Make 4 lines, one in each corner of the chunk.
+      // These lines are going to be rendered offset by the chunk position,
+      // so they should show up surrounding the chunk
+      auto start = glm::vec3(0.0f, 0.0f, 0.0f);
+      auto end = glm::vec3(0.0f, Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS, 0.0f);
+      auto color = glm::vec3(1.0f, 1.0f, 0.0f);
+      auto add_line = [=](const glm::vec3& start, const glm::vec3& end, const glm::vec3& color) {
+        m_vertices.push_back(start.x);
+        m_vertices.push_back(start.y);
+        m_vertices.push_back(start.z);
+        m_vertices.push_back(color.r);
+        m_vertices.push_back(color.g);
+        m_vertices.push_back(color.b);
+        m_vertices.push_back(end.x);
+        m_vertices.push_back(end.y);
+        m_vertices.push_back(end.z);
+        m_vertices.push_back(color.r);
+        m_vertices.push_back(color.g);
+        m_vertices.push_back(color.b);
+      };
+      auto x_hat = glm::vec3(1.0f, 0.0f, 0.0f);
+      auto z_hat = glm::vec3(0.0f, 0.0f, 1.0f);
+      add_line(start, end, color);
+      add_line(start + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*x_hat, end + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*x_hat, color);
+      add_line(start + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*z_hat, end + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*z_hat, color);
+      add_line(start + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*x_hat + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*z_hat, end + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*x_hat + Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*z_hat, color);
 
       glGenVertexArrays(1, &m_vao);
       glGenBuffers(1, &m_vbo);
 
       glBindVertexArray(m_vao);
       glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+      glBufferData(GL_ARRAY_BUFFER, static_cast<float>(m_vertices.size()) * sizeof(float), m_vertices.data(), GL_STATIC_DRAW);
 
       glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
       glEnableVertexAttribArray(0);
@@ -80,23 +80,32 @@ class ChunkBoundariesRenderer : public Renderer {
     }
 
     void render(double dt) override {
+      imguiDebugControlPanel();
+
       if (!m_show) {
         return;
       }
 
       m_shader.use();
-
-      m_shader.setMat4("model", glm::translate(
-        glm::mat4(1.0f),
-        Chunk::chunkPosition(m_camera_ptr->getPosition()) * CHUNK_SIZE
-      ));
       m_shader.setMat4("view", m_camera_ptr->getViewMatrix());
       m_shader.setMat4("projection", m_camera_ptr->getProjectionMatrix());
 
       glBindVertexArray(m_vao);
-      auto total_vertex_count = s_dimensions * s_planes_per_dimension * s_lines_per_plane * s_vertices_per_line;
-      glDrawArrays(GL_LINES, 0, total_vertex_count);
+      for (const auto& chunk_ptr : m_ui_context_ptr->getStore().getState().chunks) {
+        m_shader.setMat4("model", glm::translate(
+          glm::mat4(1.0f),
+          chunk_ptr->getPosition() * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS
+        ));
+        glDrawArrays(GL_LINES, 0, m_vertices.size() / s_floats_per_vertex);
+      }
 
       glBindVertexArray(0);
+    }
+
+    void imguiDebugControlPanel() {
+      if (ImGui::Begin("Info")) {
+        ImGui::Separator();
+        ImGui::Checkbox("Enable ChunkBoundariesRenderer (F3)", &m_show);
+      }
     }
 };

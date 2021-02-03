@@ -18,7 +18,7 @@ struct State {
   std::vector<std::shared_ptr<Chunk>> chunks {};
 
   bool wireframe { true };
-  int scale_factor { 3 };
+  int scale_factor { 0 };
 
   float scale() {
     return 1.0f / pow(2.0, scale_factor);

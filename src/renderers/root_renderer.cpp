@@ -58,11 +58,12 @@ void RootRenderer::render(double dt) {
     ImGui::Text("world_size: %i", state.world_size);
     ImGui::Checkbox("wireframe", &state.wireframe);
     static auto scale_factor_slider =
-      ImGuiUtil::SliderInt("scale_factor", &state.scale_factor, 0, 5, [=]() {
+      ImGuiUtil::SliderInt("scale_factor", &state.scale_factor, 0, 3, [=]() {
         // When the scale factor changes, we need to recreate the Chunk objects.
         m_ui_context_ptr->getStore().dispatch(std::make_shared<RecreateChunksAction>());
       });
     scale_factor_slider();
+    ImGui::Text("scale: %.3f", state.scale());
   }
   ImGui::End();
 }

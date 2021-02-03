@@ -68,4 +68,16 @@ class CreateNewWorldAction : public Action {
     std::string m_seed;
 };
 
+class RecreateChunksAction : public Action {
+  public:
+    void operator()(State& state) override {
+      for (auto i = 0; i < state.world_size; ++i) {
+        for (auto ii = 0; ii < state.world_size; ++ii) {
+          auto index { ii * state.world_size + i };
+          state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii), state.scale());
+        }
+      }
+    };
+};
+
 using Store = redux::Store<State, std::shared_ptr<Action>>;

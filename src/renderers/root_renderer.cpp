@@ -1,5 +1,8 @@
 #include <imgui.h>
 
+#include "../util/imgui_util.h"
+
+#include "../action.h"
 #include "root_renderer.h"
 #include "chunk_renderer.h"
 #include "overlay_renderer.h"
@@ -45,15 +48,21 @@ void RootRenderer::render(double dt) {
     renderer_ptr->render(dt);
   }
 
-  ImGui::SetNextWindowPos(ImVec2(10, 300));
+  ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+  const int window_width = 300;
+  ImGui::SetNextWindowPos(ImVec2(windowSize.x - 10 - window_width, 10));
+  ImGui::SetNextWindowSize(ImVec2(window_width, 0));
   if (ImGui::Begin("State")) {
-    if (ImGui::CollapsingHeader("State", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
-      State& state = m_ui_context_ptr->getStore().getState();
-      ImGui::Text("world_seed: %s", state.world_seed.c_str());
-      ImGui::Text("world_size: %i", state.world_size);
-      ImGui::Checkbox("wireframe", &state.wireframe);
-      ImGui::SliderInt("scale_factor", &state.scale_factor, 1, 5);
-    }
+    State& state = m_ui_context_ptr->getStore().getState();
+    ImGui::Text("world_seed: %s", state.world_seed.c_str());
+    ImGui::Text("world_size: %i", state.world_size);
+    ImGui::Checkbox("wireframe", &state.wireframe);
+    static auto scale_factor_slider =
+      ImGuiUtil::SliderInt("scale_factor", &state.scale_factor, 0, 5, [=]() {
+        // When the scale factor changes, we need to recreate the Chunk objects.
+        m_ui_context_ptr->getStore().dispatch(std::make_shared<RecreateChunksAction>());
+      });
+    scale_factor_slider();
   }
   ImGui::End();
 }

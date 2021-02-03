@@ -10,7 +10,7 @@
 #include "services/greedy_mesh.h"
 
 Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{scale} {
-  m_blocks.resize(pow(CHUNK_SIZE * (1.0 / scale), 3), Block{Block::Type::NONE});
+  m_blocks.resize(pow(getSize(), 3), Block{Block::Type::NONE});
   m_blocks[0] = Block{Block::Type::GRASS};
   m_blocks[1] = Block{Block::Type::GRASS};
   m_blocks[2] = Block{Block::Type::GRASS};
@@ -23,15 +23,10 @@ Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{sc
 };
 
 Block Chunk::blockAt(int x, int y, int z) const {
-  // FIXME These don't account for scale factor
-  // if (x > CHUNK_SIZE - 1)
-    // throw std::invalid_argument("X is larger than CHUNK_SIZE - 1");
-  // if (y > CHUNK_SIZE - 1)
-    // throw std::invalid_argument("Y is larger than CHUNK_SIZE - 1");
-  // if (z > CHUNK_SIZE - 1)
-    // throw std::invalid_argument("Z is larger than CHUNK_SIZE - 1");
-
-  auto index { z * CHUNK_SIZE_SQUARED + y * CHUNK_SIZE + x };
+  assert(x > 0 && x < getSize());
+  assert(y > 0 && y < getSize());
+  assert(z > 0 && z < getSize());
+  auto index { z * getSizeSquared() + y * getSize() + x };
   return m_blocks.at(index);
 }
 
@@ -61,11 +56,11 @@ void Chunk::render(const Shader& shader) {
     m_is_mesh_dirty = false;
   }
 
-  // Only render the chunk if the mesh is up to date. I'm not sure how
-  // necessary this is.
+  // Only render the chunk if the mesh is up to date.
+  // I'm not sure how necessary this is.
   if (!m_is_mesh_dirty) {
     glm::mat4 block_model = glm::scale(glm::mat4(1.0), glm::vec3(m_scale));
-    block_model = glm::translate(block_model, m_position * CHUNK_SIZE);
+    block_model = glm::translate(block_model, m_position * getSize());
     shader.setMat4("model", block_model);
 
     glBindVertexArray(m_vao);

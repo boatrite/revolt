@@ -4,12 +4,6 @@
 #include <ostream>
 #include <vector>
 
-constexpr int CHUNK_SIZE { 16 };
-constexpr int CHUNK_SIZE_CUBED { CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE };
-constexpr int CHUNK_SIZE_SQUARED { CHUNK_SIZE * CHUNK_SIZE };
-constexpr int CHUNK_SIZE_HALVED { CHUNK_SIZE / 2 };
-constexpr int CHUNK_SIZE_QUARTERED { CHUNK_SIZE / 4 };
-
 struct Block {
   enum class Type {
     NONE = 0,

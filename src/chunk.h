@@ -20,22 +20,32 @@ class Chunk {
     bool m_is_mesh_dirty { false };
     unsigned int m_vao {};
     unsigned int m_vbo {};
-
   public:
+    // Chunk size is defined as this many units regardless of scale.
+    // That means when the scale is smaller, we store that many more blocks
+    // inside each chunk.
+    // This means that, e.g., a smaller scale causes world gen like perlin
+    // noise to show up in "more resolution" over the same amount of in-world
+    // space.
+    static const int CHUNK_SIZE_IN_UNIT_BLOCKS { 16 };
+
     Chunk(glm::vec3 position, float scale);
 
     const glm::vec3& getPosition() const { return m_position; }
+    const float getScale() const { return m_scale; }
+    const int getSize() const { return CHUNK_SIZE_IN_UNIT_BLOCKS * (1.0 / m_scale); }
+    const int getSizeSquared() const { return pow(getSize(), 2); }
 
     Block blockAt(int x, int y, int z) const;
 
     void render(const Shader& shader);
 
-    // I don't really like this here, but I'm not sure where else to put it.
+    // Remember, chunk position is independent of scale.
     static const glm::vec3 chunkPosition(const glm::vec3& position) {
       return glm::vec3(
-        (position.x > 0 ? floor : ceil)(position.x / CHUNK_SIZE),
-        floor(position.y / CHUNK_SIZE),
-        (position.z > 0 ? floor : ceil)(position.z / CHUNK_SIZE)
+        (position.x > 0 ? floor : ceil)(position.x / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS),
+        floor(position.y / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS),
+        (position.z > 0 ? floor : ceil)(position.z / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS)
       );
     }
 };

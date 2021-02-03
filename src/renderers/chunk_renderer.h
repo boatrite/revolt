@@ -22,8 +22,4 @@ class ChunkRenderer : public Renderer {
     std::shared_ptr<Camera> m_camera_ptr;
 
     Shader m_shader { Shader("chunk.vert", "chunk.frag") };
-    // int m_floats_per_vertex { 6 };
-    // std::array<float, 36 * 3> m_cube_vertices {
-    // };
-    // std::array<float, 36 * 6> color_cube(Color color_code);
 };

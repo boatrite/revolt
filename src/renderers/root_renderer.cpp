@@ -60,7 +60,7 @@ void RootRenderer::render(double dt) {
     static auto scale_factor_slider =
       ImGuiUtil::SliderInt("scale_factor", &state.scale_factor, 0, 3, [=]() {
         // When the scale factor changes, we need to recreate the Chunk objects.
-        m_ui_context_ptr->getStore().dispatch(std::make_shared<RecreateChunksAction>());
+        m_ui_context_ptr->getStore().dispatch(RecreateChunksAction());
       });
     scale_factor_slider();
     ImGui::Text("scale: %.3f", state.scale());

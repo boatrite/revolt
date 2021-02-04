@@ -38,12 +38,8 @@ struct State {
 // Another flux implementation: https://github.com/eandritskiy/flux_cpp
 class Action {
   public:
-    virtual ~Action() {
-      std::cout << "Action destroyed" << std::endl;
-    };
+    virtual ~Action() {};
     virtual void operator()(State& state) {};
-    Action(const Action&) = delete; // Delete copy constructor
-    Action& operator=(const Action&) = delete; // Delete copy assignment
 
   protected:
     Action() {};
@@ -54,7 +50,6 @@ class CreateNewWorldAction : public Action {
     CreateNewWorldAction(std::string seed) : m_seed{seed} {};
 
     void operator()(State& state) override {
-      std::cout << "In new CREATE_NEW_WORLD action handler" << std::endl;
       state.world_seed = m_seed;
       state.world_size = 2;
       for (auto i = 0; i < state.world_size; ++i) {
@@ -80,4 +75,4 @@ class RecreateChunksAction : public Action {
     };
 };
 
-using Store = redux::Store<State, std::shared_ptr<Action>>;
+using Store = redux::Store<State, std::function<void(State&)>>;

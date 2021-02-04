@@ -50,7 +50,7 @@ void Store<STATE_T, ACTION_T>::subscribe(Subscriber subscriber) {
 
 template <typename STATE_T, typename ACTION_T>
 void Store<STATE_T, ACTION_T>::dispatch(ACTION_T action) {
-	action->operator()(state);
+	action(state);
 
 	for(int i = 0; i < subscribers.size(); i++) {
 		subscribers[i](state);

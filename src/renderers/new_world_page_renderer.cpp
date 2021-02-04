@@ -42,7 +42,7 @@ void NewWorldPageRenderer::render(double dt) {
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10));
   if (ImGui::Button("Create World", buttonSize)) {
     std::cout << "Create world button clicked. Seed: " + m_world_seed << std::endl;
-    m_ui_context_ptr->getStore().dispatch(std::make_shared<CreateNewWorldAction>(m_world_seed));
+    m_ui_context_ptr->getStore().dispatch(CreateNewWorldAction(m_world_seed));
     m_ui_context_ptr->changeCurrentPage(
       std::make_shared<RootRenderer>(m_ui_context_ptr)
     );

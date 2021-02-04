@@ -28,10 +28,15 @@ UIContext::UIContext(GLFWwindow* window) : m_window{window} {
   });
 }
 
+UIContext::~UIContext() {
+  std::cout << "~UIContext() called" << std::endl;
+}
+
 //
 // Quit functionality
 //
 void UIContext::quit() {
+  std::cout << "UIContext::quit() called. Telling glfw window to close now." << std::endl;
   glfwSetWindowShouldClose(m_window, 1);
 }
 

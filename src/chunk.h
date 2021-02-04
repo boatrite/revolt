@@ -27,7 +27,7 @@ class Chunk {
     // This means that, e.g., a smaller scale causes world gen like perlin
     // noise to show up in "more resolution" over the same amount of in-world
     // space.
-    static const int CHUNK_SIZE_IN_UNIT_BLOCKS { 16 };
+    static const int CHUNK_SIZE_IN_UNIT_BLOCKS;
 
     Chunk(glm::vec3 position, float scale);
 

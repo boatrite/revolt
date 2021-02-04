@@ -26,7 +26,9 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
 }
 
 App::~App() {
+  std::cout << "~App() entered" << std::endl;
   m_ui_context_ptr->removeHandlers(this);
+  std::cout << "~App() finished" << std::endl;
 }
 
 void App::update(double dt) {

@@ -18,6 +18,7 @@ class UIContext {
 
   public:
     UIContext(GLFWwindow* window);
+    ~UIContext();
 
     //
     // Well, I'm going to try to use redux again.

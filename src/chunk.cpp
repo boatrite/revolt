@@ -9,6 +9,8 @@
 #include "chunk.h"
 #include "services/greedy_mesh.h"
 
+const int Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS { 16 };
+
 Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{scale} {
   m_blocks.resize(pow(getSize(), 3), Block{Block::Type::NONE});
   m_blocks[0] = Block{Block::Type::GRASS};
@@ -23,9 +25,9 @@ Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{sc
 };
 
 Block Chunk::blockAt(int x, int y, int z) const {
-  assert(x > 0 && x < getSize());
-  assert(y > 0 && y < getSize());
-  assert(z > 0 && z < getSize());
+  // assert(x > 0 && x < getSize());
+  // assert(y > 0 && y < getSize());
+  // assert(z > 0 && z < getSize());
   auto index { z * getSizeSquared() + y * getSize() + x };
   return m_blocks.at(index);
 }

@@ -38,7 +38,7 @@ RootRenderer::~RootRenderer() {
 }
 
 void RootRenderer::render(double dt) {
-  if (m_ui_context_ptr->getStore().getState().wireframe) {
+  if (m_wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   } else {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -56,7 +56,6 @@ void RootRenderer::render(double dt) {
     State& state = m_ui_context_ptr->getStore().getState();
     ImGui::Text("world_seed: %s", state.world_seed.c_str());
     ImGui::Text("world_size: %i", state.world_size);
-    ImGui::Checkbox("wireframe", &state.wireframe);
     static auto scale_factor_slider =
       ImGuiUtil::SliderInt("scale_factor", &state.scale_factor, 0, 3, [=]() {
         // When the scale factor changes, we need to recreate the Chunk objects.
@@ -66,4 +65,9 @@ void RootRenderer::render(double dt) {
     ImGui::Text("scale: %.3f", state.scale());
   }
   ImGui::End();
+
+  if (ImGui::Begin("Info")) {
+    ImGui::Separator();
+    ImGui::Checkbox("wireframe", &m_wireframe);
+  }
 }

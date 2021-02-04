@@ -20,7 +20,6 @@ struct State {
   int world_size {};
   std::vector<std::shared_ptr<Chunk>> chunks {};
 
-  bool wireframe { true };
   int scale_factor { 0 };
 
   float scale() {

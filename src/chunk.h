@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/scalar_multiplication.hpp>
 
 #include "common.h"
 #include "util/shader.h"
@@ -42,10 +43,11 @@ class Chunk {
 
     // Remember, chunk position is independent of scale.
     static const glm::vec3 chunkPosition(const glm::vec3& position) {
+      auto scaled = position / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
       return glm::vec3(
-        (position.x > 0 ? floor : ceil)(position.x / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS),
-        floor(position.y / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS),
-        (position.z > 0 ? floor : ceil)(position.z / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS)
+        position.x > 0 ? floor(scaled.x) : ceil(scaled.x),
+        floor(scaled.y),
+        position.z > 0 ? floor(scaled.z) : ceil(scaled.z)
       );
     }
 };

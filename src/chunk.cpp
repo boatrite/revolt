@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -6,6 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
+#include <noise/noise.h>
+
 #include "chunk.h"
 #include "services/greedy_mesh.h"
 
@@ -13,13 +17,27 @@ const int Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS { 16 };
 
 Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{scale} {
   m_blocks.resize(pow(getSize(), 3), Block{Block::Type::NONE});
-  m_blocks[0] = Block{Block::Type::GRASS};
-  m_blocks[1] = Block{Block::Type::GRASS};
-  m_blocks[2] = Block{Block::Type::GRASS};
 
-  m_blocks[4] = Block{Block::Type::GRASS};
-  m_blocks[5] = Block{Block::Type::DIRT};
-  m_blocks[6] = Block{Block::Type::GRASS};
+  noise::module::Perlin perlin;
+  float min_height = 0;
+  float max_height = getSize();
+  for (float block_x = 0; block_x < getSize(); ++block_x) {
+    for (float block_z = 0; block_z < getSize(); ++block_z) {
+      float noise_x = block_x / getSize() + position.x;
+      float noise_z = block_z / getSize() + position.z;
+
+      float generated_noise = (1 + perlin.GetValue(noise_x, 0.0, noise_z)) / 2.0;
+      float noise = glm::clamp(generated_noise, 0.0f, 1.0f);
+      float raw_height = min_height + noise * (max_height + 1 - min_height);
+      auto height = floor(glm::clamp(raw_height, min_height, max_height));
+
+      for (auto block_y = 0; block_y < height; ++block_y) {
+        auto index = block_z * getSizeSquared() + block_y * getSize() + block_x;
+        m_blocks[index] = Block{Block::Type::GRASS};
+      }
+    }
+  }
+
   m_mesh = GreedyMesh::computeChunkMesh(this);
   m_is_mesh_dirty = true;
 };

@@ -20,11 +20,7 @@ SOFTWARE.
 #ifndef REDUX_H
 #define REDUX_H
 
-#define __HAS_CPP11_SUPPORT (__cplusplus >= 201103L)
-
-#if __HAS_CPP11_SUPPORT
 #include <functional>
-#endif
 #include <vector>
 
 namespace redux {
@@ -32,30 +28,22 @@ namespace redux {
 template <typename STATE_T, typename ACTION_T>
 class Store {
 	public:
-		#if __HAS_CPP11_SUPPORT
-		typedef std::function<STATE_T(STATE_T, ACTION_T)> Reducer;
-		typedef std::function<void(STATE_T)> Subscriber;
-		#else
-		typedef STATE_T (*Reducer) (STATE_T, ACTION_T);
-		typedef void (*Subscriber) (STATE_T);
-		#endif
+		typedef std::function<void(STATE_T&, ACTION_T)> Reducer;
+		typedef std::function<void(STATE_T&)> Subscriber;
 
-		Store(Reducer, STATE_T);
+		Store(Reducer);
 		void subscribe(Subscriber);
 		void dispatch(ACTION_T);
 		STATE_T& getState();
 
 	private:
 		Reducer reducer;
-		STATE_T state;
+		STATE_T state {};
 		std::vector<Subscriber> subscribers;
 };
 
 template <typename STATE_T, typename ACTION_T>
-Store<STATE_T, ACTION_T>::Store(Reducer reducer, STATE_T initialState) :
-	reducer(reducer),
-	state(initialState) {
-}
+Store<STATE_T, ACTION_T>::Store(Reducer reducer) : reducer(reducer) {}
 
 template <typename STATE_T, typename ACTION_T>
 void Store<STATE_T, ACTION_T>::subscribe(Subscriber subscriber) {
@@ -64,7 +52,7 @@ void Store<STATE_T, ACTION_T>::subscribe(Subscriber subscriber) {
 
 template <typename STATE_T, typename ACTION_T>
 void Store<STATE_T, ACTION_T>::dispatch(ACTION_T action) {
-	state = reducer(state, action);
+	reducer(state, action);
 
 	for(int i = 0; i < subscribers.size(); i++) {
 		subscribers[i](state);

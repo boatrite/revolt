@@ -1,6 +1,5 @@
 # pragma once
 
-#include "redux.hpp"
 #include "renderers/main_menu_renderer.h"
 #include "renderers/root_renderer.h"
 #include "ui_context.h"

@@ -24,10 +24,10 @@ struct State {
     return 1.0f / pow(2.0, scale_factor);
   }
 
-  // FIXME If I don't want to copy state all the time (which seems dangerous),
-  // I need to update redux.hpp to use references where appropriate.
-  // State(const State&) = delete; // Delete copy constructor
-  // State& operator=(const State&) = delete; // Delete copy assignment
+  State(const State&) = delete; // Delete copy constructor
+  State& operator=(const State&) = delete; // Delete copy assignment
+  State(State&&) = delete; // Delete move constructor
+  State& operator=(State &&) = delete; // Delete move assignment
 };
 
 // I've tried out lots of variations, here

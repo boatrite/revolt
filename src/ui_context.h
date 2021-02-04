@@ -25,14 +25,11 @@ class UIContext {
     // able to access it since most places have a ui context.
     //
   private:
-    Store m_store { Store(
-      [](State& state, std::shared_ptr<Action> action) {
-        action->operator()(state);
-      }
-    ) };
+    Store m_store { Store() };
 
   public:
     Store& getStore() { return m_store; };
+    State& getState() { return getStore().getState(); };
 
     //
     // Quit functionality

@@ -28,22 +28,20 @@ namespace redux {
 template <typename STATE_T, typename ACTION_T>
 class Store {
 	public:
-		typedef std::function<void(STATE_T&, ACTION_T)> Reducer;
 		typedef std::function<void(STATE_T&)> Subscriber;
 
-		Store(Reducer);
+		Store();
 		void subscribe(Subscriber);
 		void dispatch(ACTION_T);
 		STATE_T& getState();
 
 	private:
-		Reducer reducer;
 		STATE_T state {};
 		std::vector<Subscriber> subscribers;
 };
 
 template <typename STATE_T, typename ACTION_T>
-Store<STATE_T, ACTION_T>::Store(Reducer reducer) : reducer(reducer) {}
+Store<STATE_T, ACTION_T>::Store() {}
 
 template <typename STATE_T, typename ACTION_T>
 void Store<STATE_T, ACTION_T>::subscribe(Subscriber subscriber) {
@@ -52,7 +50,7 @@ void Store<STATE_T, ACTION_T>::subscribe(Subscriber subscriber) {
 
 template <typename STATE_T, typename ACTION_T>
 void Store<STATE_T, ACTION_T>::dispatch(ACTION_T action) {
-	reducer(state, action);
+	action->operator()(state);
 
 	for(int i = 0; i < subscribers.size(); i++) {
 		subscribers[i](state);

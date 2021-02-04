@@ -33,27 +33,10 @@ struct State {
   State& operator=(State &&) = delete; // Delete move assignment
 };
 
-// I've tried out lots of variations, here
-// (https://devtato.com/2020/09/30/flux-architecture-part-4-message-types/) is a
-// dispatch method that uses template overloading stuff to handle actions which
-// is similar to something I was researching earlier.
-//
-// Another flux implementation: https://github.com/eandritskiy/flux_cpp
-class Action {
-  public:
-    virtual ~Action() {};
-    virtual void operator()(State& state) {};
-
-  protected:
-    Action() {};
-};
-
-class CreateNewWorldAction : public Action {
-  public:
-    CreateNewWorldAction(std::string seed) : m_seed{seed} {};
-
-    void operator()(State& state) override {
-      state.world_seed = m_seed;
+auto CreateNewWorldAction =
+  [](std::string seed) {
+    return [=](State& state) {
+      state.world_seed = seed;
       state.world_size = 2;
       for (auto i = 0; i < state.world_size; ++i) {
         for (auto ii = 0; ii < state.world_size; ++ii) {
@@ -61,27 +44,22 @@ class CreateNewWorldAction : public Action {
         }
       }
     };
-
-  private:
-    std::string m_seed;
-};
-
-class RecreateChunksAction : public Action {
-  public:
-    void operator()(State& state) override {
-      for (auto i = 0; i < state.world_size; ++i) {
-        for (auto ii = 0; ii < state.world_size; ++ii) {
-          auto index { ii * state.world_size + i };
-          state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii), state.scale());
-        }
-      }
-    };
-};
-
-auto ChangeCurrentPageAction = [](std::shared_ptr<Renderer> renderer_ptr) {
-  return [=](State& state) {
-    state.current_page_ptr = renderer_ptr;
   };
+
+auto RecreateChunksAction = [](State& state) {
+  for (auto i = 0; i < state.world_size; ++i) {
+    for (auto ii = 0; ii < state.world_size; ++ii) {
+      auto index { ii * state.world_size + i };
+      state.chunks[index] = std::make_shared<Chunk>(glm::vec3(i, 0, ii), state.scale());
+    }
+  }
 };
+
+auto ChangeCurrentPageAction =
+  [](std::shared_ptr<Renderer> renderer_ptr) {
+    return [=](State& state) {
+      state.current_page_ptr = renderer_ptr;
+    };
+  };
 
 using Store = redux::Store<State, std::function<void(State&)>>;

@@ -54,8 +54,8 @@ void RootRenderer::render(double dt) {
   ImGui::SetNextWindowSize(ImVec2(window_width, 0));
   if (ImGui::Begin("State")) {
     State& state = m_ui_context_ptr->getStore().getState();
-    ImGui::Text("world_seed: %s", state.world_seed.c_str());
-    ImGui::Text("world_size: %i", state.world_size);
+    ImGui::Text("world_seed: %s", state.world_ptr->seed.c_str());
+    ImGui::Text("world_size: %ix%i", state.world_ptr->width_in_chunks, state.world_ptr->length_in_chunks);
     static auto scale_factor_slider =
       ImGuiUtil::SliderInt("scale_factor", &state.scale_factor, 0, 3, [=]() {
         // When the scale factor changes, we need to recreate the Chunk objects.

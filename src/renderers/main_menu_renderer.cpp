@@ -40,14 +40,14 @@ void MainMenuRenderer::render(double dt) {
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, windowSize.y/2 - buttonSize.y/2)); // Move cursor on needed positions
   ImGui::PushFont(FontBook::NotoSans28Bold());
   if (ImGui::Button("New World", buttonSize)) {
-    m_ui_context_ptr->changeCurrentPage(
-      std::make_shared<NewWorldPageRenderer>(m_ui_context_ptr)
+    m_ui_context_ptr->getStore().dispatch(
+      ChangeCurrentPageAction(std::make_shared<NewWorldPageRenderer>(m_ui_context_ptr))
     );
   }
   ImGui::SetCursorPos(ImVec2(windowSize.x/2 - buttonSize.x/2, ImGui::GetCursorPos().y+10));
   if (ImGui::Button("Test", buttonSize)) {
-    m_ui_context_ptr->changeCurrentPage(
-      std::make_shared<RootRenderer>(m_ui_context_ptr)
+    m_ui_context_ptr->getStore().dispatch(
+      ChangeCurrentPageAction(std::make_shared<RootRenderer>(m_ui_context_ptr))
     );
   }
   ImGui::PopFont();

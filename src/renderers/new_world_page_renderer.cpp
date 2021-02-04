@@ -43,8 +43,8 @@ void NewWorldPageRenderer::render(double dt) {
   if (ImGui::Button("Create World", buttonSize)) {
     std::cout << "Create world button clicked. Seed: " + m_world_seed << std::endl;
     m_ui_context_ptr->getStore().dispatch(CreateNewWorldAction(m_world_seed));
-    m_ui_context_ptr->changeCurrentPage(
-      std::make_shared<RootRenderer>(m_ui_context_ptr)
+    m_ui_context_ptr->getStore().dispatch(
+      ChangeCurrentPageAction(std::make_shared<RootRenderer>(m_ui_context_ptr))
     );
   }
   ImGui::PopFont();

@@ -1,8 +1,8 @@
 #include "app.h"
 
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
-  m_ui_context_ptr->changeCurrentPage(
-    std::make_shared<MainMenuRenderer>(m_ui_context_ptr)
+  m_ui_context_ptr->getStore().dispatch(
+    ChangeCurrentPageAction(std::make_shared<MainMenuRenderer>(m_ui_context_ptr))
   );
 
   m_ui_context_ptr->addKeyPressedHandler(
@@ -20,8 +20,8 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
   );
 
   m_ui_context_ptr->getStore().dispatch(CreateNewWorldAction("foobar"));
-  m_ui_context_ptr->changeCurrentPage(
-    std::make_shared<RootRenderer>(m_ui_context_ptr)
+  m_ui_context_ptr->getStore().dispatch(
+    ChangeCurrentPageAction(std::make_shared<RootRenderer>(m_ui_context_ptr))
   );
 }
 
@@ -35,8 +35,8 @@ void App::update(double dt) {
 }
 
 void App::render(double dt) {
-  if (m_ui_context_ptr->getCurrentPagePtr()) {
-    m_ui_context_ptr->getCurrentPagePtr()->render(dt);
+  if (m_ui_context_ptr->getState().current_page_ptr) {
+    m_ui_context_ptr->getState().current_page_ptr->render(dt);
   }
 
   if (m_show_demo_window) {

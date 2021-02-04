@@ -8,11 +8,14 @@
 
 #include <glm/glm.hpp>
 
-#include "common.h"
 #include "chunk.h"
+#include "common.h"
 #include "redux.hpp"
+#include "renderers/renderer.h"
 
 struct State {
+  std::shared_ptr<Renderer> current_page_ptr {};
+
   std::string world_seed {};
   int world_size {};
   std::vector<std::shared_ptr<Chunk>> chunks {};
@@ -73,6 +76,12 @@ class RecreateChunksAction : public Action {
         }
       }
     };
+};
+
+auto ChangeCurrentPageAction = [](std::shared_ptr<Renderer> renderer_ptr) {
+  return [=](State& state) {
+    state.current_page_ptr = renderer_ptr;
+  };
 };
 
 using Store = redux::Store<State, std::function<void(State&)>>;

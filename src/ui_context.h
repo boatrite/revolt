@@ -39,21 +39,6 @@ class UIContext {
     void quit();
 
     //
-    // Page functionality
-    // UIContext keeps track of the current "page" to be rendered. It's
-    // basically the top level node for e.g. the intro menu, the new world
-    // form, the game world.
-    // In the code I just use Renderer and the naming is all over the place.
-    // RootRenderer is basically the game renderer. MainMenuRenderer is
-    // probably better referred to as the the IntroMenuRenderer.
-    //
-  private:
-    std::shared_ptr<Renderer> m_current_page_ptr {};
-  public:
-    std::shared_ptr<Renderer> getCurrentPagePtr();
-    void changeCurrentPage(std::shared_ptr<Renderer> renderer_ptr);
-
-    //
     // Window size accessors.
     // Gives consumers the ability to get the width and height each frame
     // without having to query glfw or deal with a callback and track the

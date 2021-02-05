@@ -19,6 +19,7 @@ struct World {
   int length_in_chunks {};
   int width_in_chunks {};
   int scale_factor {};
+  std::vector<std::shared_ptr<Chunk>> chunks {};
 
   float scale() {
     return 1.0f / pow(2.0, scale_factor);
@@ -29,7 +30,6 @@ struct State {
   std::shared_ptr<Renderer> current_page_ptr {};
 
   std::shared_ptr<World> world_ptr {};
-  std::vector<std::shared_ptr<Chunk>> chunks {};
 
   State(const State&) = delete; // Delete copy constructor
   State& operator=(const State&) = delete; // Delete copy assignment
@@ -47,7 +47,7 @@ auto CreateNewWorldAction =
       world_ptr->length_in_chunks = 3;
       for (auto chunk_x = 0; chunk_x < world_ptr->width_in_chunks; ++chunk_x) {
         for (auto chunk_z = 0; chunk_z < world_ptr->length_in_chunks; ++chunk_z) {
-          state.chunks.push_back(std::make_shared<Chunk>(glm::vec3(chunk_x, 0, chunk_z), world_ptr->scale()));
+          world_ptr->chunks.push_back(std::make_shared<Chunk>(glm::vec3(chunk_x, 0, chunk_z), world_ptr->scale()));
         }
       }
 
@@ -61,7 +61,7 @@ auto RecreateChunksAction = [](int scale_factor) {
     for (auto chunk_x = 0; chunk_x < state.world_ptr->width_in_chunks; ++chunk_x) {
       for (auto chunk_z = 0; chunk_z < state.world_ptr->length_in_chunks; ++chunk_z) {
         auto index { chunk_z * state.world_ptr->width_in_chunks + chunk_x };
-        state.chunks[index] = std::make_shared<Chunk>(glm::vec3(chunk_x, 0, chunk_z), state.world_ptr->scale());
+        state.world_ptr->chunks[index] = std::make_shared<Chunk>(glm::vec3(chunk_x, 0, chunk_z), state.world_ptr->scale());
       }
     }
   };

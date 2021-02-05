@@ -91,7 +91,7 @@ class ChunkBoundariesRenderer : public Renderer {
       m_shader.setMat4("projection", m_camera_ptr->getProjectionMatrix());
 
       glBindVertexArray(m_vao);
-      for (const auto& chunk_ptr : m_ui_context_ptr->getStore().getState().chunks) {
+      for (const auto& chunk_ptr : m_ui_context_ptr->getStore().getState().world_ptr->chunks) {
         m_shader.setMat4("model", glm::translate(
           glm::mat4(1.0f),
           chunk_ptr->getPosition() * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS

@@ -6,6 +6,8 @@
 #include <string>
 #include <cmath>
 
+#include <entt/entt.hpp>
+
 #include <glm/glm.hpp>
 
 #include "chunk.h"
@@ -21,50 +23,42 @@ struct World {
   int scale_factor {};
   std::vector<std::shared_ptr<Chunk>> chunks {};
 
-  float scale() {
+  float scale() const {
     return 1.0f / pow(2.0, scale_factor);
   }
 };
 
-struct State {
-  std::shared_ptr<Renderer> current_page_ptr {};
-
-  std::shared_ptr<World> world_ptr {};
-
-  State(const State&) = delete; // Delete copy constructor
-  State& operator=(const State&) = delete; // Delete copy assignment
-  State(State&&) = delete; // Delete move constructor
-  State& operator=(State &&) = delete; // Delete move assignment
+struct CurrentPage {
+  std::shared_ptr<Renderer> renderer_ptr {};
 };
 
 auto CreateNewWorldAction = [](std::string seed, int scale_factor) {
-  return [=](State& state) {
-    auto world_ptr = std::make_shared<World>();
-    world_ptr->seed = seed;
-    world_ptr->scale_factor = scale_factor;
-    world_ptr->width_in_chunks = 8;
-    world_ptr->length_in_chunks = 3;
-    for (auto chunk_x = 0; chunk_x < world_ptr->width_in_chunks; ++chunk_x) {
-      for (auto chunk_z = 0; chunk_z < world_ptr->length_in_chunks; ++chunk_z) {
-        world_ptr->chunks.push_back(std::make_shared<Chunk>(glm::vec3(chunk_x, 0, chunk_z), world_ptr->scale()));
+  return [=](entt::registry& registry) {
+    auto& world = registry.set<World>();
+    world.seed = seed;
+    world.scale_factor = scale_factor;
+    world.width_in_chunks = 8;
+    world.length_in_chunks = 3;
+    for (auto chunk_x = 0; chunk_x < world.width_in_chunks; ++chunk_x) {
+      for (auto chunk_z = 0; chunk_z < world.length_in_chunks; ++chunk_z) {
+        world.chunks.push_back(std::make_shared<Chunk>(glm::vec3(chunk_x, 0, chunk_z), world.scale()));
       }
     }
-
-    state.world_ptr = world_ptr;
   };
 };
 
 auto RecreateChunksAction = [](int scale_factor) {
-  return [=](State& state) {
-    CreateNewWorldAction(state.world_ptr->seed, scale_factor)(state);
+  return [=](entt::registry& registry) {
+    const auto& world = registry.ctx<World>();
+    CreateNewWorldAction(world.seed, scale_factor)(registry);
   };
 };
 
 auto ChangeCurrentPageAction =
   [](std::shared_ptr<Renderer> renderer_ptr) {
-    return [=](State& state) {
-      state.current_page_ptr = renderer_ptr;
+    return [=](entt::registry& registry) {
+      registry.set<CurrentPage>(renderer_ptr);
     };
   };
 
-using Store = redux::Store<State, std::function<void(State&)>>;
+using Store = redux::Store<entt::registry, std::function<void(entt::registry&)>>;

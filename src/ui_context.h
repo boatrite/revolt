@@ -30,7 +30,7 @@ class UIContext {
 
   public:
     Store& getStore() { return m_store; };
-    State& getState() { return getStore().getState(); };
+    entt::registry& getRegistry() { return getStore().getState(); };
 
     //
     // Quit functionality

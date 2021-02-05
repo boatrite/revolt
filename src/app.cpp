@@ -35,8 +35,9 @@ void App::update(double dt) {
 }
 
 void App::render(double dt) {
-  if (m_ui_context_ptr->getState().current_page_ptr) {
-    m_ui_context_ptr->getState().current_page_ptr->render(dt);
+  const auto& current_page = m_ui_context_ptr->getRegistry().ctx<CurrentPage>();
+  if (current_page.renderer_ptr) {
+    current_page.renderer_ptr->render(dt);
   }
 
   if (m_show_demo_window) {

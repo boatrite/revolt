@@ -54,20 +54,22 @@ void RootRenderer::render(double dt) {
   ImGui::SetNextWindowSize(ImVec2(window_width, 0));
 
   if (ImGui::Begin("State")) {
-    State& state = m_ui_context_ptr->getStore().getState();
+    const auto& world = m_ui_context_ptr->getRegistry().ctx<World>();
+    ImGui::Text("world_seed: %s", world.seed.c_str());
 
-    ImGui::Text("world_seed: %s", state.world_ptr->seed.c_str());
+    ImGui::Text("world_size: %ix%i", world.width_in_chunks, world.length_in_chunks);
 
-    ImGui::Text("world_size: %ix%i", state.world_ptr->width_in_chunks, state.world_ptr->length_in_chunks);
-
+    int tmp = world.scale_factor; // We don't actually want to change the value
+                                  // with the SliderInt, so assign to a tmp var
+                                  // just for the display.
     static auto scale_factor_slider =
-      ImGuiUtil::SliderInt("scale_factor", &state.world_ptr->scale_factor, 0, 3, [=](auto prev, auto next) {
+      ImGuiUtil::SliderInt("scale_factor", &tmp, 0, 3, [=](auto prev, auto next) {
         // When the scale factor changes, we need to recreate the Chunk objects.
         m_ui_context_ptr->getStore().dispatch(RecreateChunksAction(next));
       });
     scale_factor_slider();
 
-    ImGui::Text("scale: %.3f", state.world_ptr->scale());
+    ImGui::Text("scale: %.3f", world.scale());
   }
   ImGui::End();
 

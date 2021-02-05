@@ -45,7 +45,7 @@ class ImGuiUtil {
       int* v,
       int v_min,
       int v_max,
-      std::function<void()> f,
+      std::function<void(int,int)> f,
       const char* format = "%d",
       ImGuiSliderFlags flags = 0
     ) {
@@ -54,7 +54,7 @@ class ImGuiUtil {
         ImGui::SliderInt(label, v, v_min, v_max, format, flags);
         if (*v != s_last_value) {
           if (f) {
-            f();
+            f(s_last_value, *v);
           }
           s_last_value = *v;
         }

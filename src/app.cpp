@@ -19,7 +19,7 @@ App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_contex
     }
   );
 
-  m_ui_context_ptr->getStore().dispatch(CreateNewWorldAction("foobar"));
+  m_ui_context_ptr->getStore().dispatch(CreateNewWorldAction("foobar", 0));
   m_ui_context_ptr->getStore().dispatch(
     ChangeCurrentPageAction(std::make_shared<RootRenderer>(m_ui_context_ptr))
   );

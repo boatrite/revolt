@@ -53,8 +53,9 @@ void RootRenderer::render(double dt) {
   ImGui::SetNextWindowPos(ImVec2(windowSize.x - 10 - window_width, 10));
   ImGui::SetNextWindowSize(ImVec2(window_width, 0));
 
-  if (ImGui::Begin("State")) {
-    const auto& world = m_ui_context_ptr->getRegistry().ctx<World>();
+  if (ImGui::Begin("entt")) {
+    const auto& e = m_ui_context_ptr->getRegistry().view<World>().front();
+    const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
     ImGui::Text("world_seed: %s", world.seed.c_str());
 
     ImGui::Text("world_size: %ix%i", world.width_in_chunks, world.length_in_chunks);
@@ -70,6 +71,16 @@ void RootRenderer::render(double dt) {
     scale_factor_slider();
 
     ImGui::Text("scale: %.3f", world.scale());
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Save World")) {
+      m_ui_context_ptr->getStore().dispatch(SaveWorldAction);
+    };
+
+    if (ImGui::Button("Load World")) {
+      m_ui_context_ptr->getStore().dispatch(LoadWorldAction);
+    };
   }
   ImGui::End();
 

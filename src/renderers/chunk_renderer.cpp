@@ -21,7 +21,9 @@ void ChunkRenderer::render(double dt) {
   m_shader.setMat4("view", m_camera_ptr->getViewMatrix());
   m_shader.setMat4("projection", m_camera_ptr->getProjectionMatrix());
 
-  for (const auto& chunk_ptr : m_ui_context_ptr->getRegistry().ctx<World>().chunks) {
+  const auto& e = m_ui_context_ptr->getRegistry().view<World>().front();
+  const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
+  for (const auto& chunk_ptr : world.chunks) {
     if (chunk_ptr) {
       chunk_ptr->render(m_shader);
     }

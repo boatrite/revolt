@@ -41,6 +41,10 @@ class Chunk {
 
     void render(const Shader& shader);
 
+    template<typename Archive>
+    void serialize(Archive &archive) {
+    }
+
     // Remember, chunk position is independent of scale.
     static const glm::vec3 chunkPosition(const glm::vec3& position) {
       auto scaled = position / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;

@@ -63,12 +63,10 @@ void RootRenderer::render(double dt) {
     int tmp = world.scale_factor; // We don't actually want to change the value
                                   // with the SliderInt, so assign to a tmp var
                                   // just for the display.
-    static auto scale_factor_slider =
-      ImGuiUtil::SliderInt("scale_factor", &tmp, 0, 3, [=](auto prev, auto next) {
-        // When the scale factor changes, we need to recreate the Chunk objects.
-        m_ui_context_ptr->getStore().dispatch(RecreateChunksAction(next));
-      });
-    scale_factor_slider();
+    if(ImGui::SliderInt("scale_factor", &tmp, 0, 3, "%d")) {
+      // When the scale factor changes, we need to recreate the Chunk objects.
+      m_ui_context_ptr->getStore().dispatch(RecreateChunksAction(tmp));
+    }
 
     ImGui::Text("scale: %.3f", world.scale());
 

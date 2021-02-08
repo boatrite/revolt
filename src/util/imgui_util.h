@@ -36,28 +36,4 @@ class ImGuiUtil {
       ImGuiStyle& style = ImGui::GetStyle();
       style = s_saved_style;
     };
-
-    // This creates and returns a function which when called renders an ImGui
-    // component that fires the given callback when a change to the value is
-    // detected.
-    static std::function<void()> SliderInt(
-      const char* label,
-      int* v,
-      int v_min,
-      int v_max,
-      std::function<void(int,int)> f,
-      const char* format = "%d",
-      ImGuiSliderFlags flags = 0
-    ) {
-      return [=]() {
-        static int s_last_value { *v };
-        ImGui::SliderInt(label, v, v_min, v_max, format, flags);
-        if (*v != s_last_value) {
-          if (f) {
-            f(s_last_value, *v);
-          }
-          s_last_value = *v;
-        }
-      };
-    }
 };

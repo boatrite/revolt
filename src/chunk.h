@@ -4,6 +4,8 @@
 #include <ostream>
 #include <vector>
 
+#include <cereal/access.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
@@ -12,9 +14,13 @@
 
 class Chunk {
   private:
+    // Serialized variables.
+    // Anything needing to be saved should be defined here and used in the
+    // archive method.
+    // The other members are therefore all runtime values.
     glm::vec3 m_position { 0, 0, 0 };
-    std::vector<Block> m_blocks {};
     const float m_scale; // 1 / 2^n where n is 0,1,2,...
+    std::vector<Block> m_blocks {};
 
     // Meshing & Rendering
     std::vector<float> m_mesh {};
@@ -41,9 +47,26 @@ class Chunk {
 
     void render(const Shader& shader);
 
+    //
+    // Cereal serialization
+    //
     template<typename Archive>
-    void serialize(Archive &archive) {
-    }
+    void serialize(Archive& archive) {
+      archive(m_position, m_scale);
+    };
+
+    // Since we want to serialize a (vector of) std::shared_ptr<Chunk> and because
+    // Chunk doesn't have a default constructor (and I don't want to give it one),
+    // we need to define this load_and_construct method.
+    // See: http://uscilab.github.io/cereal/pointers.html
+    template <class Archive>
+    static void load_and_construct(Archive& archive, cereal::construct<Chunk>& construct) {
+      glm::vec3 position {};
+      archive(position);
+      float scale {};
+      archive(scale);
+      construct(position, scale);
+    };
 
     // Remember, chunk position is independent of scale.
     static const glm::vec3 chunkPosition(const glm::vec3& position) {

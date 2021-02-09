@@ -7,10 +7,16 @@
 #include <cmath>
 
 #include <cereal/archives/json.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
 
 #include <entt/entt.hpp>
 
 #include <glm/glm.hpp>
+
+#include "util/glm_cereal.h"
 
 #include "chunk.h"
 #include "common.h"
@@ -45,7 +51,8 @@ struct World {
       seed,
       length_in_chunks,
       width_in_chunks,
-      scale_factor
+      scale_factor,
+      chunks
     );
   }
 };
@@ -87,7 +94,6 @@ auto SaveWorldAction = [](entt::registry& registry) {
 
   {
     cereal::JSONOutputArchive output{storage};
-    // output(CEREAL_NVP(registry.ctx<World>()));
     entt::snapshot{registry}.entities(output).component<Position, World>(output);
   }
 
@@ -118,9 +124,6 @@ auto LoadWorldAction = [](entt::registry& registry) {
   cereal::JSONInputArchive input{copy};
   entt::continuous_loader loader{registry};
   loader.entities(input).component<Position, World>(input);
-  // World world {};
-  // input(world);
-  // registry.set<World>(world);
 };
 
 auto ChangeCurrentPageAction =

@@ -1,7 +1,5 @@
 #include <imgui.h>
 
-#include "../util/imgui_util.h"
-
 #include "../action.h"
 #include "root_renderer.h"
 #include "chunk_renderer.h"

@@ -22,6 +22,11 @@ struct Block {
   bool operator!=(const Block& other) const {
     return !(*this == other);
   }
+
+  template<typename Archive>
+  void serialize(Archive &archive) {
+    archive(type);
+  };
 };
 
 static constexpr struct Block EMPTY_BLOCK { Block::Type::NONE };

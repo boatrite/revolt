@@ -42,6 +42,11 @@ Chunk::Chunk(glm::vec3 position, float scale) : m_position{position}, m_scale{sc
   m_is_mesh_dirty = true;
 };
 
+Chunk::Chunk(glm::vec3 position, float scale, std::vector<Block> blocks) : m_position{position}, m_scale{scale}, m_blocks{std::move(blocks)} {
+  m_mesh = GreedyMesh::computeChunkMesh(this);
+  m_is_mesh_dirty = true;
+};
+
 Block Chunk::blockAt(int x, int y, int z) const {
   assert(x >= 0 && x < getSize());
   assert(y >= 0 && y < getSize());

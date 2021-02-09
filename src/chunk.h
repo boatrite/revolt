@@ -36,7 +36,12 @@ class Chunk {
     // space.
     static const int CHUNK_SIZE_IN_UNIT_BLOCKS;
 
+    //
+    // Two constructors. The one is used to generate the chunk's blocks first.
+    // The other is used during deserialization when we want to load the current data.
+    //
     Chunk(glm::vec3 position, float scale);
+    Chunk(glm::vec3 position, float scale, std::vector<Block> blocks);
 
     const glm::vec3& getPosition() const { return m_position; }
     const float getScale() const { return m_scale; }
@@ -52,7 +57,7 @@ class Chunk {
     //
     template<typename Archive>
     void serialize(Archive& archive) {
-      archive(m_position, m_scale);
+      archive(CEREAL_NVP(m_position), CEREAL_NVP(m_scale), CEREAL_NVP(m_blocks));
     };
 
     // Since we want to serialize a (vector of) std::shared_ptr<Chunk> and because
@@ -65,7 +70,9 @@ class Chunk {
       archive(position);
       float scale {};
       archive(scale);
-      construct(position, scale);
+      std::vector<Block> blocks {};
+      archive(blocks);
+      construct(position, scale, std::move(blocks));
     };
 
     // Remember, chunk position is independent of scale.

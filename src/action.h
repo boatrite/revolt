@@ -47,12 +47,12 @@ struct World {
   template<typename Archive>
   void serialize(Archive &archive) {
     archive(
-      name,
-      seed,
-      length_in_chunks,
-      width_in_chunks,
-      scale_factor,
-      chunks
+      CEREAL_NVP(name),
+      CEREAL_NVP(seed),
+      CEREAL_NVP(length_in_chunks),
+      CEREAL_NVP(width_in_chunks),
+      CEREAL_NVP(scale_factor),
+      CEREAL_NVP(chunks)
     );
   }
 };
@@ -97,8 +97,8 @@ auto SaveWorldAction = [](entt::registry& registry) {
     entt::snapshot{registry}.entities(output).component<Position, World>(output);
   }
 
-  std::cout << "****** Saved: *****" << std::endl;
-  std::cout << storage.str() << std::endl;
+  // std::cout << "****** Saved: *****" << std::endl;
+  // std::cout << storage.str() << std::endl;
   registry.set<InMemorySnapshot>(std::move(storage));
 };
 
@@ -117,8 +117,8 @@ auto SaveWorldAction = [](entt::registry& registry) {
 // I could even add in run length encoding to see compression is possible.
 auto LoadWorldAction = [](entt::registry& registry) {
   std::stringstream& storage = registry.ctx<InMemorySnapshot>().storage;
-  std::cout << "****** Loading: *****" << std::endl;
-  std::cout << storage.str() << std::endl;
+  // std::cout << "****** Loading: *****" << std::endl;
+  // std::cout << storage.str() << std::endl;
   std::stringstream copy;
   copy << storage.str();
   cereal::JSONInputArchive input{copy};

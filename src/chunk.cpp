@@ -47,12 +47,16 @@ Chunk::Chunk(glm::vec3 position, float scale, std::vector<Block> blocks) : m_pos
   m_is_mesh_dirty = true;
 };
 
-Block Chunk::blockAt(int x, int y, int z) const {
-  assert(x >= 0 && x < getSize());
-  assert(y >= 0 && y < getSize());
-  assert(z >= 0 && z < getSize());
-  auto index { z * getSizeSquared() + y * getSize() + x };
+Block Chunk::blockAt(int block_x, int block_y, int block_z) const {
+  assert(block_x >= 0 && block_x < getSize());
+  assert(block_y >= 0 && block_y < getSize());
+  assert(block_z >= 0 && block_z < getSize());
+  auto index { block_z * getSizeSquared() + block_y * getSize() + block_x };
   return m_blocks.at(index);
+}
+
+Block Chunk::blockAt(const glm::vec3& block_position) const {
+  return blockAt(block_position.x, block_position.y, block_position.z);
 }
 
 void Chunk::render(const Shader& shader) {

@@ -49,6 +49,7 @@ class Chunk {
     const int getSizeSquared() const { return pow(getSize(), 2); }
 
     Block blockAt(int x, int y, int z) const;
+    Block blockAt(const glm::vec3& block_position) const;
 
     void render(const Shader& shader);
 
@@ -77,11 +78,16 @@ class Chunk {
 
     // Remember, chunk position is independent of scale.
     static const glm::vec3 chunkPosition(const glm::vec3& position) {
-      auto scaled = position / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
+      return chunkPosition(position.x, position.y, position.z);
+    }
+    static const glm::vec3 chunkPosition(const int world_x, const int world_y, const int world_z) {
+      float chunk_x = world_x / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
+      float chunk_y = world_y / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
+      float chunk_z = world_z / Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
       return glm::vec3(
-        position.x > 0 ? floor(scaled.x) : ceil(scaled.x),
-        floor(scaled.y),
-        position.z > 0 ? floor(scaled.z) : ceil(scaled.z)
+        chunk_x > 0 ? floor(chunk_x) : ceil(chunk_x),
+        chunk_y > 0 ? floor(chunk_y) : ceil(chunk_y),
+        chunk_z > 0 ? floor(chunk_z) : ceil(chunk_z)
       );
     }
 };

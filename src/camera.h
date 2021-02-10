@@ -53,6 +53,7 @@ class Camera {
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
     const glm::vec3& getPosition() const;
+    const glm::vec3& getCameraFront() const;
 
     void imguiDebugControlPanel();
 };

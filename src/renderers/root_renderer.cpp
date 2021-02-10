@@ -46,6 +46,18 @@ void RootRenderer::render(double dt) {
     renderer_ptr->render(dt);
   }
 
+  const auto& e = m_ui_context_ptr->getRegistry().view<World>().front();
+  const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
+  world.raycast(
+      m_camera_ptr->getPosition(),
+      m_camera_ptr->getCameraFront(),
+      20,
+      [](float x, float y, float z, const Block& block, glm::vec3& face) {
+        std::cout << "Hey my raycast thing happened! :) " << x << ", " << y << ", " << z << ", " << block << ", " << face << std::endl;
+        return true;
+      }
+  );
+
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   const int window_width = 300;
   ImGui::SetNextWindowPos(ImVec2(windowSize.x - 10 - window_width, 10));

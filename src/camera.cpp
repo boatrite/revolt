@@ -50,6 +50,10 @@ const glm::vec3& Camera::getPosition() const {
   return position;
 }
 
+const glm::vec3& Camera::getCameraFront() const {
+  return cameraFront;
+}
+
 void Camera::processInput(float dt) {
   if (!m_ui_context_ptr->isFocusedInGame()) {
     return;

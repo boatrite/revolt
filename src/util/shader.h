@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 
 #include <glad/glad.h>
@@ -7,12 +8,40 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// TODO Update the conventions to match rest of the project (this file was
+// originally copied from another project before I really figured out what
+// conventions I liked)
 class Shader {
   public:
     // The Program ID
     unsigned int ID { glCreateProgram() };
 
+    //
+    // Two constructors because I want to be able to load shaders from files,
+    // and I also want to be able to specify them inline, particularly for very
+    // simple shaders.
+    //
+    // So the first constructor takes C style strings, the paths to the
+    // shader files to load. The second constructor two std::strings, the
+    // inline shader code.
+    //
+    // Conveniently, when you call `Shader("path.vert", "path.frag")` it picks
+    // the C strings constructor. To use the other one, set the code in an
+    // std::string variable first and pass the variable in. e.g.
+    // ```
+    // std::string vertex_shader { R"(
+    //   #version 330 core
+    //   ...
+    // )" };
+    // std::string fragment_shader { R"(
+    //   #version 330 core
+    //   ...
+    // )" };
+    // Shader(vertex_shader, fragment_shader);
+    // ```
+    //
     Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+    Shader(std::string vertexShader, std::string fragmentShader, std::string geometryShader = "");
 
     void use();
 
@@ -25,6 +54,6 @@ class Shader {
     void setVec4(const std::string &name, glm::vec4 value) const;
 
   private:
-    GLuint compileShader(const char* path, GLenum type);
+    GLuint compileShader(std::string codeString, GLenum type);
     void compileAndLinkProgram(GLuint vertex, GLuint fragment, GLuint geometry = 0);
 };

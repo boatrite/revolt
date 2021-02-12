@@ -6,12 +6,25 @@
 #include "file.h"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
-  GLuint vertex = compileShader(vertexPath, GL_VERTEX_SHADER);
-  GLuint fragment = compileShader(fragmentPath, GL_FRAGMENT_SHADER);
+  // std::cout << "[Shader] Compiling shader from path" << std::endl;
+  GLuint vertex = compileShader(File::read(vertexPath), GL_VERTEX_SHADER);
+  GLuint fragment = compileShader(File::read(fragmentPath), GL_FRAGMENT_SHADER);
   if (geometryPath == nullptr) {
     compileAndLinkProgram(vertex, fragment);
   } else {
-    GLuint geometry = compileShader(geometryPath, GL_GEOMETRY_SHADER);
+    GLuint geometry = compileShader(File::read(geometryPath), GL_GEOMETRY_SHADER);
+    compileAndLinkProgram(vertex, fragment, geometry);
+  }
+}
+
+Shader::Shader(std::string vertexShader, std::string fragmentShader, std::string geometryShader) {
+  // std::cout << "[Shader] Compiling shader from inline code" << std::endl;
+  GLuint vertex = compileShader(vertexShader, GL_VERTEX_SHADER);
+  GLuint fragment = compileShader(fragmentShader, GL_FRAGMENT_SHADER);
+  if (geometryShader == "") {
+    compileAndLinkProgram(vertex, fragment);
+  } else {
+    GLuint geometry = compileShader(geometryShader, GL_GEOMETRY_SHADER);
     compileAndLinkProgram(vertex, fragment, geometry);
   }
 }
@@ -48,8 +61,7 @@ void Shader::setVec4(const std::string &name, glm::vec4 value) const {
   glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
 }
 
-GLuint Shader::compileShader(const char* path, GLenum type) {
-  std::string codeString = File::read(path);
+GLuint Shader::compileShader(std::string codeString, GLenum type) {
   const char* code = codeString.c_str();
 
   // 2. Compile shader code
@@ -64,7 +76,7 @@ GLuint Shader::compileShader(const char* path, GLenum type) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, NULL, infoLog);
-    std::cerr << "ERROR: Shader compilation failed. Path: " << path << std::endl;
+    std::cerr << "ERROR: Shader compilation failed. Shader:\n" << codeString << std::endl;
   }
 
   return shader;

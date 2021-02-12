@@ -48,6 +48,7 @@ class Camera {
     float speed { 8.0f };
     float sensitivity { 0.05f };
 
+    void update();
     glm::vec3 computeCameraFront();
 
     glm::mat4 getViewMatrix() const;

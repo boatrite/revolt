@@ -1,11 +1,12 @@
 #include <imgui.h>
 
 #include "../action.h"
-#include "root_renderer.h"
-#include "chunk_renderer.h"
-#include "overlay_renderer.h"
-#include "coordinate_lines_renderer.h"
+#include "../util/debug_drawing_manager.h"
 #include "chunk_boundaries_renderer.h"
+#include "chunk_renderer.h"
+#include "coordinate_lines_renderer.h"
+#include "overlay_renderer.h"
+#include "root_renderer.h"
 
 RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   std::cout << "RootRenderer (" << this << ") created" << std::endl;
@@ -36,11 +37,18 @@ RootRenderer::~RootRenderer() {
 }
 
 void RootRenderer::render(double dt) {
+  m_camera_ptr->update();
+
   if (m_wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   } else {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
+
+  glEnable(GL_DEPTH_TEST);
+
+  glClearColor(0.132f, 0.132f, 0.132f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for(auto renderer_ptr : m_renderer_ptrs) {
     renderer_ptr->render(dt);
@@ -48,6 +56,8 @@ void RootRenderer::render(double dt) {
 
   const auto& e = m_ui_context_ptr->getRegistry().view<World>().front();
   const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
+  static DebugDrawingManager ddm {};
+  ddm.drawLine(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), m_camera_ptr->getPosition(), m_camera_ptr->getPosition()+1*glm::normalize(m_camera_ptr->getCameraFront()), glm::vec3(1.0f,1.0f,1.0f));
   world.raycast(
       m_camera_ptr->getPosition(),
       m_camera_ptr->getCameraFront(),

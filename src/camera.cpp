@@ -30,6 +30,10 @@ Camera::~Camera() {
   m_ui_context_ptr->removeHandlers(this);
 }
 
+void Camera::update() {
+  cameraFront = computeCameraFront();
+}
+
 glm::vec3 Camera::computeCameraFront() {
   glm::vec3 direction {};
   direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

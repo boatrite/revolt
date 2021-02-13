@@ -2,3 +2,6 @@ devlog
 build
 src/bindings
 tmp
+
+# This is symlinked from build to project root for ccls
+compile_commands.json

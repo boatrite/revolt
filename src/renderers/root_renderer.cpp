@@ -58,6 +58,7 @@ void RootRenderer::render(double dt) {
   const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
   static DebugDrawingManager ddm {};
   ddm.drawLine(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), m_camera_ptr->getPosition(), m_camera_ptr->getPosition()+1*glm::normalize(m_camera_ptr->getCameraFront()), glm::vec3(1.0f,1.0f,1.0f));
+  ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(0.0f, 16.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 16.0f);
   auto draw = ImGui::GetForegroundDrawList();
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   auto crosshair_size = 16.0f;
@@ -67,8 +68,9 @@ void RootRenderer::render(double dt) {
       m_camera_ptr->getPosition(),
       m_camera_ptr->getCameraFront(),
       20,
-      [](float x, float y, float z, const Block& block, glm::vec3& face) {
-        std::cout << "Hey my raycast thing happened! :) " << x << ", " << y << ", " << z << ", " << block << ", " << face << std::endl;
+      [=](float x, float y, float z, const Block& block, glm::vec3& face) {
+        ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 16.0f);
+        // std::cout << "Hey my raycast thing happened! :) " << x << ", " << y << ", " << z << ", " << block << ", " << face << std::endl;
         return true;
       }
   );

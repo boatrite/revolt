@@ -58,6 +58,11 @@ void RootRenderer::render(double dt) {
   const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
   static DebugDrawingManager ddm {};
   ddm.drawLine(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), m_camera_ptr->getPosition(), m_camera_ptr->getPosition()+1*glm::normalize(m_camera_ptr->getCameraFront()), glm::vec3(1.0f,1.0f,1.0f));
+  auto draw = ImGui::GetForegroundDrawList();
+  ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+  auto crosshair_size = 16.0f;
+  draw->AddLine(ImVec2(windowSize.x / 2 - crosshair_size / 2, windowSize.y / 2), ImVec2(windowSize.x / 2 + crosshair_size / 2, windowSize.y / 2), ImColor(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+  draw->AddLine(ImVec2(windowSize.x / 2, windowSize.y / 2 - crosshair_size / 2), ImVec2(windowSize.x / 2, windowSize.y / 2 + crosshair_size / 2), ImColor(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
   world.raycast(
       m_camera_ptr->getPosition(),
       m_camera_ptr->getCameraFront(),
@@ -68,7 +73,6 @@ void RootRenderer::render(double dt) {
       }
   );
 
-  ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   const int window_width = 300;
   ImGui::SetNextWindowPos(ImVec2(windowSize.x - 10 - window_width, 10));
   ImGui::SetNextWindowSize(ImVec2(window_width, 0));

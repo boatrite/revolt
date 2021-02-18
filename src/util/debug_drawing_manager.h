@@ -53,7 +53,7 @@ class DebugDrawingManager {
         void main()
         {
           gl_Position = projection * view * model * vec4(position, 1.0);
-          gl_PointSize = 8.0f;
+          gl_PointSize = point_size;
         }
       )"
     };
@@ -88,6 +88,16 @@ class DebugDrawingManager {
       const glm::mat4& proj_matrix,
       const glm::vec3& point,
       const glm::vec3& color,
-      float point_size = 1.0f
+      float point_size = 1.0f,
+      bool depth_off = false
+    );
+
+    void drawCube(
+      const glm::mat4& view_matrix,
+      const glm::mat4& proj_matrix,
+      const glm::vec3& point,
+      const glm::vec3& color,
+      float size = 1.0f,
+      bool depth_off = false
     );
 };

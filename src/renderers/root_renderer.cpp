@@ -56,21 +56,48 @@ void RootRenderer::render(double dt) {
 
   const auto& e = m_ui_context_ptr->getRegistry().view<World>().front();
   const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
+
   static DebugDrawingManager ddm {};
-  ddm.drawLine(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), m_camera_ptr->getPosition(), m_camera_ptr->getPosition()+1*glm::normalize(m_camera_ptr->getCameraFront()), glm::vec3(1.0f,1.0f,1.0f));
+  ddm.drawLine(m_camera_ptr->getViewMatrix(),
+      m_camera_ptr->getProjectionMatrix(),
+      m_camera_ptr->getPosition(),
+      m_camera_ptr->getPosition()+1*glm::normalize(m_camera_ptr->getCameraFront()),
+      glm::vec3(1.0f,1.0f,1.0f));
+
+  // ddm.drawCube(m_camera_ptr->getViewMatrix(),
+      // m_camera_ptr->getProjectionMatrix(),
+      // glm::vec3(0.0f, 0.0f, 0.0f),
+      // glm::vec3(1.0f,1.0f,1.0f),
+      // 1.0f, true);
+
   ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(0.0f, 16.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 16.0f);
+
+  // Render crosshair
   auto draw = ImGui::GetForegroundDrawList();
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   auto crosshair_size = 16.0f;
   draw->AddLine(ImVec2(windowSize.x / 2 - crosshair_size / 2, windowSize.y / 2), ImVec2(windowSize.x / 2 + crosshair_size / 2, windowSize.y / 2), ImColor(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
   draw->AddLine(ImVec2(windowSize.x / 2, windowSize.y / 2 - crosshair_size / 2), ImVec2(windowSize.x / 2, windowSize.y / 2 + crosshair_size / 2), ImColor(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+
+  static bool depth_off = true;
+  if (ImGui::Begin("Debug Info")) {
+    ImGui::Separator();
+    ImGui::Checkbox("ddm depth_off", &depth_off);
+  }
   world.raycast(
       m_camera_ptr->getPosition(),
-      m_camera_ptr->getCameraFront(),
-      20,
+      glm::normalize(m_camera_ptr->getCameraFront()),
+      1000,
       [=](float x, float y, float z, const Block& block, glm::vec3& face) {
-        ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 16.0f);
-        // std::cout << "Hey my raycast thing happened! :) " << x << ", " << y << ", " << z << ", " << block << ", " << face << std::endl;
+        ddm.drawLine(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), m_camera_ptr->getPosition(), glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f));
+        ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 8.0f, depth_off);
+        ddm.drawCube(m_camera_ptr->getViewMatrix(),
+                     m_camera_ptr->getProjectionMatrix(),
+                     glm::vec3(x, y, z),
+                     glm::vec3(1.0f, 1.0f, 1.0f),
+                     1.0f, depth_off);
+
+        // std::cout << "Hey my raycast thing happened: " << x << ", " << y << ", " << z << ", " << block << ", " << face << std::endl;
         return true;
       }
   );

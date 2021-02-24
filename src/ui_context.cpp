@@ -1,4 +1,5 @@
 #include <imgui.h>
+#include "bindings/imgui_impl_glfw.h"
 
 #include <algorithm>
 
@@ -23,6 +24,9 @@ UIContext::UIContext(GLFWwindow* window) : m_window{window} {
   });
 
   glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+    // Forward to Dear Imgui so scroll behavior works in imgui windows.
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+
     // Not yet implemented in UIContext
     // std::cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
   });

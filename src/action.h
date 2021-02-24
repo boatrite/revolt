@@ -47,25 +47,25 @@ struct World {
     return 1.0f / pow(2.0, scale_factor);
   }
 
-  float intbound(float s, float ds) const {
-    auto s_is_integer = round(s) == s;
-    if (ds < 0 && s_is_integer) {
-      return 0;
-    }
+  // float intbound(float s, float ds) const {
+    // auto s_is_integer = round(s) == s;
+    // if (ds < 0 && s_is_integer) {
+      // return 0;
+    // }
 
-    // Find the smallest positive t such that s+t*ds is an integer.
-    if (ds < 0) {
-      return intbound(-s, -ds);
-    } else {
-      s = mod(s, 1);
-      // problem is now s+t*ds = 1
-      return (1-s)/ds;
-    }
-  }
+    // // Find the smallest positive t such that s+t*ds is an integer.
+    // if (ds < 0) {
+      // return intbound(-s, -ds);
+    // } else {
+      // s = mod(s, 1);
+      // // problem is now s+t*ds = 1
+      // return (1-s)/ds;
+    // }
+  // }
 
-  int mod(int value, int modulus) const {
-    return (value % modulus + modulus) % modulus;
-  }
+  // int mod(int value, int modulus) const {
+    // return (value % modulus + modulus) % modulus;
+  // }
 
   // Source: https://gamedev.stackexchange.com/a/49423
   // Also here's a CUDA C impl: https://stackoverflow.com/a/38552664
@@ -80,15 +80,17 @@ struct World {
   //     the callback.
   // The foundation of this algorithm is a parameterized representation of
   // the provided ray,
-  //                    origin + t * direction,
+  //                    origin + t * ray,
   // except that t is not actually stored; rather, at any given point in the
   // traversal, we keep track of the *greater* t values which we would have
   // if we took a step sufficient to cross a cube boundary along that axis
   // (i.e. change the integer part of the coordinate) in the variables
   // tMaxX, tMaxY, and tMaxZ.
   void raycast(glm::vec3 origin, glm::vec3 direction, float radius, std::function<bool(float, float, float, const Block&, glm::vec3&)> callback) const {
-    glm::vec3 ray_end = origin + radius*glm::normalize(direction);
     glm::vec3 ray = glm::normalize(direction);
+    assert(!(ray.x == 0 && ray.y == 0 && ray.z == 0));
+
+    glm::vec3 ray_end = origin + radius*ray;
 
     float _bin_size = 1;
     glm::vec3 last_voxel(std::floor(ray_end[0]/_bin_size),
@@ -99,82 +101,94 @@ struct World {
     float x = floor(origin.x);
     float y = floor(origin.y);
     float z = floor(origin.z);
-    // Break out direction vector.
-    float dx = direction.x;
-    float dy = direction.y;
-    float dz = direction.z;
+
+    static const char* window_title { "World#raycast" };
+    if (ImGui::Begin(window_title)) {
+      ImGui::Text("origin: %f, %f, %f", origin.x, origin.y, origin.z);
+      ImGui::Separator();
+
+      ImGui::Text("Initial (x, y, z): %f, %f, %f", x, y, z);
+      ImGui::Separator();
+
+      ImGui::Text("ray_end: %f, %f, %f", ray_end.x, ray_end.y, ray_end.z);
+      ImGui::Separator();
+
+      ImGui::Text("last_voxel: %f, %f, %f", last_voxel.x, last_voxel.y, last_voxel.z);
+      ImGui::Separator();
+    }
+
     // Direction to increment x,y,z when stepping.
-    float stepX = glm::sign(dx);
-    float stepY = glm::sign(dy);
-    float stepZ = glm::sign(dz);
+    float stepX = ray.x >= 0 ? 1 : -1;
+    float stepY = ray.y >= 0 ? 1 : -1;
+    float stepZ = ray.z >= 0 ? 1 : -1;
+
     // See description above. The initial values depend on the fractional
     // part of the origin.
-    // float tMaxX = intbound(origin.x, dx);
-    // float tMaxY = intbound(origin.y, dy);
-    // float tMaxZ = intbound(origin.z, dz);
-
+    // float tMaxX = intbound(origin.x, ray.x);
+    // float tMaxY = intbound(origin.y, ray.y);
+    // float tMaxZ = intbound(origin.z, ray.z);
     // Distance along the ray to the next voxel border from the current position (tMaxX, tMaxY, tMaxZ).
-    float next_voxel_boundary_x = (x+stepX)*_bin_size; // correct
-    float next_voxel_boundary_y = (y+stepY)*_bin_size; // correct
-    float next_voxel_boundary_z = (z+stepZ)*_bin_size; // correct
+    float next_voxel_boundary_x = (x + stepX) * _bin_size; // correct
+    float next_voxel_boundary_y = (y + stepY) * _bin_size; // correct
+    float next_voxel_boundary_z = (z + stepZ) * _bin_size; // correct
     // tMaxX, tMaxY, tMaxZ -- distance until next intersection with voxel-border
     // the value of t at which the ray crosses the first vertical voxel boundary
-    float tMaxX = (direction.x != 0) ? (next_voxel_boundary_x - origin.x)/direction.x : DBL_MAX;
-    float tMaxY = (direction.y != 0) ? (next_voxel_boundary_y - origin.y)/direction.y : DBL_MAX;
-    float tMaxZ = (direction.z != 0) ? (next_voxel_boundary_z - origin.z)/direction.z : DBL_MAX;
+    float tMaxX = (ray.x != 0) ? (next_voxel_boundary_x - origin.x) / ray.x : FLT_MAX;
+    float tMaxY = (ray.y != 0) ? (next_voxel_boundary_y - origin.y) / ray.y : FLT_MAX;
+    float tMaxZ = (ray.z != 0) ? (next_voxel_boundary_z - origin.z) / ray.z : FLT_MAX;
 
     // The change in t when taking a step (always positive).
-    // float tDeltaX = stepX/dx;
-    // float tDeltaY = stepY/dy;
-    // float tDeltaZ = stepZ/dz;
-    float tDeltaX = (direction.x!=0) ? _bin_size/direction.x*stepX : DBL_MAX;
-    float tDeltaY = (direction.y!=0) ? _bin_size/direction.y*stepY : DBL_MAX;
-    float tDeltaZ = (direction.z!=0) ? _bin_size/direction.z*stepZ : DBL_MAX;
+    // float tDeltaX = stepX/ray.x;
+    // float tDeltaY = stepY/ray.y;
+    // float tDeltaZ = stepZ/ray.z;
+    float tDeltaX = (ray.x != 0) ? _bin_size / ray.x * stepX : FLT_MAX;
+    float tDeltaY = (ray.y != 0) ? _bin_size / ray.y * stepY : FLT_MAX;
+    float tDeltaZ = (ray.z != 0) ? _bin_size / ray.z * stepZ : FLT_MAX;
 
-    glm::vec3 diff(0,0,0);
-    bool neg_ray = false;
-    if (x != last_voxel[0] && ray[0]<0) { diff[0]--; neg_ray=true; }
-    if (y != last_voxel[1] && ray[1]<0) { diff[1]--; neg_ray=true; }
-    if (z != last_voxel[2] && ray[2]<0) { diff[2]--; neg_ray=true; }
-    if (neg_ray) {
-      x+=diff.x;
-      y+=diff.y;
-      z+=diff.z;
+    // Important. I believe it solves the problem described here:
+    // https://stackoverflow.com/questions/27410280/fast-voxel-traversal-algorithm-with-negative-direction
+    // However, I believe it also has a bug right at the boundary between ray.<xyz> <0 and ray.<xyz> > 0.
+    static bool disable_neg_ray { false };
+    if (ImGui::Begin(window_title)) {
+      ImGui::Checkbox("disable_neg_ray", &disable_neg_ray);
+    }
+
+    bool neg_ray { false };
+    if (!disable_neg_ray) {
+      if (x != last_voxel.x && ray.x < 0) { x--; neg_ray=true; }
+      if (y != last_voxel.y && ray.y < 0) { y--; neg_ray=true; }
+      if (z != last_voxel.z && ray.z < 0) { z--; neg_ray=true; }
+    }
+
+    if (ImGui::Begin(window_title)) {
+      ImGui::Text("ray: %f, %f, %f", ray.x, ray.y, ray.z);
+      ImGui::Separator();
+
+      ImGui::Text("step: %f, %f, %f", stepX, stepY, stepZ);
+      ImGui::Separator();
+
+      ImGui::Text("After neg ray check (x, y, z): %f, %f, %f", x, y, z);
+      ImGui::Separator();
     }
 
     // Buffer for reporting faces to the callback.
     auto face = glm::vec3 {};
 
+    // Maximum bounds of the world.
     auto wx = width_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
     auto wy = height_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
     auto wz = length_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
 
-    if (ImGui::Begin("World Raycast")) {
-      ImGui::Text("x: %f", x);
-      ImGui::Text("y: %f", y);
-      ImGui::Text("z: %f", z);
-      ImGui::Text("dx: %f", dx);
-      ImGui::Text("dy: %f", dy);
-      ImGui::Text("dz: %f", dz);
-      ImGui::Text("stepZ: %f", stepX);
-      ImGui::Text("stepY: %f", stepY);
-      ImGui::Text("stepZ: %f", stepZ);
-      ImGui::Text("tMaxX: %f", tMaxX);
-      ImGui::Text("tMaxY: %f", tMaxY);
-      ImGui::Text("tMaxZ: %f", tMaxZ);
-      ImGui::Text("tDeltaX: %f", tDeltaX);
-      ImGui::Text("tDeltaY: %f", tDeltaY);
-      ImGui::Text("tDeltaZ: %f", tDeltaZ);
-    }
+    if (ImGui::Begin(window_title)) {
+      ImGui::Text("tMax: %f, %f, %f", tMaxX, tMaxY, tMaxZ);
+      ImGui::Separator();
 
-    // Avoids an infinite loop.
-    if (dx == 0 && dy == 0 && dz == 0) {
-      throw "Raycast in zero direction!";
-    }
+      ImGui::Text("tDelta: %f, %f, %f", tDeltaX, tDeltaY, tDeltaZ);
+      ImGui::Separator();
 
-    // Rescale from units of 1 cube-edge to units of 'direction' so we can
-    // compare with 't'.
-    // radius /= sqrt(dx*dx+dy*dy+dz*dz);
+      ImGui::Text("neg_ray: %d", neg_ray);
+      ImGui::Separator();
+    }
 
     /* While ray has not gone past bounds of world */
     while (
@@ -197,36 +211,26 @@ struct World {
           chunk_position.z;
         auto chunk_ptr = chunks.at(index);
 
-        // std::cout << "***************** 1: " << (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*chunk_position) << std::endl;
-        // std::cout << "***************** 2: " << chunk_ptr->getSize() << std::endl;
-        // std::cout << "***************** 3: " << (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*chunk_position) / chunk_ptr->getSize() << std::endl;
-        // auto block_position = floor(
-          // (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*chunk_position) /
-          // chunk_ptr->getSize()
-        // );
-
         // FIXME I think it's totally plausible there's a bug here too. I still get weird little off by tiny amounts
         // and it could totally be within the range of maybe something here is cutting off values not quite right.
         auto block_position = (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * chunk_position);
-        std::cout << "Block position: " << block_position << std::endl;
         auto block = chunk_ptr->blockAt(block_position);
 
         if (block != EMPTY_BLOCK) {
-          // std::cout << "In raycast: " << x << ", " << y << ", " << z << std::endl;
           if (callback(x, y, z, block, face)) {
-            if (ImGui::Begin("World Raycast")) {
-              ImGui::Text("neg_ray: %d", neg_ray);
-              ImGui::Text("world_position.x: %f", world_position.x);
-              ImGui::Text("world_position.y: %f", world_position.y);
-              ImGui::Text("world_position.z: %f", world_position.z);
-              ImGui::Text("chunk_position.x: %f", chunk_position.x);
-              ImGui::Text("chunk_position.y: %f", chunk_position.y);
-              ImGui::Text("chunk_position.z: %f", chunk_position.z);
+            if (ImGui::Begin(window_title)) {
+              ImGui::Text("Final (x, y, z): %f, %f, %f", x, y, z);
+              ImGui::Text("Starts at the origin and is incremented until\na non-empty voxel is hit and the callback returns true");
+              ImGui::Separator();
+
+              ImGui::Text("face: %f, %f, %f", face.x, face.y, face.z);
+              ImGui::Separator();
+
+              ImGui::Text("chunk_position: %f, %f, %f", chunk_position.x, chunk_position.y, chunk_position.z);
               ImGui::Text("chunk index: %i", index);
               ImGui::Text("chunk ptr: %p", (void*)chunk_ptr.get());
-              ImGui::Text("block_position.x: %f", block_position.x);
-              ImGui::Text("block_position.y: %f", block_position.y);
-              ImGui::Text("block_position.z: %f", block_position.z);
+              ImGui::Text("block_position: %f, %f, %f", block_position.x, block_position.y, block_position.z);
+              // Not sure how to display an enum
               // ImGui::Text("block: %i", block);
             }
             break;
@@ -276,7 +280,6 @@ struct World {
           face[2] = -stepZ;
         }
       }
-      // std::cout << "In raycast after tmax: " << x << ", " << y << ", " << z << std::endl;
     }
   }
 

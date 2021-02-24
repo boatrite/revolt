@@ -47,25 +47,13 @@ struct World {
     return 1.0f / pow(2.0, scale_factor);
   }
 
-  // float intbound(float s, float ds) const {
-    // auto s_is_integer = round(s) == s;
-    // if (ds < 0 && s_is_integer) {
-      // return 0;
-    // }
-
-    // // Find the smallest positive t such that s+t*ds is an integer.
-    // if (ds < 0) {
-      // return intbound(-s, -ds);
-    // } else {
-      // s = mod(s, 1);
-      // // problem is now s+t*ds = 1
-      // return (1-s)/ds;
-    // }
-  // }
-
-  // int mod(int value, int modulus) const {
-    // return (value % modulus + modulus) % modulus;
-  // }
+  float intbound(float s, float ds) const {
+    auto s_is_integer = round(s) == s;
+    if (ds < 0 && s_is_integer) {
+      return 0;
+    }
+    return (ds > 0 ? std::ceil(s) - s : s - std::floor(s)) / std::abs(ds);
+  }
 
   // Source: https://gamedev.stackexchange.com/a/49423
   // Also here's a CUDA C impl: https://stackoverflow.com/a/38552664
@@ -87,6 +75,12 @@ struct World {
   // (i.e. change the integer part of the coordinate) in the variables
   // tMaxX, tMaxY, and tMaxZ.
   void raycast(glm::vec3 origin, glm::vec3 direction, float radius, std::function<bool(float, float, float, const Block&, glm::vec3&)> callback) const {
+    // SUCCESS. The "secondary" algo works 100% correctly. If I really dig in I
+    // might be able to understand why.
+    // Better working version of the SO impl:
+    // https://gist.github.com/dogfuntom/cc881c8fc86ad43d55d8
+    static bool use_primary_algo { false }; // "primary" is the one from the gist with the "neg_ray" stuff, the 'secondary' is the SO version
+
     glm::vec3 ray = glm::normalize(direction);
     assert(!(ray.x == 0 && ray.y == 0 && ray.z == 0));
 
@@ -104,6 +98,9 @@ struct World {
 
     static const char* window_title { "World#raycast" };
     if (ImGui::Begin(window_title)) {
+      ImGui::Checkbox("Use primary algo", &use_primary_algo);
+      ImGui::Separator();
+
       ImGui::Text("origin: %f, %f, %f", origin.x, origin.y, origin.z);
       ImGui::Separator();
 
@@ -118,46 +115,68 @@ struct World {
     }
 
     // Direction to increment x,y,z when stepping.
-    float stepX = ray.x >= 0 ? 1 : -1;
-    float stepY = ray.y >= 0 ? 1 : -1;
-    float stepZ = ray.z >= 0 ? 1 : -1;
+    float stepX, stepY, stepZ;
+    if (use_primary_algo) {
+      stepX = ray.x >= 0 ? 1 : -1;
+      stepY = ray.y >= 0 ? 1 : -1;
+      stepZ = ray.z >= 0 ? 1 : -1;
+    } else {
+      stepX = glm::sign(ray.x);
+      stepY = glm::sign(ray.y);
+      stepZ = glm::sign(ray.z);
+    }
 
-    // See description above. The initial values depend on the fractional
-    // part of the origin.
-    // float tMaxX = intbound(origin.x, ray.x);
-    // float tMaxY = intbound(origin.y, ray.y);
-    // float tMaxZ = intbound(origin.z, ray.z);
-    // Distance along the ray to the next voxel border from the current position (tMaxX, tMaxY, tMaxZ).
-    float next_voxel_boundary_x = (x + stepX) * _bin_size; // correct
-    float next_voxel_boundary_y = (y + stepY) * _bin_size; // correct
-    float next_voxel_boundary_z = (z + stepZ) * _bin_size; // correct
-    // tMaxX, tMaxY, tMaxZ -- distance until next intersection with voxel-border
-    // the value of t at which the ray crosses the first vertical voxel boundary
-    float tMaxX = (ray.x != 0) ? (next_voxel_boundary_x - origin.x) / ray.x : FLT_MAX;
-    float tMaxY = (ray.y != 0) ? (next_voxel_boundary_y - origin.y) / ray.y : FLT_MAX;
-    float tMaxZ = (ray.z != 0) ? (next_voxel_boundary_z - origin.z) / ray.z : FLT_MAX;
+    float tMaxX, tMaxY, tMaxZ;
+    if (use_primary_algo) {
+      // Distance along the ray to the next voxel border from the current position (tMaxX, tMaxY, tMaxZ).
+      float next_voxel_boundary_x = (x + stepX) * _bin_size; // correct
+      float next_voxel_boundary_y = (y + stepY) * _bin_size; // correct
+      float next_voxel_boundary_z = (z + stepZ) * _bin_size; // correct
+      // tMaxX, tMaxY, tMaxZ -- distance until next intersection with voxel-border
+      // the value of t at which the ray crosses the first vertical voxel boundary
+      tMaxX = (ray.x != 0) ? (next_voxel_boundary_x - origin.x) / ray.x : FLT_MAX;
+      tMaxY = (ray.y != 0) ? (next_voxel_boundary_y - origin.y) / ray.y : FLT_MAX;
+      tMaxZ = (ray.z != 0) ? (next_voxel_boundary_z - origin.z) / ray.z : FLT_MAX;
+    } else {
+      // See description above. The initial values depend on the fractional
+      // part of the origin.
+      tMaxX = intbound(origin.x, ray.x);
+      tMaxY = intbound(origin.y, ray.y);
+      tMaxZ = intbound(origin.z, ray.z);
+    }
 
     // The change in t when taking a step (always positive).
-    // float tDeltaX = stepX/ray.x;
-    // float tDeltaY = stepY/ray.y;
-    // float tDeltaZ = stepZ/ray.z;
-    float tDeltaX = (ray.x != 0) ? _bin_size / ray.x * stepX : FLT_MAX;
-    float tDeltaY = (ray.y != 0) ? _bin_size / ray.y * stepY : FLT_MAX;
-    float tDeltaZ = (ray.z != 0) ? _bin_size / ray.z * stepZ : FLT_MAX;
+    float tDeltaX, tDeltaY, tDeltaZ;
+    if (use_primary_algo) {
+      tDeltaX = (ray.x != 0) ? _bin_size / ray.x * stepX : FLT_MAX;
+      tDeltaY = (ray.y != 0) ? _bin_size / ray.y * stepY : FLT_MAX;
+      tDeltaZ = (ray.z != 0) ? _bin_size / ray.z * stepZ : FLT_MAX;
+    } else {
+      tDeltaX = stepX / ray.x;
+      tDeltaY = stepY / ray.y;
+      tDeltaZ = stepZ / ray.z;
+    }
 
     // Important. I believe it solves the problem described here:
     // https://stackoverflow.com/questions/27410280/fast-voxel-traversal-algorithm-with-negative-direction
     // However, I believe it also has a bug right at the boundary between ray.<xyz> <0 and ray.<xyz> > 0.
     static bool disable_neg_ray { false };
-    if (ImGui::Begin(window_title)) {
-      ImGui::Checkbox("disable_neg_ray", &disable_neg_ray);
-    }
+    if (use_primary_algo) {
+      if (ImGui::Begin(window_title)) {
+        ImGui::Checkbox("disable_neg_ray", &disable_neg_ray);
+      }
 
-    bool neg_ray { false };
-    if (!disable_neg_ray) {
-      if (x != last_voxel.x && ray.x < 0) { x--; neg_ray=true; }
-      if (y != last_voxel.y && ray.y < 0) { y--; neg_ray=true; }
-      if (z != last_voxel.z && ray.z < 0) { z--; neg_ray=true; }
+      bool neg_ray { false };
+      if (!disable_neg_ray) {
+        if (x != last_voxel.x && ray.x < 0) { x--; neg_ray=true; }
+        if (y != last_voxel.y && ray.y < 0) { y--; neg_ray=true; }
+        if (z != last_voxel.z && ray.z < 0) { z--; neg_ray=true; }
+      }
+
+      if (ImGui::Begin(window_title)) {
+        ImGui::Text("neg_ray: %d", neg_ray);
+        ImGui::Separator();
+      }
     }
 
     if (ImGui::Begin(window_title)) {
@@ -184,9 +203,6 @@ struct World {
       ImGui::Separator();
 
       ImGui::Text("tDelta: %f, %f, %f", tDeltaX, tDeltaY, tDeltaZ);
-      ImGui::Separator();
-
-      ImGui::Text("neg_ray: %d", neg_ray);
       ImGui::Separator();
     }
 

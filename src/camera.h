@@ -11,9 +11,9 @@
 class Camera {
   private:
     std::shared_ptr<UIContext> m_ui_context_ptr;
-    float yaw { 270.0f };
-    float pitch { -30.0f };
-    glm::vec3 position { glm::vec3(10.0f, 10.0f, 30.0f) };
+    float yaw { 328.0f };
+    float pitch { -41.0f };
+    glm::vec3 position { glm::vec3(3.0f, 20.0f, 31.0f) };
     glm::vec3 cameraFront { computeCameraFront() };
     glm::vec3 cameraUp { glm::vec3(0.0f, 1.0f,  0.0f) };
     double lastX {};

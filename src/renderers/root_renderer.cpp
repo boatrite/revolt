@@ -89,8 +89,17 @@ void RootRenderer::render(double dt) {
       glm::normalize(m_camera_ptr->getCameraFront()),
       1000,
       [=](float x, float y, float z, const Block& block, glm::vec3& face) {
-        ddm.drawLine(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), m_camera_ptr->getPosition(), glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f));
-        ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 8.0f, depth_off);
+        ddm.drawLine(m_camera_ptr->getViewMatrix(),
+                     m_camera_ptr->getProjectionMatrix(),
+                     m_camera_ptr->getPosition(),
+                     glm::vec3(x, y, z),
+                     glm::vec3(1.0f, 1.0f, 1.0f));
+        ddm.drawPoint(m_camera_ptr->getViewMatrix(),
+                      m_camera_ptr->getProjectionMatrix(),
+                      glm::vec3(x, y, z),
+                      glm::vec3(1.0f, 1.0f, 1.0f),
+                      8.0f,
+                      depth_off);
         ddm.drawCube(m_camera_ptr->getViewMatrix(),
                      m_camera_ptr->getProjectionMatrix(),
                      glm::vec3(x, y, z),

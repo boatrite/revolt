@@ -191,11 +191,14 @@ struct World {
       if (!(x < 0 || y < 0 || z < 0 || x >= wx || y >= wy || z >= wz)) {
         auto world_position = glm::vec3(x, y, z);
 
+        // Okay I fixed the bug here. Now it calculates index correctly. It
+        // needs to correspond correctly to how the for-loops go when
+        // generating the world and filling in the chunks.
         auto chunk_position = Chunk::chunkPosition(world_position);
         int index =
-          chunk_position.z * height_in_chunks * width_in_chunks +
+          chunk_position.x * height_in_chunks * length_in_chunks +
           chunk_position.y * width_in_chunks +
-          chunk_position.x;
+          chunk_position.z;
         auto chunk_ptr = chunks.at(index);
 
         // std::cout << "***************** 1: " << (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*chunk_position) << std::endl;
@@ -205,8 +208,13 @@ struct World {
           // (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS*chunk_position) /
           // chunk_ptr->getSize()
         // );
+
+        // FIXME I think it's totally plausible there's a bug here too. I still get weird little off by tiny amounts
+        // and it could totally be within the range of maybe something here is cutting off values not quite right.
         auto block_position = (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * chunk_position);
+        std::cout << "Block position: " << block_position << std::endl;
         auto block = chunk_ptr->blockAt(block_position);
+
         if (block != EMPTY_BLOCK) {
           // std::cout << "In raycast: " << x << ", " << y << ", " << z << std::endl;
           if (callback(x, y, z, block, face)) {
@@ -223,7 +231,7 @@ struct World {
               ImGui::Text("block_position.x: %f", block_position.x);
               ImGui::Text("block_position.y: %f", block_position.y);
               ImGui::Text("block_position.z: %f", block_position.z);
-              ImGui::Text("block: %i", block);
+              // ImGui::Text("block: %i", block);
             }
             break;
           }

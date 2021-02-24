@@ -67,26 +67,6 @@ struct World {
     return (value % modulus + modulus) % modulus;
   }
 
-  void debugWindow(float x, float y, float z, float dx, float dy, float dz, float stepX, float stepY, float stepZ, float tMaxX, float tMaxY, float tMaxZ, float tDeltaX, float tDeltaY, float tDeltaZ, const glm::vec3& face, float wx, float wy, float wz) const {
-    if (ImGui::Begin("World Raycast")) {
-      ImGui::Text("x: %f", x);
-      ImGui::Text("y: %f", y);
-      ImGui::Text("z: %f", z);
-      ImGui::Text("dx: %f", dx);
-      ImGui::Text("dy: %f", dy);
-      ImGui::Text("dz: %f", dz);
-      ImGui::Text("stepZ: %f", stepX);
-      ImGui::Text("stepY: %f", stepY);
-      ImGui::Text("stepZ: %f", stepZ);
-      ImGui::Text("tMaxX: %f", tMaxX);
-      ImGui::Text("tMaxY: %f", tMaxY);
-      ImGui::Text("tMaxZ: %f", tMaxZ);
-      ImGui::Text("tDeltaX: %f", tDeltaX);
-      ImGui::Text("tDeltaY: %f", tDeltaY);
-      ImGui::Text("tDeltaZ: %f", tDeltaZ);
-    }
-  }
-
   // Source: https://gamedev.stackexchange.com/a/49423
   // Also here's a CUDA C impl: https://stackoverflow.com/a/38552664
   // ---
@@ -169,7 +149,23 @@ struct World {
     auto wy = height_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
     auto wz = length_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
 
-    debugWindow(x, y, z, dx, dy, dz, stepX, stepY, stepZ, tMaxX, tMaxY, tMaxZ, tDeltaX, tDeltaY, tDeltaZ, face, wx, wy, wz);
+    if (ImGui::Begin("World Raycast")) {
+      ImGui::Text("x: %f", x);
+      ImGui::Text("y: %f", y);
+      ImGui::Text("z: %f", z);
+      ImGui::Text("dx: %f", dx);
+      ImGui::Text("dy: %f", dy);
+      ImGui::Text("dz: %f", dz);
+      ImGui::Text("stepZ: %f", stepX);
+      ImGui::Text("stepY: %f", stepY);
+      ImGui::Text("stepZ: %f", stepZ);
+      ImGui::Text("tMaxX: %f", tMaxX);
+      ImGui::Text("tMaxY: %f", tMaxY);
+      ImGui::Text("tMaxZ: %f", tMaxZ);
+      ImGui::Text("tDeltaX: %f", tDeltaX);
+      ImGui::Text("tDeltaY: %f", tDeltaY);
+      ImGui::Text("tDeltaZ: %f", tDeltaZ);
+    }
 
     // Avoids an infinite loop.
     if (dx == 0 && dy == 0 && dz == 0) {

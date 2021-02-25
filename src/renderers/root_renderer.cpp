@@ -1,6 +1,7 @@
 #include <imgui.h>
 
 #include "../action.h"
+#include "../color.h"
 #include "../util/debug_drawing_manager.h"
 #include "chunk_boundaries_renderer.h"
 #include "chunk_renderer.h"
@@ -86,27 +87,23 @@ void RootRenderer::render(double dt) {
   }
   world.raycast(
       m_camera_ptr->getPosition(),
-      glm::normalize(m_camera_ptr->getCameraFront()),
-      1000,
+      m_camera_ptr->getCameraFront(),
+      FLT_MAX,
       [=](float x, float y, float z, const Block& block, glm::vec3& face) {
-        // ddm.drawLine(m_camera_ptr->getViewMatrix(),
-                     // m_camera_ptr->getProjectionMatrix(),
-                     // m_camera_ptr->getPosition(),
-                     // glm::vec3(x, y, z) * world.scale(),
-                     // glm::vec3(1.0f, 1.0f, 1.0f));
+        const auto intersected_voxel = glm::vec3(x, y, z);
+        const auto voxel_world_coords = intersected_voxel * world.scale();
         ddm.drawPoint(m_camera_ptr->getViewMatrix(),
                       m_camera_ptr->getProjectionMatrix(),
-                      glm::vec3(x, y, z) * world.scale(),
-                      glm::vec3(1.0f, 1.0f, 1.0f),
+                      voxel_world_coords,
+                      Color::WHITE,
                       8.0f,
                       depth_off);
         ddm.drawCube(m_camera_ptr->getViewMatrix(),
                      m_camera_ptr->getProjectionMatrix(),
-                     glm::vec3(x, y, z) * world.scale(),
-                     glm::vec3(1.0f, 1.0f, 1.0f),
+                      voxel_world_coords,
+                     Color::WHITE,
                      world.scale(), depth_off);
 
-        // std::cout << "Hey my raycast thing happened: " << x << ", " << y << ", " << z << ", " << block << ", " << face << std::endl;
         return true;
       }
   );

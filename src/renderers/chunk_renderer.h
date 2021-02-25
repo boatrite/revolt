@@ -4,13 +4,6 @@
 #include "../util/shader.h"
 #include "renderer.h"
 
-enum class Color {
-  dirt,
-  grass,
-  sand,
-  water
-};
-
 class ChunkRenderer : public Renderer {
   public:
     ChunkRenderer(std::shared_ptr<UIContext> m_ui_context_ptr, std::shared_ptr<Camera> camera_ptr);

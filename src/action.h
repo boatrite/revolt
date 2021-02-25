@@ -40,19 +40,19 @@ struct World {
   int width_in_chunks {}; // x axis
   int height_in_chunks {}; // y axis
   int length_in_chunks {}; // z axis
-  int scale_factor {};
+  int scale_factor {}; // 0, 1, 2, 3, ...
   std::vector<std::shared_ptr<Chunk>> chunks {};
 
-  float scale() const {
-    return 1.0f / pow(2.0, scale_factor);
+  float inverse_scale() const { // 1, 2, 4, 8, ..., 2^n
+    return pow(2.0f, scale_factor);
   }
 
-  float intbound(float s, float ds) const {
-    auto s_is_integer = round(s) == s;
-    if (ds < 0 && s_is_integer) {
-      return 0;
-    }
-    return (ds > 0 ? std::ceil(s) - s : s - std::floor(s)) / std::abs(ds);
+  float inverse_scale_squared() const { // 1, 4, 16, 64, ..., 2^2n
+    return pow(inverse_scale(), 2.0f);
+  }
+
+  float scale() const { // 1, 1/2, 1/4, 1/8, ..., 1/2^n
+    return 1.0f / inverse_scale();
   }
 
   // Source: https://gamedev.stackexchange.com/a/49423
@@ -86,15 +86,14 @@ struct World {
 
     glm::vec3 ray_end = origin + radius*ray;
 
-    float _bin_size = 1;
-    glm::vec3 last_voxel(std::floor(ray_end[0]/_bin_size),
-                         std::floor(ray_end[1]/_bin_size),
-                         std::floor(ray_end[2]/_bin_size));
+    glm::vec3 last_voxel(std::floor(ray_end[0] / scale()),
+                         std::floor(ray_end[1] / scale()),
+                         std::floor(ray_end[2] / scale()));
 
     // Cube containing origin point.
-    float x = floor(origin.x);
-    float y = floor(origin.y);
-    float z = floor(origin.z);
+    float x = floor(origin.x / scale());
+    float y = floor(origin.y / scale());
+    float z = floor(origin.z / scale());
 
     static const char* window_title { "World#raycast" };
     if (ImGui::Begin(window_title)) {
@@ -129,9 +128,9 @@ struct World {
     float tMaxX, tMaxY, tMaxZ;
     if (use_primary_algo) {
       // Distance along the ray to the next voxel border from the current position (tMaxX, tMaxY, tMaxZ).
-      float next_voxel_boundary_x = (x + stepX) * _bin_size; // correct
-      float next_voxel_boundary_y = (y + stepY) * _bin_size; // correct
-      float next_voxel_boundary_z = (z + stepZ) * _bin_size; // correct
+      float next_voxel_boundary_x = (x + stepX) * scale(); // correct
+      float next_voxel_boundary_y = (y + stepY) * scale(); // correct
+      float next_voxel_boundary_z = (z + stepZ) * scale(); // correct
       // tMaxX, tMaxY, tMaxZ -- distance until next intersection with voxel-border
       // the value of t at which the ray crosses the first vertical voxel boundary
       tMaxX = (ray.x != 0) ? (next_voxel_boundary_x - origin.x) / ray.x : FLT_MAX;
@@ -140,21 +139,28 @@ struct World {
     } else {
       // See description above. The initial values depend on the fractional
       // part of the origin.
-      tMaxX = intbound(origin.x, ray.x);
-      tMaxY = intbound(origin.y, ray.y);
-      tMaxZ = intbound(origin.z, ray.z);
+      auto intbound = [=](float s, float ds) -> float {
+        auto s_is_integer = round(s) == s;
+        if (ds < 0 && s_is_integer) {
+          return 0;
+        }
+        return (ds > 0 ? std::ceil(s) - s : s - std::floor(s)) / std::abs(ds);
+      };
+      tMaxX = intbound(origin.x / scale(), ray.x / scale());
+      tMaxY = intbound(origin.y / scale(), ray.y / scale());
+      tMaxZ = intbound(origin.z / scale(), ray.z / scale());
     }
 
     // The change in t when taking a step (always positive).
     float tDeltaX, tDeltaY, tDeltaZ;
     if (use_primary_algo) {
-      tDeltaX = (ray.x != 0) ? _bin_size / ray.x * stepX : FLT_MAX;
-      tDeltaY = (ray.y != 0) ? _bin_size / ray.y * stepY : FLT_MAX;
-      tDeltaZ = (ray.z != 0) ? _bin_size / ray.z * stepZ : FLT_MAX;
+      tDeltaX = (ray.x != 0) ? scale() / ray.x * stepX : FLT_MAX;
+      tDeltaY = (ray.y != 0) ? scale() / ray.y * stepY : FLT_MAX;
+      tDeltaZ = (ray.z != 0) ? scale() / ray.z * stepZ : FLT_MAX;
     } else {
-      tDeltaX = stepX / ray.x;
-      tDeltaY = stepY / ray.y;
-      tDeltaZ = stepZ / ray.z;
+      tDeltaX = scale() / ray.x * stepX;
+      tDeltaY = scale() / ray.y * stepY;
+      tDeltaZ = scale() / ray.z * stepZ;
     }
 
     // Important. I believe it solves the problem described here:
@@ -176,6 +182,9 @@ struct World {
       if (ImGui::Begin(window_title)) {
         ImGui::Text("neg_ray: %d", neg_ray);
         ImGui::Separator();
+
+        ImGui::Text("After neg ray check (x, y, z): %f, %f, %f", x, y, z);
+        ImGui::Separator();
       }
     }
 
@@ -185,18 +194,15 @@ struct World {
 
       ImGui::Text("step: %f, %f, %f", stepX, stepY, stepZ);
       ImGui::Separator();
-
-      ImGui::Text("After neg ray check (x, y, z): %f, %f, %f", x, y, z);
-      ImGui::Separator();
     }
 
     // Buffer for reporting faces to the callback.
     auto face = glm::vec3 {};
 
-    // Maximum bounds of the world.
-    auto wx = width_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
-    auto wy = height_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
-    auto wz = length_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS;
+    // Maximum bounds of the world in block coords
+    auto wx = width_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
+    auto wy = height_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
+    auto wz = length_in_chunks * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
 
     if (ImGui::Begin(window_title)) {
       ImGui::Text("tMax: %f, %f, %f", tMaxX, tMaxY, tMaxZ);
@@ -215,12 +221,12 @@ struct World {
       // Invoke the callback, unless we are not *yet* within the bounds of the
       // world.
       if (!(x < 0 || y < 0 || z < 0 || x >= wx || y >= wy || z >= wz)) {
-        auto world_position = glm::vec3(x, y, z);
+        auto world_position_in_block_coords = glm::vec3(x, y, z);
 
         // Okay I fixed the bug here. Now it calculates index correctly. It
         // needs to correspond correctly to how the for-loops go when
         // generating the world and filling in the chunks.
-        auto chunk_position = Chunk::chunkPosition(world_position);
+        auto chunk_position = Chunk::chunkPosition(world_position_in_block_coords * scale());
         int index =
           chunk_position.x * height_in_chunks * length_in_chunks +
           chunk_position.y * width_in_chunks +
@@ -229,13 +235,17 @@ struct World {
 
         // FIXME I think it's totally plausible there's a bug here too. I still get weird little off by tiny amounts
         // and it could totally be within the range of maybe something here is cutting off values not quite right.
-        auto block_position = (world_position - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * chunk_position);
+        auto block_position = (world_position_in_block_coords - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * chunk_position * inverse_scale());
         auto block = chunk_ptr->blockAt(block_position);
 
         if (block != EMPTY_BLOCK) {
           if (callback(x, y, z, block, face)) {
             if (ImGui::Begin(window_title)) {
               ImGui::Text("Final (x, y, z): %f, %f, %f", x, y, z);
+              ImGui::Text("Starts at the origin and is incremented until\na non-empty voxel is hit and the callback returns true");
+              ImGui::Separator();
+
+              ImGui::Text("Final in world coords: %f, %f, %f", x * scale(), y * scale(), z * scale());
               ImGui::Text("Starts at the origin and is incremented until\na non-empty voxel is hit and the callback returns true");
               ImGui::Separator();
 

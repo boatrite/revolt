@@ -157,10 +157,7 @@ void DebugDrawingManager::drawCube(
   m_line_shader.setVec3("color", color);
 
   glBindVertexArray(s_vao2);
-  m_line_shader.setMat4("model", glm::translate(
-    glm::scale(glm::mat4(1.0f), glm::vec3(size)),
-    point
-  ));
+  m_line_shader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), point), glm::vec3(size)));
   if (depth_off) {
     glDisable(GL_DEPTH_TEST);
     glDrawArrays(GL_LINES, 0, vertices.size() / 3);

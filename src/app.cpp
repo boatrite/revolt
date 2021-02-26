@@ -1,5 +1,8 @@
 #include "app.h"
 
+#include "actions/change_current_page_action.h"
+#include "actions/create_new_world_action.h"
+
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr {ui_context_ptr} {
   m_ui_context_ptr->getStore().dispatch(
     ChangeCurrentPageAction(std::make_shared<MainMenuRenderer>(m_ui_context_ptr)));

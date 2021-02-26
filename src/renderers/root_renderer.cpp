@@ -1,6 +1,8 @@
 #include "root_renderer.h"
 
-#include "../action.h"
+#include "../actions/load_world_action.h"
+#include "../actions/recreate_chunks_action.h"
+#include "../actions/save_world_action.h"
 #include "../color.h"
 #include "../util/debug_drawing_manager.h"
 #include "chunk_boundaries_renderer.h"

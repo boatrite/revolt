@@ -1,5 +1,6 @@
 #include "main_menu_renderer.h"
 
+#include "../actions/change_current_page_action.h"
 #include "../font_book.h"
 #include "../util/imgui_util.h"
 #include "new_world_page_renderer.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../util/glm_cereal.h"
 #include "../util/shader.h"
 #include "block.h"
 
@@ -7,6 +8,10 @@
 #include <glm/gtx/scalar_multiplication.hpp>
 
 #include <cereal/access.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
 
 #include <array>
 #include <ostream>

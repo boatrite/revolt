@@ -76,7 +76,7 @@ struct World {
     auto world_bounds = glm::vec3(width_in_chunks, height_in_chunks, length_in_chunks)
                       * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
 
-    static const char* window_title {"World#raycast"};
+    static const char* window_title {"World"};
     if (ImGui::Begin(window_title)) {
       ImGui::Text("Initial Values:");
       ImGui::Text("origin        = (%f, %f, %f)", origin.x, origin.y, origin.z);
@@ -232,8 +232,9 @@ struct World {
   void serialize(Archive& archive) {
     archive(CEREAL_NVP(name),
             CEREAL_NVP(seed),
-            CEREAL_NVP(length_in_chunks),
             CEREAL_NVP(width_in_chunks),
+            CEREAL_NVP(height_in_chunks),
+            CEREAL_NVP(length_in_chunks),
             CEREAL_NVP(scale_factor),
             CEREAL_NVP(chunks));
   }

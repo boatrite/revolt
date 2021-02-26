@@ -1,11 +1,12 @@
 #pragma once
 
-#include "action.h"
 #include "redux.hpp"
 #include "renderers/renderer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <entt/entt.hpp>
 
 #include <functional>
 #include <iostream>
@@ -26,6 +27,7 @@ class UIContext {
   // able to access it since most places have a ui context.
   //
  private:
+  using Store = redux::Store<entt::registry, std::function<void(entt::registry&)>>;
   Store m_store {Store()};
 
  public:

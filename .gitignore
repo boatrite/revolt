@@ -1,7 +1,10 @@
-devlog
 build
-src/bindings
+devlog
 tmp
+
+# imgui bindings for opengl and glfw get copied from the conan package into
+# here
+src/bindings
 
 # This is symlinked from build to project root for ccls
 compile_commands.json

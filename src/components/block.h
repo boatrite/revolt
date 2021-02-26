@@ -5,13 +5,14 @@
 #include <ostream>
 
 struct Block {
-  enum class Type {
+  enum class Type
+  {
     NONE = 0,
     GRASS,
     DIRT,
   };
 
-  Type type { Type::NONE };
+  Type type {Type::NONE};
 
   bool operator==(const Block& other) const {
     return this->type == other.type;
@@ -21,8 +22,8 @@ struct Block {
     return !(*this == other);
   }
 
-  template<typename Archive>
-  void serialize(Archive &archive) {
+  template <typename Archive>
+  void serialize(Archive& archive) {
     archive(CEREAL_NVP(type));
   };
 };
@@ -44,8 +45,7 @@ inline std::ostream& operator<<(std::ostream& o, const Block::Type& block_type) 
   return o;
 }
 
-inline std::ostream& operator<<(std::ostream& o, const Block& block)
-{
+inline std::ostream& operator<<(std::ostream& o, const Block& block) {
   o << block.type;
   return o;
 }

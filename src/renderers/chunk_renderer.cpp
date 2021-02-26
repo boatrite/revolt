@@ -8,7 +8,11 @@
 #include <iostream>
 #include <vector>
 
-ChunkRenderer::ChunkRenderer(std::shared_ptr<UIContext> ui_context_ptr, std::shared_ptr<Camera> camera_ptr) : m_ui_context_ptr{ui_context_ptr}, m_camera_ptr {camera_ptr} {}
+ChunkRenderer::ChunkRenderer(std::shared_ptr<UIContext> ui_context_ptr,
+                             std::shared_ptr<Camera> camera_ptr) :
+  m_ui_context_ptr {ui_context_ptr},
+  m_camera_ptr {camera_ptr} {
+}
 
 void ChunkRenderer::render(double dt) {
   m_shader.use();

@@ -1,4 +1,4 @@
-# pragma once
+#pragma once
 
 #include "components/chunk.h"
 #include "components/world.h"
@@ -26,8 +26,8 @@
 struct Position {
   float x {}, y {};
 
-  template<typename Archive>
-  void serialize(Archive &archive) {
+  template <typename Archive>
+  void serialize(Archive& archive) {
     archive(x, y);
   }
 };
@@ -54,11 +54,7 @@ auto CreateNewWorldAction = [](std::string seed, int scale_factor) {
       for (auto chunk_y = 0; chunk_y < world.height_in_chunks; ++chunk_y) {
         for (auto chunk_z = 0; chunk_z < world.length_in_chunks; ++chunk_z) {
           world.chunks.push_back(
-            std::make_shared<Chunk>(
-              glm::vec3(chunk_x, chunk_y, chunk_z),
-              world.scale()
-            )
-          );
+            std::make_shared<Chunk>(glm::vec3(chunk_x, chunk_y, chunk_z), world.scale()));
         }
       }
     }
@@ -77,8 +73,8 @@ auto SaveWorldAction = [](entt::registry& registry) {
   std::stringstream storage;
 
   {
-    cereal::JSONOutputArchive output{storage};
-    entt::snapshot{registry}.entities(output).component<Position, World>(output);
+    cereal::JSONOutputArchive output {storage};
+    entt::snapshot {registry}.entities(output).component<Position, World>(output);
   }
 
   // std::cout << "****** Saved: *****" << std::endl;
@@ -105,16 +101,15 @@ auto LoadWorldAction = [](entt::registry& registry) {
   // std::cout << storage.str() << std::endl;
   std::stringstream copy;
   copy << storage.str();
-  cereal::JSONInputArchive input{copy};
-  entt::continuous_loader loader{registry};
+  cereal::JSONInputArchive input {copy};
+  entt::continuous_loader loader {registry};
   loader.entities(input).component<Position, World>(input);
 };
 
-auto ChangeCurrentPageAction =
-  [](std::shared_ptr<Renderer> renderer_ptr) {
-    return [=](entt::registry& registry) {
-      registry.set<CurrentPage>(renderer_ptr);
-    };
+auto ChangeCurrentPageAction = [](std::shared_ptr<Renderer> renderer_ptr) {
+  return [=](entt::registry& registry) {
+    registry.set<CurrentPage>(renderer_ptr);
   };
+};
 
 using Store = redux::Store<entt::registry, std::function<void(entt::registry&)>>;

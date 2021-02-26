@@ -17,10 +17,10 @@
 struct World {
   std::string name {};
   std::string seed {};
-  int width_in_chunks {}; // x axis
+  int width_in_chunks {};  // x axis
   int height_in_chunks {}; // y axis
   int length_in_chunks {}; // z axis
-  int scale_factor {}; // 0, 1, 2, 3, ...
+  int scale_factor {};     // 0, 1, 2, 3, ...
   std::vector<std::shared_ptr<Chunk>> chunks {};
 
   float inverse_scale() const { // 1, 2, 4, 8, ..., 2^n
@@ -35,12 +35,15 @@ struct World {
     return 1.0f / inverse_scale();
   }
 
-  void raycast(glm::vec3 origin, glm::vec3 direction, float radius, std::function<bool(float, float, float, const Block&, glm::vec3&)> callback) const {
+  void raycast(glm::vec3 origin,
+               glm::vec3 direction,
+               float radius,
+               std::function<bool(float, float, float, const Block&, glm::vec3&)> callback) const {
     glm::vec3 ray = glm::normalize(direction);
     assert(ray.length() != 0);
 
     // Track and display the number of times the raycast loop happens
-    int cycles { 0 };
+    int cycles {0};
 
     // Cube containing the starting point.
     auto current_voxel = glm::floor(origin / scale());
@@ -58,31 +61,29 @@ struct World {
       }
       return (ds > 0 ? std::ceil(s) - s : s - std::floor(s)) / std::abs(ds);
     };
-    auto t_max = glm::vec3(
-      intbound(origin.x / scale(), ray.x / scale()),
-      intbound(origin.y / scale(), ray.y / scale()),
-      intbound(origin.z / scale(), ray.z / scale())
-    );
+    auto t_max = glm::vec3(intbound(origin.x / scale(), ray.x / scale()),
+                           intbound(origin.y / scale(), ray.y / scale()),
+                           intbound(origin.z / scale(), ray.z / scale()));
 
     // The change in t when taking a step (always positive).
-    auto t_delta = glm::vec3(
-      scale() / ray.x * step.x,
-      scale() / ray.y * step.y,
-      scale() / ray.z * step.z
-    );
+    auto t_delta =
+      glm::vec3(scale() / ray.x * step.x, scale() / ray.y * step.y, scale() / ray.z * step.z);
 
     // Buffer for reporting faces to the callback.
     auto face = glm::vec3 {};
 
     // Maximum bounds of the world in block coords
     auto world_bounds = glm::vec3(width_in_chunks, height_in_chunks, length_in_chunks)
-      * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
+                      * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
 
-    static const char* window_title { "World#raycast" };
+    static const char* window_title {"World#raycast"};
     if (ImGui::Begin(window_title)) {
       ImGui::Text("Initial Values:");
       ImGui::Text("origin        = (%f, %f, %f)", origin.x, origin.y, origin.z);
-      ImGui::Text("current_voxel = (%f, %f, %f)", current_voxel.x, current_voxel.y, current_voxel.z);
+      ImGui::Text("current_voxel = (%f, %f, %f)",
+                  current_voxel.x,
+                  current_voxel.y,
+                  current_voxel.z);
       ImGui::Text("ray           = (%f, %f, %f)", ray.x, ray.y, ray.z);
       ImGui::Text("step          = (%f, %f, %f)", step.x, step.y, step.z);
       ImGui::Text("t_max         = (%f, %f, %f)", t_max.x, t_max.y, t_max.z);
@@ -111,11 +112,9 @@ struct World {
      * min_z and world_bounds.xyz with world_bounds.max_xyz.
      *
      * */
-    while (
-      (step.x > 0 ? current_voxel.x < world_bounds.x: current_voxel.x >= 0) &&
-      (step.y > 0 ? current_voxel.y < world_bounds.y: current_voxel.y >= 0) &&
-      (step.z > 0 ? current_voxel.z < world_bounds.z : current_voxel.z >= 0)
-    ) {
+    while ((step.x > 0 ? current_voxel.x < world_bounds.x : current_voxel.x >= 0)
+           && (step.y > 0 ? current_voxel.y < world_bounds.y : current_voxel.y >= 0)
+           && (step.z > 0 ? current_voxel.z < world_bounds.z : current_voxel.z >= 0)) {
       // I guess I'm 1-indexing cycles. I feel like it makes sense that if you
       // see "1" it's the first cycle, and once the loop breaks, this will
       // contain the cycle on which we broke, so the number displayed is the
@@ -124,21 +123,17 @@ struct World {
 
       // If we are within the bounds of the world, check the block at that
       // position.
-      bool in_world_bounds = !(current_voxel.x < 0 ||
-                               current_voxel.y < 0 ||
-                               current_voxel.z < 0 ||
-                               current_voxel.x >= world_bounds.x ||
-                               current_voxel.y >= world_bounds.y ||
-                               current_voxel.z >= world_bounds.z);
+      bool in_world_bounds = current_voxel.x >= 0 && current_voxel.y >= 0 && current_voxel.z >= 0
+                          && current_voxel.x < world_bounds.x && current_voxel.y < world_bounds.y
+                          && current_voxel.z < world_bounds.z;
       if (in_world_bounds) {
         auto chunk_position = Chunk::chunkPosition(current_voxel * scale());
-        int chunk_index =
-          chunk_position.x * height_in_chunks * length_in_chunks +
-          chunk_position.y * width_in_chunks +
-          chunk_position.z;
+        int chunk_index = chunk_position.x * height_in_chunks * length_in_chunks
+                        + chunk_position.y * width_in_chunks + chunk_position.z;
         const auto& chunk_ptr = chunks.at(chunk_index);
 
-        auto block_position = (current_voxel - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * chunk_position * inverse_scale());
+        auto block_position =
+          (current_voxel - Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * chunk_position * inverse_scale());
         const auto& block = chunk_ptr->blockAt(block_position);
 
         // If there is a block at the current position, then we call the
@@ -151,12 +146,24 @@ struct World {
               ImGui::Text("Final Values:");
               ImGui::Text("cycles           = %i", cycles);
               ImGui::Text("t_max            = (%f, %f, %f)", t_max.x, t_max.y, t_max.z);
-              ImGui::Text("current_voxel    = (%f, %f, %f)", current_voxel.x, current_voxel.y, current_voxel.z);
-              ImGui::Text("in world coords  = (%f, %f, %f)", current_voxel.x * scale(), current_voxel.y * scale(), current_voxel.z * scale());
+              ImGui::Text("current_voxel    = (%f, %f, %f)",
+                          current_voxel.x,
+                          current_voxel.y,
+                          current_voxel.z);
+              ImGui::Text("in world coords  = (%f, %f, %f)",
+                          current_voxel.x * scale(),
+                          current_voxel.y * scale(),
+                          current_voxel.z * scale());
               ImGui::Text("face             = (%f, %f, %f)", face.x, face.y, face.z);
-              ImGui::Text("chunk_position   = (%f, %f, %f)", chunk_position.x, chunk_position.y, chunk_position.z);
+              ImGui::Text("chunk_position   = (%f, %f, %f)",
+                          chunk_position.x,
+                          chunk_position.y,
+                          chunk_position.z);
               ImGui::Text("chunk_index      = %i", chunk_index);
-              ImGui::Text("block_position   = (%f, %f, %f)", block_position.x, block_position.y, block_position.z);
+              ImGui::Text("block_position   = (%f, %f, %f)",
+                          block_position.x,
+                          block_position.y,
+                          block_position.z);
               std::stringstream ss {};
               ss << block;
               ImGui::Text("block            = %s", ss.str().c_str());
@@ -173,7 +180,8 @@ struct World {
       // detail.
       if (t_max.x < t_max.y) {
         if (t_max.x < t_max.z) {
-          if (t_max.x > radius) break;
+          if (t_max.x > radius)
+            break;
           // Update which cube we are now in.
           current_voxel.x += step.x;
 
@@ -185,7 +193,8 @@ struct World {
           face.y = 0;
           face.z = 0;
         } else {
-          if (t_max.z > radius) break;
+          if (t_max.z > radius)
+            break;
           current_voxel.z += step.z;
           t_max.z += t_delta.z;
 
@@ -195,7 +204,8 @@ struct World {
         }
       } else {
         if (t_max.y < t_max.z) {
-          if (t_max.y > radius) break;
+          if (t_max.y > radius)
+            break;
           current_voxel.y += step.y;
           t_max.y += t_delta.y;
 
@@ -205,7 +215,8 @@ struct World {
         } else {
           // Identical to the second case, repeated for simplicity in
           // the conditionals.
-          if (t_max.z > radius) break;
+          if (t_max.z > radius)
+            break;
           current_voxel.z += step.z;
           t_max.z += t_delta.z;
 
@@ -217,15 +228,13 @@ struct World {
     }
   }
 
-  template<typename Archive>
-  void serialize(Archive &archive) {
-    archive(
-      CEREAL_NVP(name),
-      CEREAL_NVP(seed),
-      CEREAL_NVP(length_in_chunks),
-      CEREAL_NVP(width_in_chunks),
-      CEREAL_NVP(scale_factor),
-      CEREAL_NVP(chunks)
-    );
+  template <typename Archive>
+  void serialize(Archive& archive) {
+    archive(CEREAL_NVP(name),
+            CEREAL_NVP(seed),
+            CEREAL_NVP(length_in_chunks),
+            CEREAL_NVP(width_in_chunks),
+            CEREAL_NVP(scale_factor),
+            CEREAL_NVP(chunks));
   }
 };

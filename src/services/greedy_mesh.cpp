@@ -8,7 +8,8 @@ std::vector<float> GreedyMesh::computeChunkMesh(Chunk* chunk) {
   std::vector<float> mesh {};
 
   // Sweep over each axis (X (d = 0), Y (d = 1) and Z (d = 2))
-  for (bool backFace = true, b = false; b != backFace; backFace = false, b = !b) { // A for loop that runs twice.
+  for (bool backFace = true, b = false; b != backFace;
+       backFace = false, b = !b) { // A for loop that runs twice.
     for (auto sweepAxis = 0; sweepAxis < 3; ++sweepAxis) {
       int col, row, k, l, width, height;
 
@@ -24,30 +25,41 @@ std::vector<float> GreedyMesh::computeChunkMesh(Chunk* chunk) {
       q[sweepAxis] = 1;
 
       Side side;
-      if (sweepAxis == 0)      { side = backFace ? Side::WEST   : Side::EAST;  }
-      else if (sweepAxis == 1) { side = backFace ? Side::BOTTOM : Side::TOP;   }
-      else if (sweepAxis == 2) { side = backFace ? Side::NORTH  : Side::SOUTH; }
+      if (sweepAxis == 0) {
+        side = backFace ? Side::WEST : Side::EAST;
+      } else if (sweepAxis == 1) {
+        side = backFace ? Side::BOTTOM : Side::TOP;
+      } else if (sweepAxis == 2) {
+        side = backFace ? Side::NORTH : Side::SOUTH;
+      }
 
       // Check each slice of the chunk one at a time
       for (currBlockCoords[sweepAxis] = -1; currBlockCoords[sweepAxis] < chunk->getSize();) {
         // Compute the mask
         auto n = 0;
-        for (currBlockCoords[orthoAxisV] = 0; currBlockCoords[orthoAxisV] < chunk->getSize(); ++currBlockCoords[orthoAxisV]) {
-          for (currBlockCoords[orthoAxisU] = 0; currBlockCoords[orthoAxisU] < chunk->getSize(); ++currBlockCoords[orthoAxisU]) {
-            // chunk.isBlockAt(x,y,z) takes local-to-chunk map positions and returns true if a block exists there
+        for (currBlockCoords[orthoAxisV] = 0; currBlockCoords[orthoAxisV] < chunk->getSize();
+             ++currBlockCoords[orthoAxisV]) {
+          for (currBlockCoords[orthoAxisU] = 0; currBlockCoords[orthoAxisU] < chunk->getSize();
+               ++currBlockCoords[orthoAxisU]) {
+            // chunk.isBlockAt(x,y,z) takes local-to-chunk map positions and returns true if a block
+            // exists there
 
-            Block blockCurrent = 0 <= currBlockCoords[sweepAxis]             ? chunk->blockAt(currBlockCoords[0],        currBlockCoords[1],        currBlockCoords[2])        : EMPTY_BLOCK;
-            Block blockCompare = currBlockCoords[sweepAxis] < chunk->getSize() - 1 ? chunk->blockAt(currBlockCoords[0] + q[0], currBlockCoords[1] + q[1], currBlockCoords[2] + q[2]) : EMPTY_BLOCK;
+            Block blockCurrent =
+              0 <= currBlockCoords[sweepAxis]
+                ? chunk->blockAt(currBlockCoords[0], currBlockCoords[1], currBlockCoords[2])
+                : EMPTY_BLOCK;
+            Block blockCompare = currBlockCoords[sweepAxis] < chunk->getSize() - 1
+                                 ? chunk->blockAt(currBlockCoords[0] + q[0],
+                                                  currBlockCoords[1] + q[1],
+                                                  currBlockCoords[2] + q[2])
+                                 : EMPTY_BLOCK;
 
             // The mask is set to true if there is a visible face between two blocks,
             //   i.e. both aren't empty and both aren't blocks
-            mask[n++] = (
-              blockCurrent != EMPTY_BLOCK
-                && blockCompare != EMPTY_BLOCK
-                && blockCurrent == blockCompare
-                  ? Block::Type::NONE
-                  : (backFace ? blockCompare.type : blockCurrent.type)
-            );
+            mask[n++] = (blockCurrent != EMPTY_BLOCK && blockCompare != EMPTY_BLOCK
+                             && blockCurrent == blockCompare
+                           ? Block::Type::NONE
+                           : (backFace ? blockCompare.type : blockCurrent.type));
           }
         }
 
@@ -62,12 +74,15 @@ std::vector<float> GreedyMesh::computeChunkMesh(Chunk* chunk) {
             if (mask[n] != Block::Type::NONE) {
               // Compute the width of this quad and store it in width
               //   This is done by searching along the current axis until mask[n + width] is false
-              for (width = 1; col + width < chunk->getSize() && mask[n + width] != Block::Type::NONE && mask[n + width] == mask[n]; width++) { }
+              for (width = 1; col + width < chunk->getSize() && mask[n + width] != Block::Type::NONE
+                              && mask[n + width] == mask[n];
+                   width++) {}
 
               // Compute the height of this quad and store it in height
-              //   This is done by checking if every block next to this row (range 0 to width) is also part of the mask.
-              //   For example, if width is 5 we currently have a quad of dimensions 1 x 5. To reduce triangle count,
-              //   greedy meshing will attempt to expand this quad out to CHUNK_SIZE x 5, but will stop if it reaches a hole in the mask
+              //   This is done by checking if every block next to this row (range 0 to width) is
+              //   also part of the mask. For example, if width is 5 we currently have a quad of
+              //   dimensions 1 x 5. To reduce triangle count, greedy meshing will attempt to expand
+              //   this quad out to CHUNK_SIZE x 5, but will stop if it reaches a hole in the mask
 
               auto done = false;
               for (height = 1; row + height < chunk->getSize(); height++) {
@@ -100,12 +115,21 @@ std::vector<float> GreedyMesh::computeChunkMesh(Chunk* chunk) {
               float dv[3] {};
               dv[orthoAxisV] = height;
 
-              // Create a quad for this face. Colour, normal or textures are not stored in this block vertex format.
+              // Create a quad for this face. Colour, normal or textures are not stored in this
+              // block vertex format.
               quad quad {
-                currBlockCoords[0]                , currBlockCoords[1]                , currBlockCoords[2]                , // Top-left vertice position
-                currBlockCoords[0] + du[0]        , currBlockCoords[1] + du[1]        , currBlockCoords[2] + du[2]        , // Top right vertice position
-                currBlockCoords[0] + dv[0]        , currBlockCoords[1] + dv[1]        , currBlockCoords[2] + dv[2]        , // Bottom left vertice position
-                currBlockCoords[0] + du[0] + dv[0], currBlockCoords[1] + du[1] + dv[1], currBlockCoords[2] + du[2] + dv[2]  // Bottom right vertice position
+                currBlockCoords[0],
+                currBlockCoords[1],
+                currBlockCoords[2], // Top-left vertice position
+                currBlockCoords[0] + du[0],
+                currBlockCoords[1] + du[1],
+                currBlockCoords[2] + du[2], // Top right vertice position
+                currBlockCoords[0] + dv[0],
+                currBlockCoords[1] + dv[1],
+                currBlockCoords[2] + dv[2], // Bottom left vertice position
+                currBlockCoords[0] + du[0] + dv[0],
+                currBlockCoords[1] + du[1] + dv[1],
+                currBlockCoords[2] + du[2] + dv[2] // Bottom right vertice position
               };
 
               loadQuadIntoMesh(quad, mask[n], side, mesh);
@@ -148,16 +172,19 @@ std::vector<float> GreedyMesh::computeChunkMesh(Chunk* chunk) {
 //   rt_x, rt_y, rt_z, rt_u, rt_v, texture layer // right top
 //   lb_x, lb_y, lb_z, lb_u, lb_v, texture layer // left bottom
 // }
-void GreedyMesh::loadQuadIntoMesh(const quad& quad, const Block::Type& blockType, const Side& side, std::vector<float>& mesh) {
-  float rb_x { quad.at(9) }, rb_y { quad.at(10) }, rb_z { quad.at(11) }, // right bottom
-        rt_x { quad.at(3) }, rt_y { quad.at(4) },  rt_z { quad.at(5) },  // right top
-        lb_x { quad.at(6) }, lb_y { quad.at(7) },  lb_z { quad.at(8) },  // left bottom
-        lt_x { quad.at(0) }, lt_y { quad.at(1) },  lt_z { quad.at(2) };  // left top
+void GreedyMesh::loadQuadIntoMesh(const quad& quad,
+                                  const Block::Type& blockType,
+                                  const Side& side,
+                                  std::vector<float>& mesh) {
+  float rb_x {quad.at(9)}, rb_y {quad.at(10)}, rb_z {quad.at(11)}, // right bottom
+    rt_x {quad.at(3)}, rt_y {quad.at(4)}, rt_z {quad.at(5)},       // right top
+    lb_x {quad.at(6)}, lb_y {quad.at(7)}, lb_z {quad.at(8)},       // left bottom
+    lt_x {quad.at(0)}, lt_y {quad.at(1)}, lt_z {quad.at(2)};       // left top
 
   float rb_u, rb_v, // right bottom
-        rt_u, rt_v, // right top
-        lb_u, lb_v, // left bottom
-        lt_u, lt_v; // left top
+    rt_u, rt_v,     // right top
+    lb_u, lb_v,     // left bottom
+    lt_u, lt_v;     // left top
 
   float normal_x, normal_y, normal_z;
 
@@ -233,7 +260,7 @@ void GreedyMesh::loadQuadIntoMesh(const quad& quad, const Block::Type& blockType
   }
 
   // float textureLayer { Texture::getTextureIndexFromBlockType(blockType, side) };
-  float textureLayer { 0.5 };
+  float textureLayer {0.5};
 
   // right bottom
   mesh.push_back(rb_x); // position

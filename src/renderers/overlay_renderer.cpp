@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-OverlayRenderer::OverlayRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { cameraPtr } {
+OverlayRenderer::OverlayRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr {cameraPtr} {
 }
 
 void OverlayRenderer::render(double dt) {
@@ -13,13 +13,9 @@ void OverlayRenderer::render(double dt) {
   ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
   ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 
-  const auto flags =
-    ImGuiWindowFlags_NoMove |
-    ImGuiWindowFlags_NoDecoration |
-    ImGuiWindowFlags_AlwaysAutoResize |
-    ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing |
-    ImGuiWindowFlags_NoNav;
+  const auto flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration
+                   | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings
+                   | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
   if (ImGui::Begin("Info", &m_show_overlay, flags)) {
     ImGui::Text("Debug Info");

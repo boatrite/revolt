@@ -8,8 +8,8 @@
 #include <vector>
 
 class DebugDrawingManager {
-  private:
-    std::string m_line_vertex_shader { R"(
+ private:
+  std::string m_line_vertex_shader {R"(
       #version 330 core
 
       layout (location = 0) in vec3 position;
@@ -22,9 +22,9 @@ class DebugDrawingManager {
       {
         gl_Position = projection * view * model * vec4(position, 1.0);
       }
-    )" };
+    )"};
 
-    std::string m_line_fragment_shader { R"(
+  std::string m_line_fragment_shader {R"(
       #version 330 core
 
       out vec4 FragColor;
@@ -35,12 +35,12 @@ class DebugDrawingManager {
       {
          FragColor = vec4(color, 1.0f);
       }
-    )" };
+    )"};
 
-    Shader m_line_shader { Shader(m_line_vertex_shader, m_line_fragment_shader) };
+  Shader m_line_shader {Shader(m_line_vertex_shader, m_line_fragment_shader)};
 
-    std::string m_point_vertex_shader {
-      R"(
+  std::string m_point_vertex_shader {
+    R"(
         #version 330 core
 
         layout (location = 0) in vec3 position;
@@ -55,10 +55,9 @@ class DebugDrawingManager {
           gl_Position = projection * view * model * vec4(position, 1.0);
           gl_PointSize = point_size;
         }
-      )"
-    };
-    std::string m_point_fragment_shader {
-      R"(
+      )"};
+  std::string m_point_fragment_shader {
+    R"(
         #version 330 core
 
         out vec4 FragColor;
@@ -69,35 +68,28 @@ class DebugDrawingManager {
         {
            FragColor = vec4(color, 1.0f);
         }
-      )"
-    };
-    Shader m_point_shader { Shader(m_point_vertex_shader, m_point_fragment_shader) };
+      )"};
+  Shader m_point_shader {Shader(m_point_vertex_shader, m_point_fragment_shader)};
 
-  public:
-    void drawLine(
-      const glm::mat4& view_matrix,
-      const glm::mat4& proj_matrix,
-      const glm::vec3& from,
-      const glm::vec3& to,
-      const glm::vec3& color,
-      float line_width = 1.0f
-    );
+ public:
+  void drawLine(const glm::mat4& view_matrix,
+                const glm::mat4& proj_matrix,
+                const glm::vec3& from,
+                const glm::vec3& to,
+                const glm::vec3& color,
+                float line_width = 1.0f);
 
-    void drawPoint(
-      const glm::mat4& view_matrix,
-      const glm::mat4& proj_matrix,
-      const glm::vec3& point,
-      const glm::vec3& color,
-      float point_size = 1.0f,
-      bool depth_off = false
-    );
+  void drawPoint(const glm::mat4& view_matrix,
+                 const glm::mat4& proj_matrix,
+                 const glm::vec3& point,
+                 const glm::vec3& color,
+                 float point_size = 1.0f,
+                 bool depth_off = false);
 
-    void drawCube(
-      const glm::mat4& view_matrix,
-      const glm::mat4& proj_matrix,
-      const glm::vec3& point,
-      const glm::vec3& color,
-      float size = 1.0f,
-      bool depth_off = false
-    );
+  void drawCube(const glm::mat4& view_matrix,
+                const glm::mat4& proj_matrix,
+                const glm::vec3& point,
+                const glm::vec3& color,
+                float size = 1.0f,
+                bool depth_off = false);
 };

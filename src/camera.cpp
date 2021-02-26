@@ -8,21 +8,17 @@
 
 #include <functional>
 
-Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { ui_context_ptr } {
+Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr {ui_context_ptr} {
   m_ui_context_ptr->addCursorMovedHandler(
     this,
-    std::bind(&Camera::onCursorMoved, this, std::placeholders::_1, std::placeholders::_2)
-  );
+    std::bind(&Camera::onCursorMoved, this, std::placeholders::_1, std::placeholders::_2));
 
   m_ui_context_ptr->addGameGuiFocusChangedHandler(
     this,
-    std::bind(&Camera::focusCallback, this, std::placeholders::_1)
-  );
+    std::bind(&Camera::focusCallback, this, std::placeholders::_1));
 
-  m_ui_context_ptr->addProcessInput(
-    this,
-    std::bind(&Camera::processInput, this, std::placeholders::_1)
-  );
+  m_ui_context_ptr->addProcessInput(this,
+                                    std::bind(&Camera::processInput, this, std::placeholders::_1));
 }
 
 Camera::~Camera() {
@@ -46,7 +42,11 @@ glm::mat4 Camera::getViewMatrix() const {
 }
 
 glm::mat4 Camera::getProjectionMatrix() const {
-  return glm::perspective(glm::radians(fov), static_cast<float>(m_ui_context_ptr->getWidth()) / m_ui_context_ptr->getHeight(), nearPlane, farPlane);
+  return glm::perspective(glm::radians(fov),
+                          static_cast<float>(m_ui_context_ptr->getWidth())
+                            / m_ui_context_ptr->getHeight(),
+                          nearPlane,
+                          farPlane);
 }
 
 const glm::vec3& Camera::getPosition() const {
@@ -128,10 +128,14 @@ void Camera::focusCallback(bool focusedInGame) {
 #pragma GCC diagnostic pop
 
 void Camera::imguiDebugControlPanel() {
-  if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
+  if (ImGui::CollapsingHeader("Camera",
+                              ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::Text("Position: (%.0f, %.0f, %.0f)", position.x, position.y, position.z);
-    const auto& chunk_position { Chunk::chunkPosition(position) };
-    ImGui::Text("Chunk Position: (%.0f, %.0f, %.0f)", chunk_position.x, chunk_position.y, chunk_position.z);
+    const auto& chunk_position {Chunk::chunkPosition(position)};
+    ImGui::Text("Chunk Position: (%.0f, %.0f, %.0f)",
+                chunk_position.x,
+                chunk_position.y,
+                chunk_position.z);
     ImGui::Text("Yaw: %.0f", yaw);
     ImGui::Text("Pitch: %.0f", pitch);
     ImGui::Text("Camera Front: (%.0f, %.0f, %.0f)", cameraFront.x, cameraFront.y, cameraFront.z);
@@ -139,6 +143,9 @@ void Camera::imguiDebugControlPanel() {
     ImGui::SliderFloat("Near Plane", &nearPlane, Camera::MIN_NEAR_PLANE, Camera::MAX_NEAR_PLANE);
     ImGui::SliderFloat("Far Plane", &farPlane, Camera::MIN_FAR_PLANE, Camera::MAX_FAR_PLANE);
     ImGui::SliderFloat("Camera Speed", &speed, Camera::MIN_SPEED, Camera::MAX_SPEED);
-    ImGui::SliderFloat("Mouse Sensitivity", &sensitivity, Camera::MIN_SENSITIVITY, Camera::MAX_SENSITIVITY);
+    ImGui::SliderFloat("Mouse Sensitivity",
+                       &sensitivity,
+                       Camera::MIN_SENSITIVITY,
+                       Camera::MAX_SENSITIVITY);
   }
 }

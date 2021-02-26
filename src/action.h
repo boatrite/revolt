@@ -1,6 +1,9 @@
 #pragma once
 
 #include "components/chunk.h"
+#include "components/current_page.h"
+#include "components/in_memory_snapshot.h"
+#include "components/position.h"
 #include "components/world.h"
 #include "redux.hpp"
 #include "renderers/renderer.h"
@@ -22,24 +25,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
-struct Position {
-  float x {}, y {};
-
-  template <typename Archive>
-  void serialize(Archive& archive) {
-    archive(x, y);
-  }
-};
-
-
-struct CurrentPage {
-  std::shared_ptr<Renderer> renderer_ptr {};
-};
-
-struct InMemorySnapshot {
-  std::stringstream storage {};
-};
 
 auto CreateNewWorldAction = [](std::string seed, int scale_factor) {
   return [=](entt::registry& registry) {

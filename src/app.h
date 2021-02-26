@@ -10,6 +10,8 @@ class App {
   std::shared_ptr<UIContext> m_ui_context_ptr;
   bool m_show_demo_window {false};
 
+  void ShowMainMenuBar();
+
  public:
   App(std::shared_ptr<UIContext> ui_context_ptr);
   ~App();

@@ -2,6 +2,7 @@
 
 #include "actions/change_current_page_action.h"
 #include "actions/create_new_world_action.h"
+#include "util/print.h"
 
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr {ui_context_ptr} {
   m_ui_context_ptr->getStore().dispatch(
@@ -30,6 +31,8 @@ void App::update(double dt) {
 }
 
 void App::render(double dt) {
+  ShowMainMenuBar();
+
   const auto& current_page = m_ui_context_ptr->getRegistry().ctx<CurrentPage>();
   if (current_page.renderer_ptr) {
     current_page.renderer_ptr->render(dt);
@@ -37,5 +40,31 @@ void App::render(double dt) {
 
   if (m_show_demo_window) {
     ImGui::ShowDemoWindow();
+  }
+}
+
+// FIXME The actual game should be rendered in an area that doesn't includ the
+// main menu
+void App::ShowMainMenuBar() {
+  if (ImGui::BeginMainMenuBar()) {
+    auto main_menu_bar_size = ImGui::GetWindowSize();
+    std::cout << main_menu_bar_size << std::endl;
+    if (ImGui::BeginMenu("File")) {
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Edit")) {
+      if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+      if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
+      ImGui::Separator();
+      if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+      if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+      if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+      ImGui::EndMenu();
+    }
+    ImGui::EndMainMenuBar();
+    glViewport(0,
+               0,
+               m_ui_context_ptr->getWidth(),
+               m_ui_context_ptr->getHeight() - main_menu_bar_size.y);
   }
 }

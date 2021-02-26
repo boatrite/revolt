@@ -1,9 +1,10 @@
-#include <fstream>
-#include <sstream>
-#include <iostream>
-
 #include "shader.h"
+
 #include "file.h"
+
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
   // std::cout << "[Shader] Compiling shader from path" << std::endl;

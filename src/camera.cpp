@@ -1,13 +1,12 @@
-#include <imgui.h>
+#include "camera.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
-#include <functional>
+#include <imgui.h>
 
-#include "camera.h"
-#include "common.h"
+#include <functional>
 
 Camera::Camera(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr { ui_context_ptr } {
   m_ui_context_ptr->addCursorMovedHandler(

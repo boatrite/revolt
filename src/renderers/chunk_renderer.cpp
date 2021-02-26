@@ -1,13 +1,12 @@
-#include <iostream>
-#include <vector>
+#include "chunk_renderer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
-#include "../common.h"
-#include "chunk_renderer.h"
+#include <iostream>
+#include <vector>
 
 ChunkRenderer::ChunkRenderer(std::shared_ptr<UIContext> ui_context_ptr, std::shared_ptr<Camera> camera_ptr) : m_ui_context_ptr{ui_context_ptr}, m_camera_ptr {camera_ptr} {}
 

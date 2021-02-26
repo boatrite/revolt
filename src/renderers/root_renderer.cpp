@@ -1,4 +1,4 @@
-#include <imgui.h>
+#include "root_renderer.h"
 
 #include "../action.h"
 #include "../color.h"
@@ -7,7 +7,8 @@
 #include "chunk_renderer.h"
 #include "coordinate_lines_renderer.h"
 #include "overlay_renderer.h"
-#include "root_renderer.h"
+
+#include <imgui.h>
 
 RootRenderer::RootRenderer(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr{ui_context_ptr} {
   std::cout << "RootRenderer (" << this << ") created" << std::endl;
@@ -63,7 +64,7 @@ void RootRenderer::render(double dt) {
       m_camera_ptr->getProjectionMatrix(),
       m_camera_ptr->getPosition(),
       m_camera_ptr->getPosition()+1*glm::normalize(m_camera_ptr->getCameraFront()),
-      glm::vec3(1.0f,1.0f,1.0f));
+      Color::WHITE);
 
   // ddm.drawCube(m_camera_ptr->getViewMatrix(),
       // m_camera_ptr->getProjectionMatrix(),
@@ -71,7 +72,7 @@ void RootRenderer::render(double dt) {
       // glm::vec3(1.0f,1.0f,1.0f),
       // 1.0f, true);
 
-  ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(0.0f, 16.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 16.0f);
+  ddm.drawPoint(m_camera_ptr->getViewMatrix(), m_camera_ptr->getProjectionMatrix(), glm::vec3(0.0f, 16.0f, 0.0f), Color::WHITE, 16.0f);
 
   // Render crosshair
   auto draw = ImGui::GetForegroundDrawList();

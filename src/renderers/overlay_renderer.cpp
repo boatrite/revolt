@@ -1,6 +1,6 @@
-#include <imgui.h>
-
 #include "overlay_renderer.h"
+
+#include <imgui.h>
 
 OverlayRenderer::OverlayRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr { cameraPtr } {
 }

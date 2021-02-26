@@ -1,10 +1,10 @@
-#include <memory>
-
-#include <imgui.h>
-
 #include "../camera.h"
 #include "../util/shader.h"
 #include "renderer.h"
+
+#include <imgui.h>
+
+#include <memory>
 
 class CoordinateLinesRenderer : public Renderer {
   private:

@@ -1,9 +1,9 @@
 # pragma once
 
-#include <iostream>
-#include <functional>
-
 #include <imgui.h>
+
+#include <functional>
+#include <iostream>
 
 class ImGuiUtil {
   private:

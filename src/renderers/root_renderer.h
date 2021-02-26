@@ -1,8 +1,8 @@
-#include <memory>
-#include <vector>
-
 #include "../camera.h"
 #include "renderer.h"
+
+#include <memory>
+#include <vector>
 
 class RootRenderer : public Renderer {
   private:

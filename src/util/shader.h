@@ -1,12 +1,12 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GLFW/glfw3.h>
+
+#include <iostream>
+#include <string>
 
 // TODO Update the conventions to match rest of the project (this file was
 // originally copied from another project before I really figured out what

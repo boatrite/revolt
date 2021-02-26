@@ -1,8 +1,8 @@
-#include <memory>
-
 #include "../camera.h"
 #include "../util/shader.h"
 #include "renderer.h"
+
+#include <memory>
 
 class ChunkRenderer : public Renderer {
   public:

@@ -1,6 +1,7 @@
+#include "main_menu_renderer.h"
+
 #include "../font_book.h"
 #include "../util/imgui_util.h"
-#include "main_menu_renderer.h"
 #include "new_world_page_renderer.h"
 #include "root_renderer.h"
 

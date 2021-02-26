@@ -1,8 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <string>
+#include "app.h"
+#include "font_book.h"
+#include "ui_context.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,9 +11,9 @@
 #include "bindings/imgui_impl_glfw.h"
 #include "bindings/imgui_impl_opengl3.h"
 
-#include "app.h"
-#include "font_book.h"
-#include "ui_context.h"
+#include <iostream>
+#include <memory>
+#include <string>
 
 class Window {
   public:

@@ -1,14 +1,14 @@
-#include <memory>
-
-#include <imgui.h>
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/scalar_multiplication.hpp>
-
 #include "../camera.h"
-#include "../common.h"
 #include "../util/shader.h"
 #include "renderer.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtx/scalar_multiplication.hpp>
+#include <glm/gtx/transform.hpp>
+
+#include <imgui.h>
+
+#include <memory>
 
 class ChunkBoundariesRenderer : public Renderer {
   private:

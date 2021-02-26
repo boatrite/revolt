@@ -1,9 +1,9 @@
+#include "ui_context.h"
+
 #include <imgui.h>
 #include "bindings/imgui_impl_glfw.h"
 
 #include <algorithm>
-
-#include "ui_context.h"
 
 UIContext::UIContext(GLFWwindow* window) : m_window{window} {
   glfwSetWindowUserPointer(window, this);

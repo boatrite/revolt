@@ -1,11 +1,11 @@
 # pragma once
 
-#include <memory>
+#include "../ui_context.h"
+#include "renderer.h"
 
 #include <imgui.h>
 
-#include "../ui_context.h"
-#include "renderer.h"
+#include <memory>
 
 class MainMenuRenderer : public Renderer {
   private:

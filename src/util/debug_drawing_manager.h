@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
+#include "../camera.h"
+#include "shader.h"
 
 #include <glm/glm.hpp>
 
-#include "../camera.h"
-#include "shader.h"
+#include <vector>
 
 class DebugDrawingManager {
   private:

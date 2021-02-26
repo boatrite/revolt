@@ -1,16 +1,16 @@
 #pragma once
 
-#include <array>
-#include <ostream>
-#include <vector>
-
-#include <cereal/access.hpp>
+#include "../util/shader.h"
+#include "block.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
 
-#include "common.h"
-#include "util/shader.h"
+#include <cereal/access.hpp>
+
+#include <array>
+#include <ostream>
+#include <vector>
 
 class Chunk {
   private:

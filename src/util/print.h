@@ -1,11 +1,11 @@
 # pragma once
 
+#include <glm/glm.hpp>
+
 #include <array>
 #include <iterator>
 #include <ostream>
 #include <vector>
-
-#include <glm/glm.hpp>
 
 // https://stackoverflow.com/a/19152438
   template <class T, std::size_t N>

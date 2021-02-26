@@ -1,16 +1,16 @@
 # pragma once
 
-#include <functional>
-#include <iostream>
-#include <map>
-#include <memory>
+#include "action.h"
+#include "redux.hpp"
+#include "renderers/renderer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "action.h"
-#include "redux.hpp"
-#include "renderers/renderer.h"
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
 
 class UIContext {
   private:

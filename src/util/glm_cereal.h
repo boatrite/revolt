@@ -4,9 +4,9 @@
 // https://github.com/simongeilfus/Cinder-Cereal/blob/master/include/CinderCereal.h
 // for more examples of serializing glm classes.
 
-#include <cereal/cereal.hpp>
-
 #include <glm/glm.hpp>
+
+#include <cereal/cereal.hpp>
 
 namespace cereal {
   template<class Archive>

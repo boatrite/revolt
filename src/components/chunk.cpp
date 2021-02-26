@@ -1,17 +1,17 @@
-#include <iostream>
+#include "chunk.h"
+
+#include "../services/greedy_mesh.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/scalar_multiplication.hpp>
+#include <GLFW/glfw3.h>
 
 #include <noise/noise.h>
 
-#include "chunk.h"
-#include "services/greedy_mesh.h"
+#include <iostream>
 
 const int Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS { 16 };
 

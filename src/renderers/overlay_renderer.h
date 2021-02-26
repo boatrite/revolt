@@ -1,7 +1,7 @@
-#include <memory>
-
 #include "../camera.h"
 #include "renderer.h"
+
+#include <memory>
 
 class OverlayRenderer : public Renderer {
   public:

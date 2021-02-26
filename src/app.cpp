@@ -2,7 +2,6 @@
 
 #include "actions/change_current_page_action.h"
 #include "actions/create_new_world_action.h"
-#include "util/print.h"
 
 App::App(std::shared_ptr<UIContext> ui_context_ptr) : m_ui_context_ptr {ui_context_ptr} {
   m_ui_context_ptr->getStore().dispatch(
@@ -48,7 +47,6 @@ void App::render(double dt) {
 void App::ShowMainMenuBar() {
   if (ImGui::BeginMainMenuBar()) {
     auto main_menu_bar_size = ImGui::GetWindowSize();
-    std::cout << main_menu_bar_size << std::endl;
     if (ImGui::BeginMenu("File")) {
       ImGui::EndMenu();
     }

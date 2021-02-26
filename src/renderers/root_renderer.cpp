@@ -60,23 +60,6 @@ void RootRenderer::render(double dt) {
   const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);
 
   static DebugDrawingManager ddm {};
-  ddm.drawLine(m_camera_ptr->getViewMatrix(),
-               m_camera_ptr->getProjectionMatrix(),
-               m_camera_ptr->getPosition(),
-               m_camera_ptr->getPosition() + 1 * glm::normalize(m_camera_ptr->getCameraFront()),
-               Color::WHITE);
-
-  // ddm.drawCube(m_camera_ptr->getViewMatrix(),
-  // m_camera_ptr->getProjectionMatrix(),
-  // glm::vec3(0.0f, 0.0f, 0.0f),
-  // glm::vec3(1.0f,1.0f,1.0f),
-  // 1.0f, true);
-
-  ddm.drawPoint(m_camera_ptr->getViewMatrix(),
-                m_camera_ptr->getProjectionMatrix(),
-                glm::vec3(0.0f, 16.0f, 0.0f),
-                Color::WHITE,
-                16.0f);
 
   // Render crosshair
   auto draw = ImGui::GetForegroundDrawList();

@@ -1,6 +1,7 @@
 #include "camera.h"
 
 #include "components/chunk.h"
+#include "util/opengl_helpers.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -44,9 +45,9 @@ glm::mat4 Camera::getViewMatrix() const {
 }
 
 glm::mat4 Camera::getProjectionMatrix() const {
+  auto viewport_size = getViewportSize();
   return glm::perspective(glm::radians(fov),
-                          static_cast<float>(m_ui_context_ptr->getWidth())
-                            / m_ui_context_ptr->getHeight(),
+                          static_cast<float>(viewport_size.x) / viewport_size.y,
                           nearPlane,
                           farPlane);
 }

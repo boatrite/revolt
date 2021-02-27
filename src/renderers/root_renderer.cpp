@@ -5,6 +5,8 @@
 #include "../actions/save_world_action.h"
 #include "../color.h"
 #include "../util/debug_drawing_manager.h"
+#include "../util/opengl_helpers.h"
+#include "../util/print.h"
 #include "chunk_boundaries_renderer.h"
 #include "chunk_renderer.h"
 #include "coordinate_lines_renderer.h"
@@ -63,14 +65,16 @@ void RootRenderer::render(double dt) {
 
   // Render crosshair
   auto draw = ImGui::GetForegroundDrawList();
-  ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+  auto viewport_size = getViewportSize();
   auto crosshair_size = 16.0f;
-  draw->AddLine(ImVec2(windowSize.x / 2 - crosshair_size / 2, windowSize.y / 2),
-                ImVec2(windowSize.x / 2 + crosshair_size / 2, windowSize.y / 2),
+  // Is this correct for viewports that don't start at 0,0? I'm not sure but I
+  // feel like it might not be.
+  draw->AddLine(ImVec2(viewport_size.x / 2 - crosshair_size / 2, viewport_size.y / 2),
+                ImVec2(viewport_size.x / 2 + crosshair_size / 2, viewport_size.y / 2),
                 ImColor(1.0f, 1.0f, 1.0f, 1.0f),
                 1.0f);
-  draw->AddLine(ImVec2(windowSize.x / 2, windowSize.y / 2 - crosshair_size / 2),
-                ImVec2(windowSize.x / 2, windowSize.y / 2 + crosshair_size / 2),
+  draw->AddLine(ImVec2(viewport_size.x / 2, viewport_size.y / 2 - crosshair_size / 2),
+                ImVec2(viewport_size.x / 2, viewport_size.y / 2 + crosshair_size / 2),
                 ImColor(1.0f, 1.0f, 1.0f, 1.0f),
                 1.0f);
 
@@ -102,7 +106,8 @@ void RootRenderer::render(double dt) {
                 });
 
   const int window_width = 300;
-  ImGui::SetNextWindowPos(ImVec2(windowSize.x - 10 - window_width, 10));
+  ImVec2 window_size = ImGui::GetIO().DisplaySize;
+  ImGui::SetNextWindowPos(ImVec2(window_size.x - 10 - window_width, 10));
   ImGui::SetNextWindowSize(ImVec2(window_width, 0));
 
   if (ImGui::Begin("entt")) {

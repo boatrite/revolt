@@ -5,7 +5,6 @@ MainMenuBar::MainMenuBar(const UIContext& ui_context) : m_ui_context {ui_context
 
 void MainMenuBar::show() {
   if (ImGui::BeginMainMenuBar()) {
-    auto main_menu_bar_size = ImGui::GetWindowSize();
     if (ImGui::BeginMenu("File")) {
       ImGui::EndMenu();
     }
@@ -19,6 +18,5 @@ void MainMenuBar::show() {
       ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
-    glViewport(0, 0, m_ui_context.getWidth(), m_ui_context.getHeight() - main_menu_bar_size.y);
   }
 }

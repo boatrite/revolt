@@ -76,8 +76,9 @@ struct World {
     auto world_bounds = glm::vec3(width_in_chunks, height_in_chunks, length_in_chunks)
                       * Chunk::CHUNK_SIZE_IN_UNIT_BLOCKS * inverse_scale();
 
-    static const char* window_title {"World"};
-    if (ImGui::Begin(window_title)) {
+    static const char* s_window_title {"World"};
+    static bool s_show_window {false};
+    if (s_show_window && ImGui::Begin(s_window_title)) {
       ImGui::Text("Initial Values:");
       ImGui::Text("origin        = (%f, %f, %f)", origin.x, origin.y, origin.z);
       ImGui::Text("current_voxel = (%f, %f, %f)",
@@ -142,7 +143,7 @@ struct World {
         if (block != EMPTY_BLOCK) {
           if (callback(current_voxel.x, current_voxel.y, current_voxel.z, block, face)) {
             // Now that we're done searching, display some final information.
-            if (ImGui::Begin(window_title)) {
+            if (s_show_window && ImGui::Begin(s_window_title)) {
               ImGui::Text("Final Values:");
               ImGui::Text("cycles           = %i", cycles);
               ImGui::Text("t_max            = (%f, %f, %f)", t_max.x, t_max.y, t_max.z);

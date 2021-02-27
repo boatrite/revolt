@@ -79,10 +79,6 @@ void RootRenderer::render(double dt) {
                 1.0f);
 
   static bool depth_off = true;
-  if (ImGui::Begin("Debug Info")) {
-    ImGui::Separator();
-    ImGui::Checkbox("ddm depth_off", &depth_off);
-  }
   world.raycast(m_camera_ptr->getPosition(),
                 m_camera_ptr->getCameraFront(),
                 FLT_MAX,
@@ -142,5 +138,9 @@ void RootRenderer::render(double dt) {
   if (ImGui::Begin("Info")) {
     ImGui::Separator();
     ImGui::Checkbox("wireframe", &m_wireframe);
+
+    ImGui::Separator();
+    ImGui::Checkbox("ddm depth_off", &depth_off);
   }
+  ImGui::End();
 }

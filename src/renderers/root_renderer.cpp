@@ -54,6 +54,13 @@ void RootRenderer::render(double dt) {
   glClearColor(0.132f, 0.132f, 0.132f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  // This is now the most annoying part of this, is having to set this number
+  // ahead of time.
+  // It's maybe possible I could keep track of the windows I know I'm going to show,
+  // and use that count here instead. My windows aren't very dynamic right now,
+  // but something to possibly improve later.
+  ImGuiHelper::SetLeftColumnWindowCount(2);
+
   for (auto renderer_ptr : m_renderer_ptrs) {
     renderer_ptr->render(dt);
   }
@@ -85,12 +92,14 @@ void RootRenderer::render(double dt) {
                 [=](float x, float y, float z, const Block& block, glm::vec3& face) {
                   const auto intersected_voxel = glm::vec3(x, y, z);
                   const auto voxel_world_coords = intersected_voxel * world.scale();
+
                   ddm.drawPoint(m_camera_ptr->getViewMatrix(),
                                 m_camera_ptr->getProjectionMatrix(),
                                 voxel_world_coords,
                                 Color::WHITE,
                                 8.0f,
                                 depth_off);
+
                   ddm.drawCube(m_camera_ptr->getViewMatrix(),
                                m_camera_ptr->getProjectionMatrix(),
                                voxel_world_coords,
@@ -101,11 +110,7 @@ void RootRenderer::render(double dt) {
                   return true;
                 });
 
-  const int window_width = 300;
-  ImVec2 window_size = ImGui::GetIO().DisplaySize;
-  ImGui::SetNextWindowPos(ImVec2(window_size.x - 10 - window_width, 10));
-  ImGui::SetNextWindowSize(ImVec2(window_width, 0));
-
+  ImGuiHelper::PushNextWindowIntoLeftColumn();
   if (ImGui::Begin("entt")) {
     const auto& e = m_ui_context_ptr->getRegistry().view<World>().front();
     const auto& world = m_ui_context_ptr->getRegistry().get<World>(e);

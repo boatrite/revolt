@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../util/imgui_helper.h"
 #include "block.h"
 #include "chunk.h"
 
@@ -78,18 +79,21 @@ struct World {
 
     static const char* s_window_title {"World"};
     static bool s_show_window {false};
-    if (s_show_window && ImGui::Begin(s_window_title)) {
-      ImGui::Text("Initial Values:");
-      ImGui::Text("origin        = (%f, %f, %f)", origin.x, origin.y, origin.z);
-      ImGui::Text("current_voxel = (%f, %f, %f)",
-                  current_voxel.x,
-                  current_voxel.y,
-                  current_voxel.z);
-      ImGui::Text("ray           = (%f, %f, %f)", ray.x, ray.y, ray.z);
-      ImGui::Text("step          = (%f, %f, %f)", step.x, step.y, step.z);
-      ImGui::Text("t_max         = (%f, %f, %f)", t_max.x, t_max.y, t_max.z);
-      ImGui::Text("t_delta       = (%f, %f, %f)", t_delta.x, t_delta.y, t_delta.z);
-      ImGui::Separator();
+    if (s_show_window) {
+      ImGuiHelper::PushNextWindowIntoLeftColumn();
+      if (ImGui::Begin(s_window_title)) {
+        ImGui::Text("Initial Values:");
+        ImGui::Text("origin        = (%f, %f, %f)", origin.x, origin.y, origin.z);
+        ImGui::Text("current_voxel = (%f, %f, %f)",
+                    current_voxel.x,
+                    current_voxel.y,
+                    current_voxel.z);
+        ImGui::Text("ray           = (%f, %f, %f)", ray.x, ray.y, ray.z);
+        ImGui::Text("step          = (%f, %f, %f)", step.x, step.y, step.z);
+        ImGui::Text("t_max         = (%f, %f, %f)", t_max.x, t_max.y, t_max.z);
+        ImGui::Text("t_delta       = (%f, %f, %f)", t_delta.x, t_delta.y, t_delta.z);
+        ImGui::Separator();
+      }
     }
 
     /* While ray has not gone past bounds of world, do the following:

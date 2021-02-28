@@ -1,5 +1,7 @@
 #include "overlay_renderer.h"
 
+#include "../util/imgui_helper.h"
+
 #include <imgui.h>
 
 OverlayRenderer::OverlayRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPtr {cameraPtr} {
@@ -8,15 +10,11 @@ OverlayRenderer::OverlayRenderer(std::shared_ptr<Camera> cameraPtr) : m_cameraPt
 void OverlayRenderer::render(double dt) {
   ImGuiIO& io = ImGui::GetIO();
 
-  const float DISTANCE = 10.0f;
-  ImVec2 window_pos = ImVec2(DISTANCE, DISTANCE);
-  ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
-  ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-
   const auto flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration
                    | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings
                    | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
+  ImGuiHelper::PushNextWindowIntoLeftColumn();
   if (ImGui::Begin("Info", &m_show_overlay, flags)) {
     ImGui::Text("Debug Info");
 

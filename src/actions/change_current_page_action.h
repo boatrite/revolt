@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../components/current_page.h"
-#include "../renderers/renderer.h"
+#include "../rendering/renderer.h"
 
 #include <entt/entt.hpp>
 

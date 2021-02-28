@@ -1,4 +1,4 @@
-#include "opengl_helpers.h"
+#include "opengl_helper.h"
 
 #include <glad/glad.h>
 

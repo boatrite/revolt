@@ -1,5 +1,5 @@
-#include "../camera.h"
 #include "../util/imgui_helper.h"
+#include "camera.h"
 #include "renderer.h"
 
 #include <memory>

@@ -1,6 +1,6 @@
 # Revolt
 
-Successor to [mutiny](github.com/boatrite/mutiny).
+Successor to [mutiny](github.com/boatrite/mutiny), another learning project.
 
 Things I've done in this project:
 
@@ -14,3 +14,5 @@ Things I've done in this project:
 
 If mutiny was the renderer, this is the other bits. I suspect this will go the
 same, where I spike out a bunch, learn and figure things out.
+
+![Screenshot](./README/main_image.png)

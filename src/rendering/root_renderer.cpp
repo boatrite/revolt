@@ -4,12 +4,12 @@
 #include "../actions/recreate_chunks_action.h"
 #include "../actions/save_world_action.h"
 #include "../color.h"
-#include "../util/debug_drawing_manager.h"
-#include "../util/opengl_helpers.h"
+#include "../util/opengl_helper.h"
 #include "../util/print.h"
 #include "chunk_boundaries_renderer.h"
 #include "chunk_renderer.h"
 #include "coordinate_lines_renderer.h"
+#include "debug_drawing_manager.h"
 #include "overlay_renderer.h"
 
 #include <imgui.h>

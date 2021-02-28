@@ -1,7 +1,7 @@
 #pragma once
 
 #include "redux.hpp"
-#include "renderers/renderer.h"
+#include "rendering/renderer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

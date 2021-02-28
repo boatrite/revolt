@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../rendering/shader.h"
 #include "../util/glm_cereal.h"
-#include "../util/shader.h"
 #include "block.h"
 
 #include <glm/glm.hpp>

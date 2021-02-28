@@ -1,7 +1,7 @@
 #pragma once
 
-#include "renderers/main_menu_renderer.h"
-#include "renderers/root_renderer.h"
+#include "rendering/main_menu_renderer.h"
+#include "rendering/root_renderer.h"
 #include "ui_context.h"
 
 class App {

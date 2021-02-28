@@ -1,6 +1,6 @@
-#include "../camera.h"
-#include "../util/shader.h"
+#include "camera.h"
 #include "renderer.h"
+#include "shader.h"
 
 #include <imgui.h>
 

@@ -1,7 +1,7 @@
 #include "camera.h"
 
-#include "components/chunk.h"
-#include "util/opengl_helpers.h"
+#include "../components/chunk.h"
+#include "../util/opengl_helper.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

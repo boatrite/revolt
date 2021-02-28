@@ -4,7 +4,7 @@
 #include "../actions/change_current_page_action.h"
 #include "../actions/create_new_world_action.h"
 #include "../font_book.h"
-#include "../util/imgui_util.h"
+#include "../util/imgui_helper.h"
 #include "root_renderer.h"
 
 NewWorldPageRenderer::NewWorldPageRenderer(std::shared_ptr<UIContext> ui_context_ptr) :
@@ -12,7 +12,7 @@ NewWorldPageRenderer::NewWorldPageRenderer(std::shared_ptr<UIContext> ui_context
   std::cout << "NewWorldPageRenderer (" << this << ") created" << std::endl;
 
   // Create custom style for rendering window.
-  m_style = ImGuiUtil::CreateStyle([](ImGuiStyle& style) {
+  m_style = ImGuiHelper::CreateStyle([](ImGuiStyle& style) {
     style.WindowRounding = 0.0f;
     style.WindowBorderSize = 0.0f;
   });
@@ -26,7 +26,7 @@ void NewWorldPageRenderer::render(double dt) {
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  ImGuiUtil::PushStyle(m_style);
+  ImGuiHelper::PushStyle(m_style);
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   ImVec2 windowSize = ImGui::GetIO().DisplaySize;
   ImGui::SetNextWindowSize(windowSize);
@@ -49,5 +49,5 @@ void NewWorldPageRenderer::render(double dt) {
   }
   ImGui::PopFont();
   ImGui::End();
-  ImGuiUtil::PopStyle();
+  ImGuiHelper::PopStyle();
 }
